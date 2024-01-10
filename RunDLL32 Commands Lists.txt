@@ -1,0 +1,15 @@
+A Deep Dive Into RUNDLL32.EXE
+https://nasbench.medium.com/a-deep-dive-into-rundll32-exe-642344b41e90
+
+
+List of Rundll32 Commands in Windows 10
+https://www.tenforums.com/tutorials/77458-rundll32-commands-list-windows-10-a.html
+
+
+List of RunDLL32 Commands (A LITTLE OLD)
+http://chagdali.free.fr/dcs/RunDll.htm
+
+
+Opening Control Panel applets from Windows 10:
+https://www.lifewire.com/command-line-commands-for-control-panel-applets-2626060
+
