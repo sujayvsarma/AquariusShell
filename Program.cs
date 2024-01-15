@@ -12,14 +12,14 @@ namespace AquariusShell
         {
             ApplicationConfiguration.Initialize();
 
-            // Do we have at least one monitor?
-            if ((Screen.AllScreens.Length == 0) || (Screen.PrimaryScreen == null))
-            {
-                throw new ApplicationException("Cannot run this program on a system without a monitor!");
-            }
+            //// Do we have at least one monitor?
+            //if ((Screen.AllScreens.Length == 0) || (Screen.PrimaryScreen == null))
+            //{
+            //    throw new ApplicationException("Cannot run this program on a system without a monitor!");
+            //}
 
-            // As the bottom-most window, this is started first
-            Application.Run(new frmDesktopBackground());
+            //// As the bottom-most window, this is started first
+            //Application.Run(new frmDesktopBackground());
         }
     }
 }
