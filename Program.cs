@@ -1,4 +1,9 @@
+using System;
+using System.Windows.Forms;
+
 using AquariusShell.Forms;
+
+
 
 namespace AquariusShell
 {
@@ -19,7 +24,7 @@ namespace AquariusShell
             //}
 
             //// As the bottom-most window, this is started first
-            //Application.Run(new frmDesktopBackground());
+            Application.Run(new Form1());
         }
     }
 }

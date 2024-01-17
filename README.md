@@ -2,6 +2,10 @@
 
 Originally created in 1997 for the Windows 95 shell, it provided a 100% replacement for Windows' Explorer.exe that acts as a file browser but is also the "graphical shell" providing services like the desktop, taskbar, etc.
 
+## Concept: Workarea
+The Aquarius Shell does not use the concepts of "desktop" and "taskbar". Instead, it uses a "workarea" that modifies and adapts its look and feel, features offered, and behaviour according to what the user is currently doing. It **MAY** resemble the desktop/taskbar **AT TIMES**, but this is not what it is.
+
+
 ## Features
 We will attempt to recreating all of the features of the original:
 
