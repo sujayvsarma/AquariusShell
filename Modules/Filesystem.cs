@@ -1,13 +1,18 @@
-﻿using System.IO;
-using System.Runtime.InteropServices;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Text;
+
+using AquariusShell.Objects;
+using AquariusShell.Runtime;
 
 namespace AquariusShell.Modules
 {
     /// <summary>
     /// Operations on the file system (disks, folders, drives)
     /// </summary>
-    internal static class Filesystem
+    internal static partial class Filesystem
     {
 
         /// <summary>
@@ -25,134 +30,136 @@ namespace AquariusShell.Modules
         }
 
         /// <summary>
-        /// Checks if the given directory has at least ONE of the given attributes
+        /// Get a list of files in the recycle bin
         /// </summary>
-        /// <param name="directory">DirectoryInfo</param>
-        /// <param name="attributes">Attributes to check for</param>
-        /// <returns>True if atleast one was found</returns>
-        public static bool HasAnyOf(this DirectoryInfo directory, params FileAttributes[] attributes)
+        /// <returns>List of items, containing metadata about each item</returns>
+        public static List<RecyclebinItem> GetFilesInRecycleBin()
         {
-            foreach(FileAttributes attr in attributes )
+            List<RecyclebinItem> items = new();
+
+            // We are using Dynamic COM because working with ShellAPI for this is way too tedious!
+            Type shellAppType = Type.GetTypeFromProgID("Shell.Application")!;
+            dynamic? shell = Activator.CreateInstance(shellAppType)!;
+            if (shell != null)
             {
-                if (directory.Attributes.HasFlag(attr))
+                dynamic? recyclebinFolder = shell.Namespace(SHELL_NAMESPACE_RECYCLEBIN);
+                if (recyclebinFolder != null)
                 {
-                    return true;
+                    dynamic? recyclebinContents = recyclebinFolder.Items();
+                    if (recyclebinContents != null)
+                    {
+                        for (int i = 0; i < recyclebinContents.Count; i++)
+                        {
+                            dynamic? itemInFolder = recyclebinContents.Item(i);
+
+                            // "D:\src\$RECYCLE.BIN\Recycle Bin\helloworld.cs"
+                            string rbPath = recyclebinFolder.GetDetailsOf(itemInFolder, RecyclebinItemDetailColumnNames.FullyQualifiedRecyclebinPath);
+
+                            // "D:\src\$RECYCLE.BIN\Recycle Bin"
+                            string resolvedRbPath = recyclebinFolder.GetDetailsOf(itemInFolder, RecyclebinItemDetailColumnNames.RecyclebinFolder);
+
+                            // "D:\src\$RECYCLE.BIN\S-X-Y-JHSDKJASDKAHSD\helloworld.cs"
+                            string diskRbPath = Path.Combine(
+                                    Path.GetDirectoryName(resolvedRbPath)!,
+                                    ShellEnvironment.CurrentUserSID
+                                );
+
+                            diskRbPath = rbPath.Replace(resolvedRbPath, diskRbPath);
+
+                            //Debug.WriteLine("--------------------");
+                            //Debug.WriteLine($"File {i} : {recyclebinFolder.GetDetailsOf(itemInFolder, RecyclebinItemDetailColumnNames.FileName)}");
+                            //for (int j = 0; j < 256; j++)
+                            //{
+                            //    string? value = recyclebinFolder.GetDetailsOf(itemInFolder, j);
+                            //    Debug.WriteLine($"[{j}] = [{value}]");
+                            //}
+                            //Debug.WriteLine("--------------------");
+
+                            RecyclebinItem item = new(
+                                    recyclebinFolder.GetDetailsOf(itemInFolder, RecyclebinItemDetailColumnNames.FileName),
+                                    recyclebinFolder.GetDetailsOf(itemInFolder, RecyclebinItemDetailColumnNames.OriginalPath),
+                                    recyclebinFolder.GetDetailsOf(itemInFolder, RecyclebinItemDetailColumnNames.DeletedAt),
+                                    recyclebinFolder.GetDetailsOf(itemInFolder, RecyclebinItemDetailColumnNames.FileSize),
+                                    recyclebinFolder.GetDetailsOf(itemInFolder, RecyclebinItemDetailColumnNames.TypeOfObjectWithFileType),
+                                    diskRbPath
+                                );
+                            items.Add(item);
+                        }
+
+                        recyclebinContents = null;
+                    }
+
+                    recyclebinFolder = null;
                 }
+
+                shell = null;
             }
 
-            return false;
+            return items;
         }
 
         /// <summary>
-        /// Checks if the given file has at least ONE of the given attributes
+        /// Send a single file or directory to recycle bin
         /// </summary>
-        /// <param name="file">FileInfo</param>
-        /// <param name="attributes">Attributes to check for</param>
-        /// <returns>True if atleast one was found</returns>
-        public static bool HasAnyOf(this FileInfo file, params FileAttributes[] attributes)
+        /// <param name="fullyQualifiedPath">Fully qualified path to the file or directory to delete</param>
+        /// <returns>True if operation succeeded</returns>
+        public static bool SendItemToRecycleBin(string fullyQualifiedPath)
         {
-            foreach (FileAttributes attr in attributes)
+            SHFILEOPSTRUCT ops = new()
             {
-                if (file.Attributes.HasFlag(attr))
+                hWndOwnerWindow = IntPtr.Zero,
+                FunctionName = FileOperationFunctionNames.Delete,
+                Flags = FileOperationFlags.AllowUndo | FileOperationFlags.DontShowProgress | FileOperationFlags.DontShowErrors | FileOperationFlags.NoConfirmation,
+                SourceFileNames = fullyQualifiedPath + "\0\0",
+                DestinationFileNames = null
+            };
+
+            int result = SHFileOperation(ref ops);
+            return (result == 0);
+        }
+
+
+        /// <summary>
+        /// Send files to recycle bin
+        /// </summary>
+        /// <param name="fullyQualifiedPaths">Collection of files/directories to delete</param>
+        /// <returns>True if operation succeeded</returns>
+        public static bool SendFilesToRecycleBin(IEnumerable<string> fullyQualifiedPaths)
+        {
+            SHFILEOPSTRUCT ops = new()
+            {
+                hWndOwnerWindow = IntPtr.Zero,
+                FunctionName = FileOperationFunctionNames.Delete,
+                Flags = FileOperationFlags.AllowUndo | FileOperationFlags.DontShowProgress | FileOperationFlags.DontShowErrors | FileOperationFlags.NoConfirmation,
+                SourceFileNames = string.Join('\0', fullyQualifiedPaths) + "\0\0",
+                DestinationFileNames = null
+            };
+
+            int result = SHFileOperation(ref ops);
+            return (result == 0);
+        }
+
+
+        /// <summary>
+        /// Empties the recycle bin on all fixed drives
+        /// </summary>
+        public static void EmptyRecycleBin()
+        {
+            foreach (DriveInfo drive in DriveInfo.GetDrives())
+            {
+                if (drive.DriveType == DriveType.Fixed)
                 {
-                    return true;
+                    try
+                    {
+                        Shell32.ClearRecycleBin(drive.Name[0]);
+                    }
+                    catch
+                    {
+                        // eat and continue
+                    }
                 }
             }
-
-            return false;
         }
 
-        /// <summary>
-        /// Checks if the given directory has ALL of the given attributes
-        /// </summary>
-        /// <param name="directory">DirectoryInfo</param>
-        /// <param name="attributes">Attributes to check for</param>
-        /// <returns>False if at least one was NOT found</returns>
-        public static bool HasAllOf(this DirectoryInfo directory, params FileAttributes[] attributes)
-        {
-            foreach (FileAttributes attr in attributes)
-            {
-                if (!directory.Attributes.HasFlag(attr))
-                {
-                    return false;
-                }
-            }
-
-            return true;
-        }
-
-        /// <summary>
-        /// Checks if the given file has at least ONE of the given attributes
-        /// </summary>
-        /// <param name="file">FileInfo</param>
-        /// <param name="attributes">Attributes to check for</param>
-        /// <returns>False if at least one was NOT found</returns>
-        public static bool HasAllOf(this FileInfo file, params FileAttributes[] attributes)
-        {
-            foreach (FileAttributes attr in attributes)
-            {
-                if (!file.Attributes.HasFlag(attr))
-                {
-                    return false;
-                }
-            }
-
-            return true;
-        }
-
-
-
-        /// <summary>
-        /// Generates a name for a shortcut or link
-        /// </summary>
-        /// <param name="linkTargetPath">The file,program,url or other target to link to</param>
-        /// <param name="pathWhereShortcutWillBeStored">The full path to the folder where the new shortcut file will be stored</param>
-        /// <param name="proposedShortcutName">[Out] The generated shortcut name</param>
-        /// <param name="duplicateShortcut">[Out] True when this is a shortcut to a shortcut, generating a "copy" operation when it will be actually created.</param>
-        /// <param name="flags">One or more flags</param>
-        /// <returns></returns>
-        [DllImport("shell32.dll", CharSet = CharSet.Unicode, PreserveSig = true, SetLastError = true)]
-        extern static bool SHGetNewLinkInfo(string linkTargetPath, string pathWhereShortcutWillBeStored, out StringBuilder proposedShortcutName, out bool duplicateShortcut, uint flags);
-
-        /// <summary>
-        /// Flags for SHGetNewLinkInfo()
-        /// </summary>
-        public enum ShGetNewLinkInfoFlagsEnum : uint
-        {
-            /// <summary>
-            /// None of the flags
-            /// </summary>
-            None = 0,
-
-            /// <summary>
-            /// Target is a PIDL
-            /// </summary>
-            TargetIsPIDL = 1,
-            
-            /// <summary>
-            /// Do not check for uniqueness of name before generation
-            /// </summary>
-            SkipUniqueChecks = 2,
-
-            /// <summary>
-            /// Prefix shortcut name with "Shortcut to..."
-            /// </summary>
-            PrefixShortcutTo = 4,
-
-            /// <summary>
-            /// Do not add the ".lnk" filename extension
-            /// </summary>
-            DoNotAddLNKFileExtension = 8,
-
-            /// <summary>
-            /// Use non-localised names for the file name
-            /// </summary>
-            UseNonLocalisedNames = 10,
-
-            /// <summary>
-            /// Use the ".url" filename extension for web urls
-            /// </summary>
-            UseURLFileExtension = 20
-        }
     }
 }
