@@ -37,7 +37,7 @@ namespace AquariusShell.Runtime
                     }
                 }
 
-                return _currentUserSid;
+                return _currentUserSid ?? throw new ApplicationException("Critical error: Could not detect current user's account information!");
             }
         }
         private static string? _currentUserSid = null;

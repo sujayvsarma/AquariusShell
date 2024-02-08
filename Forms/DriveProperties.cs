@@ -119,7 +119,7 @@ namespace AquariusShell.Forms
                         "Aquarius Shell", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
                 {
                     Shell32.ExecuteProgram(
-                            Path.Combine(System32, "cmd.exe"), Shell32.ShellExecuteVerbsEnum.RunAs, false, 
+                            Path.Combine(System32, "cmd.exe"), Shell32.ShellExecuteVerbsEnum.RunAs, false,
                                 $"/c {Path.Combine(System32, "fsutil.exe")} dirty set c: && {Path.Combine(System32, "chkntfs.exe")} c: /c"
                         );
                 }
@@ -135,7 +135,7 @@ namespace AquariusShell.Forms
         /// </summary>
         private void btnInvokeDefrag_Click(object sender, EventArgs e)
         {
-            Shell32.ExecuteProgram(Path.Combine(System32, "cmd.exe"), Shell32.ShellExecuteVerbsEnum.RunAs, false, "/k", Path.Combine(System32, "defrag.exe"),  $"{DriveLetter}:", "/F");
+            Shell32.ExecuteProgram(Path.Combine(System32, "cmd.exe"), Shell32.ShellExecuteVerbsEnum.RunAs, false, "/k", Path.Combine(System32, "defrag.exe"), $"{DriveLetter}:", "/F");
             _drive = new(_drive.Name);
             DisplayDiskInfo();
             OnDriveAffected();
@@ -229,6 +229,19 @@ namespace AquariusShell.Forms
                     "/name", "Microsoft.BitLockerDriveEncryption", "/page", $"?InitialVolume=={DriveLetter}:"
                 );
             this.Close();
+        }
+
+        /// <summary>
+        /// Invoke form to manage security
+        /// </summary>
+        private void btnInvokeManageSecurity_Click(object sender, EventArgs e)
+        {
+            // we want the root directory of the drive:
+            IShellAppModule? aclBrowser = ShellEnvironment.ShellApps.GetInstanceOf($"{IShellAppModule.CommandSignifierPrefix}aclbrowser");
+            aclBrowser?.Execute(aclBrowser.Command, this, _drive.RootDirectory.FullName);
+
+            //ManageSecurityLists secModifyForm = new(_drive.RootDirectory);
+            //secModifyForm.Show(this);
         }
 
         /// <summary>

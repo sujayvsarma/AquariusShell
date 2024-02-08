@@ -4,6 +4,7 @@ using System.Collections.Specialized;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Media;
 using System.Windows.Forms;
 
 using AquariusShell.Modules;
@@ -243,11 +244,19 @@ namespace AquariusShell.ShellApps
             {
                 DirectoryInfo di = new(directoryPath);
 
-                // Do we need to hide Hidden/System or empty folders?
-                if ((di.Attributes.HasFlag(FileAttributes.Hidden) && (!_displayFlags.HasFlag(FileBrowserItemDisplayFlags.ShowHiddenItems))) 
-                    || (di.Attributes.HasFlag(FileAttributes.System) && (!_displayFlags.HasFlag(FileBrowserItemDisplayFlags.ShowSystemItems)))
-                    || ((!Directory.EnumerateFileSystemEntries(directoryPath).Any()) && _displayFlags.HasFlag(FileBrowserItemDisplayFlags.HideEmptyFolders)))
+                try
                 {
+                    // Do we need to hide Hidden/System or empty folders?
+                    if ((di.Attributes.HasFlag(FileAttributes.Hidden) && (!_displayFlags.HasFlag(FileBrowserItemDisplayFlags.ShowHiddenItems)))
+                        || (di.Attributes.HasFlag(FileAttributes.System) && (!_displayFlags.HasFlag(FileBrowserItemDisplayFlags.ShowSystemItems)))
+                        || ((!Directory.EnumerateFileSystemEntries(directoryPath).Any()) && _displayFlags.HasFlag(FileBrowserItemDisplayFlags.HideEmptyFolders)))
+                    {
+                        continue;
+                    }
+                }
+                catch
+                {
+                    // sometimes we get an access denied
                     continue;
                 }
 
@@ -267,11 +276,19 @@ namespace AquariusShell.ShellApps
             {
                 FileInfo fi = new(filePath);
 
-                // Do we need to hide Hidden/System or empty files?
-                if ((fi.Attributes.HasFlag(FileAttributes.Hidden) && (!_displayFlags.HasFlag(FileBrowserItemDisplayFlags.ShowHiddenItems)))
-                    || (fi.Attributes.HasFlag(FileAttributes.System) && (!_displayFlags.HasFlag(FileBrowserItemDisplayFlags.ShowSystemItems)))
-                    || ((fi.Length == 0) && _displayFlags.HasFlag(FileBrowserItemDisplayFlags.HideZeroByteFiles)))
+                try
                 {
+                    // Do we need to hide Hidden/System or empty files?
+                    if ((fi.Attributes.HasFlag(FileAttributes.Hidden) && (!_displayFlags.HasFlag(FileBrowserItemDisplayFlags.ShowHiddenItems)))
+                        || (fi.Attributes.HasFlag(FileAttributes.System) && (!_displayFlags.HasFlag(FileBrowserItemDisplayFlags.ShowSystemItems)))
+                        || ((fi.Length == 0) && _displayFlags.HasFlag(FileBrowserItemDisplayFlags.HideZeroByteFiles)))
+                    {
+                        continue;
+                    }
+                }
+                catch
+                {
+                    // sometimes we can hit an access denied
                     continue;
                 }
 
@@ -602,6 +619,39 @@ namespace AquariusShell.ShellApps
             }
             Clipboard.SetFileDropList(fileNamesList);
             _clipboardCurrentAction = action;
+        }
+
+        /// <summary>
+        /// Handle certain special key combinations
+        /// </summary>
+        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+        {
+            // backspace
+            if (keyData.HasFlag(Keys.Back))
+            {
+                // go up to the parent level. If we are at My PC, beep!
+                string? jump = null;
+                foreach(ListViewItem lv in lvFileSystemView.Items)
+                {
+                    if (lv.Text == "(..)")
+                    {
+                        jump = GetPathFromListViewItem(lv);
+                        break;
+                    }
+                }
+
+                // dont look for string.Empty as My PC == Empty string!!!
+                if (jump != null)
+                {
+                    LoadCurrentDirectoryView(jump);
+                    return true;
+                }
+
+                SystemSounds.Exclamation.Play();
+                return true;
+            }
+
+            return base.ProcessCmdKey(ref msg, keyData);
         }
 
     }

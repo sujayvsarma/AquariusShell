@@ -132,13 +132,15 @@ namespace AquariusShell.Forms
                     }
                 }
 
-                btnUnblockFile.Tag = zInfo.ToString();
-                btnUnblockFile.Visible = true;
+                btnUnblockFileOrManageAcl.Tag = zInfo.ToString();
+                btnUnblockFileOrManageAcl.Text = "&Unblock";
             }
             else
             {
                 _unsafeFileStreamFile = null;
-                btnUnblockFile.Visible = false;
+
+                btnUnblockFileOrManageAcl.Tag = null;
+                btnUnblockFileOrManageAcl.Text = "&Security...";
             }
 
             foreach (KeyValuePair<string, string> meta in GetFileMetadata())
@@ -375,7 +377,7 @@ namespace AquariusShell.Forms
                 FileOperationWithProgress fo = new(_fileInfo.FullName, destination);
                 fo.Show(this);
                 fo.MoveSingleFileOrDirectoryContents();
-                
+
 
                 // no longer relevant
                 this.Close();
@@ -402,22 +404,39 @@ namespace AquariusShell.Forms
         }
 
         /// <summary>
-        /// Unblock the file / mark the file as "safe" by removing its alternate stream.
+        /// Unblock the file / mark the file as "safe" by removing its alternate stream. 
+        /// OR for unblocked files, manage it's security ACLs
         /// </summary>
-        private void btnUnblockFile_Click(object sender, EventArgs e)
+        private void btnUnblockFileOrManageAcl_Click(object sender, EventArgs e)
         {
-            string origin = (string)btnUnblockFile.Tag!;
-            if (MessageBox.Show(
-                    $"This file is set as 'unsafe' by Windows as it originated {origin}." + Environment.NewLine + Environment.NewLine +
-                    $"Unblocking this file may result in any viruses/worms/trojans in this file to be executed which may cause harm to your data and computer." + Environment.NewLine + Environment.NewLine +
-                    $"Do you wish to unblock this file?",
-                    "Aquarius Shell",
-                    MessageBoxButtons.YesNo,
-                    MessageBoxIcon.Question
-                ) == DialogResult.Yes)
+            string? origin = (string?)btnUnblockFileOrManageAcl.Tag!;
+            if (origin != null)
             {
-                File.Delete(_unsafeFileStreamFile!);
-                btnUnblockFile.Visible = false;
+                // UNBLOCK MODE!
+
+                if (MessageBox.Show(
+                        $"This file is set as 'unsafe' by Windows as it originated {origin}." + Environment.NewLine + Environment.NewLine +
+                        $"Unblocking this file may result in any viruses/worms/trojans in this file to be executed which may cause harm to your data and computer." + Environment.NewLine + Environment.NewLine +
+                        $"Do you wish to unblock this file?",
+                        "Aquarius Shell",
+                        MessageBoxButtons.YesNo,
+                        MessageBoxIcon.Question
+                    ) == DialogResult.Yes)
+                {
+                    File.Delete(_unsafeFileStreamFile!);
+
+                    btnUnblockFileOrManageAcl.Tag = null;
+                    btnUnblockFileOrManageAcl.Text = "&Security...";
+                }
+            }
+            else
+            {
+                // SECURITY MODE!
+                IShellAppModule? aclBrowser = ShellEnvironment.ShellApps.GetInstanceOf($"{IShellAppModule.CommandSignifierPrefix}aclbrowser");
+                aclBrowser?.Execute(aclBrowser.Command, this, _fileInfo.FullName);
+
+                //ManageSecurityLists secModifyForm = new(_fileInfo);
+                //secModifyForm.Show(this);
             }
         }
 

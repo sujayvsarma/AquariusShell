@@ -118,7 +118,8 @@ namespace AquariusShell.Runtime
                             Icon: (Image)t.GetProperty("LauncherOrTaskManagerIcon")!.GetValue(instance)!,
                             Command: (string)t.GetProperty("Command")!.GetValue(instance)!,
                             InstancingMode: (ShellAppInstancingModeEnum)t.GetProperty("InstancingMode")!.GetValue(instance)!,
-                            ImageListKeyName: string.Empty
+                            ImageListKeyName: string.Empty,
+                            HideFromLauncher: (bool)t.GetProperty("HideFromLauncher")!.GetValue(instance)!
                         ));
                 }
                 instance = null;

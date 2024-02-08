@@ -51,16 +51,19 @@ namespace AquariusShell.Forms
             // Add Shell Apps
             foreach (AppIconOrShortcut shellApp in ShellEnvironment.ShellApps)
             {
-                string imageKey = itemKey.ToString();
-                lvAppsListIcons32.Images.Add(imageKey, shellApp.Icon!);
-                ListViewItem item = new()
+                if (!shellApp.HideFromLauncher)
                 {
-                    Text = shellApp.AppName,
-                    ImageKey = imageKey,
-                    Tag = shellApp.Command
-                };
-                lvShellApps.Items.Add(item);
-                itemKey++;
+                    string imageKey = itemKey.ToString();
+                    lvAppsListIcons32.Images.Add(imageKey, shellApp.Icon!);
+                    ListViewItem item = new()
+                    {
+                        Text = shellApp.AppName,
+                        ImageKey = imageKey,
+                        Tag = shellApp.Command
+                    };
+                    lvShellApps.Items.Add(item);
+                    itemKey++;
+                }
             }
 
             // Add Windows Apps
@@ -157,7 +160,7 @@ namespace AquariusShell.Forms
             IShellAppModule? app = ShellEnvironment.ShellApps.GetInstanceOf(shellAppCommand);
             if (app != null)
             {
-                app.Execute(shellAppCommand);
+                app.Execute(shellAppCommand, ShellEnvironment.WorkArea);
             }
         }
 

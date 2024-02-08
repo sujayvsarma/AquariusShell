@@ -1,4 +1,6 @@
-﻿using System.Drawing;
+﻿using System;
+using System.Drawing;
+using System.Windows.Forms;
 
 using AquariusShell.Controls;
 
@@ -31,6 +33,12 @@ namespace AquariusShell
         public ShellAppInstancingModeEnum InstancingMode { get; }
 
         /// <summary>
+        /// When set, this app is not shown on the Launcher UI
+        /// </summary>
+        public bool HideFromLauncher { get; }
+
+
+        /// <summary>
         /// Evaluate the provided command and respond if this module can handle it.
         /// </summary>
         /// <param name="command">Command string to evaluate.</param>
@@ -42,8 +50,9 @@ namespace AquariusShell
         /// Execute the module
         /// </summary>
         /// <param name="command">Command string</param>
+        /// <param name="parentWindowHandle">Parent window. If NULL, sets to Workarea</param>
         /// <param name="parameters">Any parameters for this command (context)</param>
-        public void Execute(string command, params string[] parameters);
+        public void Execute(string command, IWin32Window? parentWindowHandle, params string[] parameters);
 
 
         /// <summary>

@@ -269,6 +269,18 @@ namespace AquariusShell.Forms
             }
         }
 
+        /// <summary>
+        /// User clicked the "Manage security..." button. Show the ACL edit UI
+        /// </summary>
+        private void btnManageSecurity_Click(object sender, EventArgs e)
+        {
+            IShellAppModule? aclBrowser = ShellEnvironment.ShellApps.GetInstanceOf($"{IShellAppModule.CommandSignifierPrefix}aclbrowser");
+            aclBrowser?.Execute(aclBrowser.Command, this, _dirInfo.FullName);
+
+            //ManageSecurityLists secModifyForm = new(_dirInfo);
+            //secModifyForm.Show(this);
+        }
+
         #endregion
 
         /// <summary>
@@ -288,6 +300,5 @@ namespace AquariusShell.Forms
         private bool _disableEvents = false;
         private DirectoryInfo _dirInfo = default!;
         private Dictionary<string, CheckBox> _attributeCheckboxes;
-
     }
 }

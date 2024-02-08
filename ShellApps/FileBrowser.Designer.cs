@@ -72,6 +72,7 @@
             propertiesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             btnJumpGo = new System.Windows.Forms.Button();
             tbJumpAddress = new System.Windows.Forms.TextBox();
+            label1 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)fsWatcher).BeginInit();
             explorerToolbar.SuspendLayout();
             cmsContextMenu.SuspendLayout();
@@ -103,8 +104,8 @@
             tssbMyComputer.Image = Properties.Resources.computer;
             tssbMyComputer.ImageTransparentColor = System.Drawing.Color.Magenta;
             tssbMyComputer.Name = "tssbMyComputer";
-            tssbMyComputer.Size = new System.Drawing.Size(77, 35);
-            tssbMyComputer.Text = "Computer";
+            tssbMyComputer.Size = new System.Drawing.Size(58, 35);
+            tssbMyComputer.Text = "My PC";
             tssbMyComputer.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
             tssbMyComputer.ButtonClick += ToolstripButton_MyComputer_ClickEvent;
             // 
@@ -213,28 +214,28 @@
             toolStripDropDownButton1.Image = Properties.Resources.show;
             toolStripDropDownButton1.ImageTransparentColor = System.Drawing.Color.Magenta;
             toolStripDropDownButton1.Name = "toolStripDropDownButton1";
-            toolStripDropDownButton1.Size = new System.Drawing.Size(79, 35);
-            toolStripDropDownButton1.Text = "&View Mode";
+            toolStripDropDownButton1.Size = new System.Drawing.Size(45, 35);
+            toolStripDropDownButton1.Text = "&View";
             toolStripDropDownButton1.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
             // 
             // largeIconsToolStripMenuItem
             // 
             largeIconsToolStripMenuItem.Name = "largeIconsToolStripMenuItem";
-            largeIconsToolStripMenuItem.Size = new System.Drawing.Size(134, 22);
+            largeIconsToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             largeIconsToolStripMenuItem.Text = "&Large icons";
             largeIconsToolStripMenuItem.Click += largeIconsToolStripMenuItem_Click;
             // 
             // smallIconsToolStripMenuItem
             // 
             smallIconsToolStripMenuItem.Name = "smallIconsToolStripMenuItem";
-            smallIconsToolStripMenuItem.Size = new System.Drawing.Size(134, 22);
+            smallIconsToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             smallIconsToolStripMenuItem.Text = "&Small icons";
             smallIconsToolStripMenuItem.Click += smallIconsToolStripMenuItem_Click;
             // 
             // detailsToolStripMenuItem
             // 
             detailsToolStripMenuItem.Name = "detailsToolStripMenuItem";
-            detailsToolStripMenuItem.Size = new System.Drawing.Size(134, 22);
+            detailsToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             detailsToolStripMenuItem.Text = "&Details";
             detailsToolStripMenuItem.Click += detailsToolStripMenuItem_Click;
             // 
@@ -269,14 +270,15 @@
             lvFileSystemView.Activation = System.Windows.Forms.ItemActivation.TwoClick;
             lvFileSystemView.AllowDrop = true;
             lvFileSystemView.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
+            lvFileSystemView.BorderStyle = System.Windows.Forms.BorderStyle.None;
             lvFileSystemView.Font = new System.Drawing.Font("Segoe UI", 8F);
             lvFileSystemView.FullRowSelect = true;
             lvFileSystemView.LabelEdit = true;
             lvFileSystemView.LargeImageList = viewImagesLarge;
-            lvFileSystemView.Location = new System.Drawing.Point(0, 72);
+            lvFileSystemView.Location = new System.Drawing.Point(3, 69);
             lvFileSystemView.Name = "lvFileSystemView";
             lvFileSystemView.ShowItemToolTips = true;
-            lvFileSystemView.Size = new System.Drawing.Size(957, 454);
+            lvFileSystemView.Size = new System.Drawing.Size(952, 453);
             lvFileSystemView.SmallImageList = viewImagesSmall;
             lvFileSystemView.TabIndex = 2;
             lvFileSystemView.UseCompatibleStateImageBehavior = false;
@@ -376,26 +378,36 @@
             btnJumpGo.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
             btnJumpGo.BackgroundImage = Properties.Resources.openNew;
             btnJumpGo.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
-            btnJumpGo.Location = new System.Drawing.Point(918, 42);
+            btnJumpGo.Location = new System.Drawing.Point(924, 41);
             btnJumpGo.Name = "btnJumpGo";
-            btnJumpGo.Size = new System.Drawing.Size(34, 27);
+            btnJumpGo.Size = new System.Drawing.Size(27, 27);
             btnJumpGo.TabIndex = 5;
             btnJumpGo.UseVisualStyleBackColor = true;
             btnJumpGo.Click += JumpAddressGoButton_ClickEvent;
             // 
             // tbJumpAddress
             // 
-            tbJumpAddress.Location = new System.Drawing.Point(0, 44);
+            tbJumpAddress.Location = new System.Drawing.Point(57, 44);
             tbJumpAddress.Name = "tbJumpAddress";
-            tbJumpAddress.Size = new System.Drawing.Size(912, 23);
+            tbJumpAddress.Size = new System.Drawing.Size(861, 23);
             tbJumpAddress.TabIndex = 6;
             tbJumpAddress.WordWrap = false;
             tbJumpAddress.KeyUp += JumpAddressTextbox_EnterKeyPressedEvent;
+            // 
+            // label1
+            // 
+            label1.AutoSize = true;
+            label1.Location = new System.Drawing.Point(12, 47);
+            label1.Name = "label1";
+            label1.Size = new System.Drawing.Size(39, 15);
+            label1.TabIndex = 7;
+            label1.Text = "Go to:";
             // 
             // FileBrowser
             // 
             AutoScroll = true;
             ClientSize = new System.Drawing.Size(957, 526);
+            Controls.Add(label1);
             Controls.Add(tbJumpAddress);
             Controls.Add(btnJumpGo);
             Controls.Add(lvFileSystemView);
@@ -458,5 +470,6 @@
         private System.Windows.Forms.ToolStripMenuItem detailsToolStripMenuItem;
         private System.Windows.Forms.ToolStripButton tsbRecyclebinRestore;
         private System.Windows.Forms.ToolStripMenuItem restoreToolStripMenuItem;
+        private System.Windows.Forms.Label label1;
     }
 }

@@ -54,6 +54,7 @@
             columnHeader1 = new System.Windows.Forms.ColumnHeader();
             columnHeader2 = new System.Windows.Forms.ColumnHeader();
             fbdDestinationPicker = new System.Windows.Forms.FolderBrowserDialog();
+            btnManageSecurity = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)pbFileTypeIcon).BeginInit();
             tabControl1.SuspendLayout();
             tpGeneral.SuspendLayout();
@@ -101,6 +102,7 @@
             // 
             // tpGeneral
             // 
+            tpGeneral.Controls.Add(btnManageSecurity);
             tpGeneral.Controls.Add(btnCopyDirectory);
             tpGeneral.Controls.Add(btnMoveDirectory);
             tpGeneral.Controls.Add(btnDeleteDirectory);
@@ -353,6 +355,16 @@
             fbdDestinationPicker.OkRequiresInteraction = true;
             fbdDestinationPicker.RootFolder = System.Environment.SpecialFolder.MyComputer;
             // 
+            // btnManageSecurity
+            // 
+            btnManageSecurity.Location = new System.Drawing.Point(311, 352);
+            btnManageSecurity.Name = "btnManageSecurity";
+            btnManageSecurity.Size = new System.Drawing.Size(86, 30);
+            btnManageSecurity.TabIndex = 15;
+            btnManageSecurity.Text = "&Security...";
+            btnManageSecurity.UseVisualStyleBackColor = true;
+            btnManageSecurity.Click += btnManageSecurity_Click;
+            // 
             // DirectoryEntryProperties
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -407,5 +419,6 @@
         private System.Windows.Forms.Label lblTypeName;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.FolderBrowserDialog fbdDestinationPicker;
+        private System.Windows.Forms.Button btnManageSecurity;
     }
 }

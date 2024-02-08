@@ -13,6 +13,7 @@ namespace AquariusShell.Runtime
     /// <param name="Command">Command to invoke the app</param>
     /// <param name="InstancingMode">Type of instancing</param>
     /// <param name="ImageListKeyName">(Optional) Name of the key in an accompanying ImageList</param>
+    /// <param name="HideFromLauncher">When set, hides app from launcher</param>
     public record AppIconOrShortcut
         (
             string TypeName,
@@ -21,6 +22,7 @@ namespace AquariusShell.Runtime
             Image? Icon,
             string Command,
             ShellAppInstancingModeEnum InstancingMode,
-            string ImageListKeyName = ""
+            string ImageListKeyName = "",
+            bool HideFromLauncher = false
         );
 }

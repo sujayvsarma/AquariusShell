@@ -45,14 +45,15 @@
             lblAvailableSpace = new System.Windows.Forms.Label();
             lblDriveLabel = new System.Windows.Forms.Label();
             groupBox1 = new System.Windows.Forms.GroupBox();
-            btnInvokeFormatDisk = new System.Windows.Forms.Button();
-            btnInvokeCheckdisk = new System.Windows.Forms.Button();
-            btnInvokeDefrag = new System.Windows.Forms.Button();
             btnInvokeRenameVolume = new System.Windows.Forms.Button();
+            btnInvokeDefrag = new System.Windows.Forms.Button();
+            btnInvokeCheckdisk = new System.Windows.Forms.Button();
+            btnInvokeTakeOffline = new System.Windows.Forms.Button();
             btnInvokeManageBitlocker = new System.Windows.Forms.Button();
+            btnInvokeFormatDisk = new System.Windows.Forms.Button();
             prgDriveSpaceUsage = new System.Windows.Forms.ProgressBar();
             label4 = new System.Windows.Forms.Label();
-            btnInvokeTakeOffline = new System.Windows.Forms.Button();
+            btnManageSecurity = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)pbDriveTypeIcon).BeginInit();
             basicInfoLayoutTable.SuspendLayout();
             groupBox1.SuspendLayout();
@@ -261,6 +262,7 @@
             groupBox1.Controls.Add(btnInvokeDefrag);
             groupBox1.Controls.Add(btnInvokeCheckdisk);
             groupBox1.Controls.Add(btnInvokeTakeOffline);
+            groupBox1.Controls.Add(btnManageSecurity);
             groupBox1.Controls.Add(btnInvokeManageBitlocker);
             groupBox1.Controls.Add(btnInvokeFormatDisk);
             groupBox1.Location = new System.Drawing.Point(7, 277);
@@ -269,36 +271,6 @@
             groupBox1.TabIndex = 16;
             groupBox1.TabStop = false;
             groupBox1.Text = "Tools";
-            // 
-            // btnInvokeFormatDisk
-            // 
-            btnInvokeFormatDisk.Location = new System.Drawing.Point(159, 59);
-            btnInvokeFormatDisk.Name = "btnInvokeFormatDisk";
-            btnInvokeFormatDisk.Size = new System.Drawing.Size(75, 23);
-            btnInvokeFormatDisk.TabIndex = 0;
-            btnInvokeFormatDisk.Text = "F&ormat";
-            btnInvokeFormatDisk.UseVisualStyleBackColor = true;
-            btnInvokeFormatDisk.Click += btnInvokeFormatDisk_Click;
-            // 
-            // btnInvokeCheckdisk
-            // 
-            btnInvokeCheckdisk.Location = new System.Drawing.Point(78, 30);
-            btnInvokeCheckdisk.Name = "btnInvokeCheckdisk";
-            btnInvokeCheckdisk.Size = new System.Drawing.Size(75, 23);
-            btnInvokeCheckdisk.TabIndex = 0;
-            btnInvokeCheckdisk.Text = "C&heck disk";
-            btnInvokeCheckdisk.UseVisualStyleBackColor = true;
-            btnInvokeCheckdisk.Click += btnInvokeCheckdisk_Click;
-            // 
-            // btnInvokeDefrag
-            // 
-            btnInvokeDefrag.Location = new System.Drawing.Point(159, 30);
-            btnInvokeDefrag.Name = "btnInvokeDefrag";
-            btnInvokeDefrag.Size = new System.Drawing.Size(75, 23);
-            btnInvokeDefrag.TabIndex = 0;
-            btnInvokeDefrag.Text = "D&efrag";
-            btnInvokeDefrag.UseVisualStyleBackColor = true;
-            btnInvokeDefrag.Click += btnInvokeDefrag_Click;
             // 
             // btnInvokeRenameVolume
             // 
@@ -310,9 +282,39 @@
             btnInvokeRenameVolume.UseVisualStyleBackColor = true;
             btnInvokeRenameVolume.Click += btnInvokeRenameVolume_Click;
             // 
+            // btnInvokeDefrag
+            // 
+            btnInvokeDefrag.Location = new System.Drawing.Point(159, 30);
+            btnInvokeDefrag.Name = "btnInvokeDefrag";
+            btnInvokeDefrag.Size = new System.Drawing.Size(75, 23);
+            btnInvokeDefrag.TabIndex = 0;
+            btnInvokeDefrag.Text = "D&efrag";
+            btnInvokeDefrag.UseVisualStyleBackColor = true;
+            btnInvokeDefrag.Click += btnInvokeDefrag_Click;
+            // 
+            // btnInvokeCheckdisk
+            // 
+            btnInvokeCheckdisk.Location = new System.Drawing.Point(78, 30);
+            btnInvokeCheckdisk.Name = "btnInvokeCheckdisk";
+            btnInvokeCheckdisk.Size = new System.Drawing.Size(75, 23);
+            btnInvokeCheckdisk.TabIndex = 0;
+            btnInvokeCheckdisk.Text = "C&heck disk";
+            btnInvokeCheckdisk.UseVisualStyleBackColor = true;
+            btnInvokeCheckdisk.Click += btnInvokeCheckdisk_Click;
+            // 
+            // btnInvokeTakeOffline
+            // 
+            btnInvokeTakeOffline.Location = new System.Drawing.Point(33, 59);
+            btnInvokeTakeOffline.Name = "btnInvokeTakeOffline";
+            btnInvokeTakeOffline.Size = new System.Drawing.Size(75, 23);
+            btnInvokeTakeOffline.TabIndex = 0;
+            btnInvokeTakeOffline.Text = "O&ffline";
+            btnInvokeTakeOffline.UseVisualStyleBackColor = true;
+            btnInvokeTakeOffline.Click += btnInvokeTakeOffline_Click;
+            // 
             // btnInvokeManageBitlocker
             // 
-            btnInvokeManageBitlocker.Location = new System.Drawing.Point(240, 59);
+            btnInvokeManageBitlocker.Location = new System.Drawing.Point(195, 59);
             btnInvokeManageBitlocker.Name = "btnInvokeManageBitlocker";
             btnInvokeManageBitlocker.Size = new System.Drawing.Size(75, 23);
             btnInvokeManageBitlocker.TabIndex = 0;
@@ -320,10 +322,20 @@
             btnInvokeManageBitlocker.UseVisualStyleBackColor = true;
             btnInvokeManageBitlocker.Click += btnInvokeManageBitlocker_Click;
             // 
-            // pbSpaceUsage
+            // btnInvokeFormatDisk
+            // 
+            btnInvokeFormatDisk.Location = new System.Drawing.Point(114, 59);
+            btnInvokeFormatDisk.Name = "btnInvokeFormatDisk";
+            btnInvokeFormatDisk.Size = new System.Drawing.Size(75, 23);
+            btnInvokeFormatDisk.TabIndex = 0;
+            btnInvokeFormatDisk.Text = "F&ormat";
+            btnInvokeFormatDisk.UseVisualStyleBackColor = true;
+            btnInvokeFormatDisk.Click += btnInvokeFormatDisk_Click;
+            // 
+            // prgDriveSpaceUsage
             // 
             prgDriveSpaceUsage.Location = new System.Drawing.Point(7, 237);
-            prgDriveSpaceUsage.Name = "pbSpaceUsage";
+            prgDriveSpaceUsage.Name = "prgDriveSpaceUsage";
             prgDriveSpaceUsage.Size = new System.Drawing.Size(405, 25);
             prgDriveSpaceUsage.Style = System.Windows.Forms.ProgressBarStyle.Continuous;
             prgDriveSpaceUsage.TabIndex = 17;
@@ -339,15 +351,15 @@
             label4.Text = "Drive space usage";
             label4.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
-            // btnInvokeTakeOffline
+            // btnManageSecurity
             // 
-            btnInvokeTakeOffline.Location = new System.Drawing.Point(78, 59);
-            btnInvokeTakeOffline.Name = "btnInvokeTakeOffline";
-            btnInvokeTakeOffline.Size = new System.Drawing.Size(75, 23);
-            btnInvokeTakeOffline.TabIndex = 0;
-            btnInvokeTakeOffline.Text = "O&ffline";
-            btnInvokeTakeOffline.UseVisualStyleBackColor = true;
-            btnInvokeTakeOffline.Click += btnInvokeTakeOffline_Click;
+            btnManageSecurity.Location = new System.Drawing.Point(276, 59);
+            btnManageSecurity.Name = "btnManageSecurity";
+            btnManageSecurity.Size = new System.Drawing.Size(75, 23);
+            btnManageSecurity.TabIndex = 0;
+            btnManageSecurity.Text = "&Security...";
+            btnManageSecurity.UseVisualStyleBackColor = true;
+            btnManageSecurity.Click += btnInvokeManageSecurity_Click;
             // 
             // DriveProperties
             // 
@@ -402,5 +414,6 @@
         private System.Windows.Forms.ProgressBar prgDriveSpaceUsage;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Button btnInvokeTakeOffline;
+        private System.Windows.Forms.Button btnManageSecurity;
     }
 }

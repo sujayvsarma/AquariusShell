@@ -34,7 +34,7 @@
             sfdFileCopyMoveDestinationPicker = new System.Windows.Forms.SaveFileDialog();
             tabControl1 = new System.Windows.Forms.TabControl();
             tpGeneral = new System.Windows.Forms.TabPage();
-            btnUnblockFile = new System.Windows.Forms.Button();
+            btnUnblockFileOrManageAcl = new System.Windows.Forms.Button();
             btnCopyFile = new System.Windows.Forms.Button();
             btnMoveFile = new System.Windows.Forms.Button();
             btnDeleteFile = new System.Windows.Forms.Button();
@@ -113,7 +113,7 @@
             // 
             // tpGeneral
             // 
-            tpGeneral.Controls.Add(btnUnblockFile);
+            tpGeneral.Controls.Add(btnUnblockFileOrManageAcl);
             tpGeneral.Controls.Add(btnCopyFile);
             tpGeneral.Controls.Add(btnMoveFile);
             tpGeneral.Controls.Add(btnDeleteFile);
@@ -127,14 +127,15 @@
             tpGeneral.Text = "General";
             tpGeneral.UseVisualStyleBackColor = true;
             // 
-            // btnUnblockFile
+            // btnUnblockFileOrManageAcl
             // 
-            btnUnblockFile.Location = new System.Drawing.Point(322, 353);
-            btnUnblockFile.Name = "btnUnblockFile";
-            btnUnblockFile.Size = new System.Drawing.Size(75, 30);
-            btnUnblockFile.TabIndex = 14;
-            btnUnblockFile.Text = "&Unblock";
-            btnUnblockFile.UseVisualStyleBackColor = true;
+            btnUnblockFileOrManageAcl.Location = new System.Drawing.Point(312, 352);
+            btnUnblockFileOrManageAcl.Name = "btnUnblockFileOrManageAcl";
+            btnUnblockFileOrManageAcl.Size = new System.Drawing.Size(86, 30);
+            btnUnblockFileOrManageAcl.TabIndex = 14;
+            btnUnblockFileOrManageAcl.Text = "&Unblock";
+            btnUnblockFileOrManageAcl.UseVisualStyleBackColor = true;
+            btnUnblockFileOrManageAcl.Click += btnUnblockFileOrManageAcl_Click;
             // 
             // btnCopyFile
             // 
@@ -441,7 +442,7 @@
         private System.Windows.Forms.Label lblLastModified;
         private System.Windows.Forms.Label lblLastAccessed;
         private System.Windows.Forms.TabPage tpMetadata;
-        private System.Windows.Forms.Button btnUnblockFile;
+        private System.Windows.Forms.Button btnUnblockFileOrManageAcl;
         private System.Windows.Forms.Button btnCopyFile;
         private System.Windows.Forms.Button btnMoveFile;
         private System.Windows.Forms.Button btnDeleteFile;

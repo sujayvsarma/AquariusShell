@@ -53,6 +53,11 @@ namespace AquariusShell.ShellApps
         /// </summary>
         public ShellAppInstancingModeEnum InstancingMode => ShellAppInstancingModeEnum.Single;
 
+        /// <summary>
+        /// When set, this app is not shown on the Launcher UI
+        /// </summary>
+        public bool HideFromLauncher => false;
+
         #endregion
 
         #region Methods
@@ -69,14 +74,16 @@ namespace AquariusShell.ShellApps
         /// <summary>
         /// Execute the module
         /// </summary>
+
         /// <param name="command">Command string</param>
+        /// <param name="parentWindowHandle">Parent window. If NULL, sets to Workarea</param>
         /// <param name="parameters">Any parameters for this command (context)</param>
-        public void Execute(string command, params string[] parameters)
+        public void Execute(string command, IWin32Window? parentWindowHandle, params string[] parameters)
         {
             if (_command.Equals(command, StringComparison.InvariantCultureIgnoreCase))
             {
                 // make it modal to the workarea!
-                this.ShowDialog(ShellEnvironment.WorkArea);
+                this.ShowDialog((parentWindowHandle ?? ShellEnvironment.WorkArea));
 
                 // per MSDN, modal dialog forms should be disposed after use
                 this.Dispose(true);
