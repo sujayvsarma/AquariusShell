@@ -4,6 +4,8 @@ using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
 
+using AquariusShell.Runtime;
+
 namespace AquariusShell.ShellApps
 {
     /// <summary>
@@ -40,7 +42,8 @@ namespace AquariusShell.ShellApps
                 {
                     volLabel = drive.VolumeLabel;
                 }
-                catch {
+                catch
+                {
                     volLabel = "UNFORMATTED!";
                 }
 
@@ -80,16 +83,35 @@ namespace AquariusShell.ShellApps
             InitializeComponent();
 
             DIRECTORY_MYCOMPUTER = Environment.GetFolderPath(Environment.SpecialFolder.MyComputer);
-            _currentDirectory = DIRECTORY_MYCOMPUTER;
+
             _historyList = new();
             _clipboardCurrentAction = ClipboardActionTypesEnum.None;
             _displayFlags = FileBrowserItemDisplayFlags.None;
             _editActionsOnListViewItemsIsDisabled = false;
             _listingState = ListViewListingStatesEnum.SpecialFolder;
+
+            _activeTab = tpDefaultPage;
+            _activeExplorer = lvDefaultFileBrowser;
+
+            ilTabImages.Images.Add("COMPUTER", SystemIcons.GetStockIcon(StockIconId.DesktopPC));
+            ilTabImages.Images.Add("DEVICES", SystemIcons.GetStockIcon(StockIconId.Printer));
+            ilTabImages.Images.Add("RECYCLE_BIN", SystemIcons.GetStockIcon(StockIconId.Recycler));
+            ilTabImages.Images.Add(ShellEnvironment.IMAGEKEY_FOLDER, SystemIcons.GetStockIcon(StockIconId.Folder));
+
+            tpDefaultPage.Tag = 0;              // Tab Index
+            tpAddNewPage.Tag = -1;              // This should never comeup!
+
+            _tabwiseCurrentDirectory = new()
+            {
+                { 0, DIRECTORY_MYCOMPUTER }
+            };
         }
 
+        private TabPage _activeTab;
+        private ListView _activeExplorer;
+        private Dictionary<int, string> _tabwiseCurrentDirectory;
+
         private string? _preselectedItem = null;
-        private string _currentDirectory;
         private readonly Stack<string> _historyList;
         private ClipboardActionTypesEnum _clipboardCurrentAction;
         private FileBrowserItemDisplayFlags _displayFlags;

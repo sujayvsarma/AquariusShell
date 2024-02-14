@@ -276,9 +276,6 @@ namespace AquariusShell.Forms
         {
             IShellAppModule? aclBrowser = ShellEnvironment.ShellApps.GetInstanceOf($"{IShellAppModule.CommandSignifierPrefix}aclbrowser");
             aclBrowser?.Execute(aclBrowser.Command, this, _dirInfo.FullName);
-
-            //ManageSecurityLists secModifyForm = new(_dirInfo);
-            //secModifyForm.Show(this);
         }
 
         #endregion

@@ -23,67 +23,76 @@ namespace AquariusShell.ShellApps
         /// </summary>
         private void LoadCurrentDirectoryView(string? newDirectory = null)
         {
+            string currentTabDirectory = GetCurrentDirectoryForTab(_activeTab);
             if (newDirectory != null)
             {
-                _currentDirectory = newDirectory;
+                currentTabDirectory = newDirectory;
             }
+            NoteCurrentDirectoryForTab(_activeTab, currentTabDirectory);
 
-            lvFileSystemView.Items.Clear();
-            lvFileSystemView.Groups.Clear();
-            lvFileSystemView.Columns.Clear();
+            _activeExplorer.Items.Clear();
+            _activeExplorer.Groups.Clear();
+            _activeExplorer.Columns.Clear();
 
             viewImagesLarge.Images.Clear();
             viewImagesSmall.Images.Clear();
-
-            AddIconToImageLists(IMAGEKEY_FOLDER, SystemIcons.GetStockIcon(StockIconId.Folder));
+            AddIconToImageLists(ShellEnvironment.IMAGEKEY_FOLDER, SystemIcons.GetStockIcon(StockIconId.Folder));
             AddIconToImageLists(IMAGEKEY_PARENTCONTAINER, SystemIcons.GetStockIcon(StockIconId.FolderOpen));
 
-            if (_currentDirectory == DIRECTORY_MYCOMPUTER)
-            {
-                _editActionsOnListViewItemsIsDisabled = true;
-                _listingState = ListViewListingStatesEnum.SpecialFolder;
-                ResetToolbarAndContextMenu();
-                LoadMyComputerView();
+            _editActionsOnListViewItemsIsDisabled = true;
+            _listingState = ListViewListingStatesEnum.SpecialFolder;
 
+            if (currentTabDirectory == DIRECTORY_MYCOMPUTER)
+            {
+                LoadMyComputerView();
                 tbJumpAddress.Text = "Computer";
             }
-            else if (_currentDirectory == PATHKEY_PRINTERS)
+            else if (currentTabDirectory == PATHKEY_PRINTERS)
             {
-                _editActionsOnListViewItemsIsDisabled = true;
-                _listingState = ListViewListingStatesEnum.SpecialFolder;
-                ResetToolbarAndContextMenu();
                 LoadPrintersList();
-
                 tbJumpAddress.Text = "Printers";
             }
-            else if (_currentDirectory == PATHKEY_RECYCLEBIN)
+            else if (currentTabDirectory == PATHKEY_RECYCLEBIN)
             {
-                _editActionsOnListViewItemsIsDisabled = true;
-                _listingState = ListViewListingStatesEnum.SpecialFolder;
-                ResetToolbarAndContextMenu();
                 LoadRecycleBinView();
-
                 tbJumpAddress.Text = "Deleted items";
             }
             else
             {
                 _editActionsOnListViewItemsIsDisabled = false;
-                if (_currentDirectory.StartsWith(Environment.GetFolderPath(Environment.SpecialFolder.Windows))
-                        || _currentDirectory.StartsWith(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles))
-                        || _currentDirectory.StartsWith(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86))
-                        || _currentDirectory.StartsWith(Environment.GetFolderPath(Environment.SpecialFolder.CommonProgramFiles))
-                        || _currentDirectory.StartsWith(Environment.GetFolderPath(Environment.SpecialFolder.CommonProgramFilesX86)))
+                if (currentTabDirectory.StartsWith(Environment.GetFolderPath(Environment.SpecialFolder.Windows))
+                        || currentTabDirectory.StartsWith(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles))
+                        || currentTabDirectory.StartsWith(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86))
+                        || currentTabDirectory.StartsWith(Environment.GetFolderPath(Environment.SpecialFolder.CommonProgramFiles))
+                        || currentTabDirectory.StartsWith(Environment.GetFolderPath(Environment.SpecialFolder.CommonProgramFilesX86)))
                 {
-                    // Protect system directories
+                    // Protect system directories   
                     _editActionsOnListViewItemsIsDisabled = true;
                 }
 
                 _listingState = ListViewListingStatesEnum.FileSystemDirectory;
-                ResetToolbarAndContextMenu();
                 LoadFilesystemDirectory();
 
-                tbJumpAddress.Text = _currentDirectory;
+                tbJumpAddress.Text = currentTabDirectory;
             }
+
+            if (! string.IsNullOrWhiteSpace(_preselectedItem))
+            {
+                foreach (ListViewItem item in _activeExplorer.Items)
+                {
+                    if (GetPathFromListViewItem(item) == _preselectedItem)
+                    {
+                        item.Selected = true;
+                        break;
+                    }
+                }
+
+                // This is a use-once thingy!
+                _preselectedItem = null;
+            }
+
+            ResetToolbarAndContextMenu();
+            SetActiveTabTitle();
         }
 
         /// <summary>
@@ -92,19 +101,14 @@ namespace AquariusShell.ShellApps
         private void LoadMyComputerView()
         {
             // Adds all the "Drive" icons
-            foreach (StockIconId iconId in Enum.GetValues<StockIconId>())
-            {
-                string id = iconId.ToString();
-                if (id.StartsWith("Drive") || id.EndsWith("Drive"))
-                {
-                    AddIconToImageLists(id, SystemIcons.GetStockIcon(iconId));
-                }
-            }
+            Icons.LoadDriveIcons(viewImagesLarge, viewImagesSmall);
 
+            // special items
             AddIconToImageLists(IMAGEKEY_RECYCLEBIN, SystemIcons.GetStockIcon(StockIconId.Recycler));
             AddIconToImageLists(IMAGEKEY_PRINTERS, SystemIcons.GetStockIcon(StockIconId.Printer));            
 
-            lvFileSystemView.Groups.AddRange(
+            // Groups
+            _activeExplorer.Groups.AddRange(
                     new ListViewGroup[]
                     {
                         new ListViewGroup("Drives") { Name = "lvgDrives", CollapsedState = ListViewGroupCollapsedState.Expanded },
@@ -113,7 +117,8 @@ namespace AquariusShell.ShellApps
                     }
                 );
 
-            lvFileSystemView.Columns.AddRange(
+            // Columns for Details view
+            _activeExplorer.Columns.AddRange(
                     new ColumnHeader[]
                     {
                         new ColumnHeader() { Width = 240, Text = "Volume label" },
@@ -124,20 +129,10 @@ namespace AquariusShell.ShellApps
                     }
                 );
 
+            // Load drives
             foreach (DriveInfo drive in DriveInfo.GetDrives())
             {
-                string imageKey = drive.DriveType switch
-                {
-                    DriveType.CDRom => StockIconId.DriveCD.ToString(),
-                    DriveType.Fixed => StockIconId.DriveFixed.ToString(),
-                    DriveType.Network => (drive.IsReady ? StockIconId.DriveNet.ToString() : StockIconId.DriveNetDisabled.ToString()),
-                    DriveType.NoRootDirectory => StockIconId.DriveUnknown.ToString(),
-                    DriveType.Ram => StockIconId.DriveRam.ToString(),
-                    DriveType.Removable => StockIconId.DriveRemovable.ToString(),
-
-                    _ => StockIconId.DriveUnknown.ToString()
-                };
-
+                string imageKey = Icons.GetImageKey(drive);
                 ListViewItem driveIcon = default!;
 
                 try
@@ -154,6 +149,7 @@ namespace AquariusShell.ShellApps
                 }
                 catch(IOException)
                 {
+                    // Drive may not be formatted, but add it to our view nonetheless
                     driveIcon = AddItemToListView(
                             $"(Not Formatted) {Environment.NewLine}({drive.Name})",
                             imageKey,
@@ -165,22 +161,24 @@ namespace AquariusShell.ShellApps
                         );
                 }
 
-                driveIcon.Group = lvFileSystemView.Groups["lvgDrives"];
+                driveIcon.Group = _activeExplorer.Groups["lvgDrives"];
             }
 
+            // Recycle bin
             ListViewItem recycleBin = AddItemToListView(
                     "Deleted Items",
                     IMAGEKEY_RECYCLEBIN,
                     PATHKEY_RECYCLEBIN
                 );
-            recycleBin.Group = lvFileSystemView.Groups["lvgWinSys"];
+            recycleBin.Group = _activeExplorer.Groups["lvgWinSys"];
 
+            // Printers
             ListViewItem printers = AddItemToListView(
                     "Installed printers",
                     IMAGEKEY_PRINTERS,
                     PATHKEY_PRINTERS
                 );
-            printers.Group = lvFileSystemView.Groups["lvgDevices"];
+            printers.Group = _activeExplorer.Groups["lvgDevices"];
         }
 
         /// <summary>
@@ -188,9 +186,8 @@ namespace AquariusShell.ShellApps
         /// </summary>
         private void LoadFilesystemDirectory()
         {
-            if (_listingState == ListViewListingStatesEnum.FileSystemDirectory)
-            {
-                lvFileSystemView.Groups.AddRange(
+            // Groups
+            _activeExplorer.Groups.AddRange(
                     new ListViewGroup[]
                     {
                         new ListViewGroup("Directories") { Name = "lvgDirectories", CollapsedState = ListViewGroupCollapsedState.Expanded },
@@ -199,31 +196,50 @@ namespace AquariusShell.ShellApps
                     }
                 );
 
-                lvFileSystemView.Columns.AddRange(
-                        new ColumnHeader[]
-                        {
+            // Columns for Details view
+            _activeExplorer.Columns.AddRange(
+                    new ColumnHeader[]
+                    {
                             new ColumnHeader() { Width = 240, Text = "Name" },
                             new ColumnHeader() { Width = 42, Text = "Sync", TextAlign = HorizontalAlignment.Center },
                             new ColumnHeader() { Width = 180, Text = "Type" },
                             new ColumnHeader() { Width = 120, Text = "Size", TextAlign = HorizontalAlignment.Right },
                             new ColumnHeader() { Width = 180, Text = "Last modified", TextAlign = HorizontalAlignment.Right }
-                        }
-                    );
-            }
-
-            DirectoryInfo? diParent = (new DirectoryInfo(_currentDirectory)).Parent;
-            if (diParent != null)
-            {
-                ListViewItem backIcon = AddItemToListView(
-                    "(..)",
-                    IMAGEKEY_PARENTCONTAINER,
-                    diParent.FullName,
-                        string.Empty,
-                        "Parent directory",
-                        string.Empty,
-                        string.Empty
+                    }
                 );
-                backIcon.Group = lvFileSystemView.Groups["Directories"];
+
+            // Set up the BACK icon
+            string currentTabDirectory = GetCurrentDirectoryForTab(_activeTab);
+            if (!string.IsNullOrWhiteSpace(currentTabDirectory))
+            {
+                DirectoryInfo? diParent = (new DirectoryInfo(currentTabDirectory)).Parent;
+                if (diParent != null)
+                {
+                    ListViewItem backIcon = AddItemToListView(
+                        "(..)",
+                        IMAGEKEY_PARENTCONTAINER,
+                        diParent.FullName,
+                            string.Empty,
+                            "Parent directory",
+                            string.Empty,
+                            string.Empty
+                    );
+                    backIcon.Group = _activeExplorer.Groups["Directories"];
+                }
+                else
+                {
+                    // We need to root this in My Computer
+                    ListViewItem backIcon = AddItemToListView(
+                        "(..)",
+                        IMAGEKEY_PARENTCONTAINER,
+                        DIRECTORY_MYCOMPUTER,
+                            string.Empty,
+                            "Parent directory",
+                            string.Empty,
+                            string.Empty
+                    );
+                    backIcon.Group = _activeExplorer.Groups["Directories"];
+                }
             }
             else
             {
@@ -237,10 +253,11 @@ namespace AquariusShell.ShellApps
                         string.Empty,
                         string.Empty
                 );
-                backIcon.Group = lvFileSystemView.Groups["Directories"];
+                backIcon.Group = _activeExplorer.Groups["Directories"];
             }
 
-            foreach (string directoryPath in Directory.GetDirectories(_currentDirectory, "*.*", SearchOption.TopDirectoryOnly))
+            // Load directories first
+            foreach (string directoryPath in Directory.GetDirectories(currentTabDirectory, "*.*", SearchOption.TopDirectoryOnly))
             {
                 DirectoryInfo di = new(directoryPath);
 
@@ -262,17 +279,18 @@ namespace AquariusShell.ShellApps
 
                 ListViewItem folderIcon = AddItemToListView(
                         di.Name,
-                        IMAGEKEY_FOLDER,
+                        ShellEnvironment.IMAGEKEY_FOLDER,
                         di.FullName,
                             string.Empty,
                             "Directory",
                             string.Empty,
                             ((di.LastAccessTime > di.LastWriteTime) ? di.LastWriteTime : di.LastWriteTime).ToString("MMM dd, yyyy HH:mm:ss")
                     );
-                folderIcon.Group = lvFileSystemView.Groups["Directories"];
+                folderIcon.Group = _activeExplorer.Groups["Directories"];
             }
 
-            foreach (string filePath in Directory.GetFiles(_currentDirectory, "*.*", SearchOption.TopDirectoryOnly))
+            // Load files
+            foreach (string filePath in Directory.GetFiles(currentTabDirectory, "*.*", SearchOption.TopDirectoryOnly))
             {
                 FileInfo fi = new(filePath);
 
@@ -292,27 +310,9 @@ namespace AquariusShell.ShellApps
                     continue;
                 }
 
-                string imageKey = Path.GetExtension(fi.FullName).ToUpperInvariant();
-                if (imageKey == ".LNK")
-                {
-                    // each .lnk will have its own icon, based on its target
-                    int linkItemsCount = 0;
-                    foreach (string? s in viewImagesLarge.Images.Keys)
-                    {
-                        if ((!string.IsNullOrWhiteSpace(s)) && (s.EndsWith(".LNK")))
-                        {
-                            linkItemsCount++;
-                        }
-                    }
-
-                    imageKey = $"{linkItemsCount}.LNK";
-                }
-
-                if (!viewImagesLarge.Images.ContainsKey(imageKey))
-                {
-                    Icon icon = Icons.ExtractAssociatedIcon(filePath);
-                    AddIconToImageLists(imageKey, icon);
-                }
+                // If a file is marked Offline, it is usually a one-drive backed item that does not exist on disk.
+                // Trying to fetch its icon would download the item!!!
+                string imageKey = (fi.Attributes.HasFlag(FileAttributes.Offline) ? Icons.GetGenericFileIcon(viewImagesLarge, viewImagesSmall) : Icons.GetImageKey(fi.FullName, viewImagesLarge, viewImagesSmall));
 
                 ListViewItem fileIcon = AddItemToListView(
                         fi.Name,
@@ -323,7 +323,7 @@ namespace AquariusShell.ShellApps
                             fi.Length.FormatFileSize(),
                             ((fi.LastAccessTime > fi.LastWriteTime) ? fi.LastWriteTime : fi.LastWriteTime).ToString("MMM dd, yyyy HH:mm:ss")
                     );
-                fileIcon.Group = lvFileSystemView.Groups[(IsFileExecutable(fi.Extension) ? "lvgExecutables" : "lvgAllOtherFiles")];
+                fileIcon.Group = _activeExplorer.Groups[(IsFileExecutable(fi.Extension) ? "lvgExecutables" : "lvgAllOtherFiles")];
             }
         }
 
@@ -332,7 +332,8 @@ namespace AquariusShell.ShellApps
         /// </summary>
         private void LoadRecycleBinView()
         {
-            lvFileSystemView.Columns.AddRange(
+            // Columns for Details view
+            _activeExplorer.Columns.AddRange(
                         new ColumnHeader[]
                         {
                             new ColumnHeader() { Width = 240, Text = "Name" },
@@ -352,32 +353,18 @@ namespace AquariusShell.ShellApps
                         string.Empty, 
                         string.Empty
                 );
-            backIcon.Group = lvFileSystemView.Groups["Directories"];
+            backIcon.Group = _activeExplorer.Groups["Directories"];
 
+            // Load items in recycle bin
+            // Enumeration is via a COM32 call!
             foreach (RecyclebinItem item in Filesystem.GetFilesInRecycleBin())
             {
                 string fileNameExtension = Path.GetExtension(item.FileName);
-                string imageKey = (item.FileType.Equals("FILE FOLDER", StringComparison.InvariantCultureIgnoreCase) ? IMAGEKEY_FOLDER : fileNameExtension.ToUpperInvariant());
-                if (imageKey == ".LNK")
-                {
-                    // each .lnk will have its own icon, based on its target
-                    int linkItemsCount = 0;
-                    foreach (string? s in viewImagesLarge.Images.Keys)
-                    {
-                        if ((!string.IsNullOrWhiteSpace(s)) && (s.EndsWith(".LNK")))
-                        {
-                            linkItemsCount++;
-                        }
-                    }
 
-                    imageKey = $"{linkItemsCount}.LNK";
-                }
-
-                if (!viewImagesLarge.Images.ContainsKey(imageKey))
-                {
-                    Icon icon = Icons.ExtractAssociatedIcon(item.FileName);
-                    AddIconToImageLists(imageKey, icon);
-                }
+                string imageKey = (item.FileType.Equals("FILE FOLDER", StringComparison.InvariantCultureIgnoreCase) 
+                                        ? ShellEnvironment.IMAGEKEY_FOLDER 
+                                        : Icons.GetImageKey(item.FileName, viewImagesLarge, viewImagesSmall)
+                                    );
 
                 ListViewItem fileIcon = AddItemToListView(
                         item.FileName, 
@@ -388,7 +375,14 @@ namespace AquariusShell.ShellApps
                             item.DeletedAt,
                             item.OriginalPath
                     );
-                fileIcon.Group = lvFileSystemView.Groups[(IsFileExecutable(fileNameExtension) ? "lvgExecutables" : "lvgAllOtherFiles")];
+                fileIcon.Group = _activeExplorer.Groups[(IsFileExecutable(fileNameExtension) ? "lvgExecutables" : "lvgAllOtherFiles")];
+            }
+
+            if (_activeExplorer.Items.Count > 0)
+            {
+                // enable the DELETE toolbar and context items
+                tsbEditDelete.Enabled = true;
+                deleteToolStripMenuItem.Enabled = true;
             }
         }
 
@@ -397,7 +391,8 @@ namespace AquariusShell.ShellApps
         /// </summary>
         private void LoadPrintersList()
         {
-            lvFileSystemView.Columns.AddRange(
+            // Columns for ListView
+            _activeExplorer.Columns.AddRange(
                         new ColumnHeader[]
                         {
                             new ColumnHeader() { Width = 240, Text = "Name" },
@@ -406,8 +401,10 @@ namespace AquariusShell.ShellApps
                         }
                     );
 
+            // This is a WMI call that will return at least one printer
             List<Printer> printers = ShellEnvironment.GetPrinters(true);
 
+            // Icons for printers
             AddIconToImageLists("PRINTER", SystemIcons.GetStockIcon(StockIconId.Printer));
             AddIconToImageLists("FAX", SystemIcons.GetStockIcon(StockIconId.PrinterFax));
             AddIconToImageLists("NETPRINTER", SystemIcons.GetStockIcon(StockIconId.PrinterNet));
@@ -462,7 +459,7 @@ namespace AquariusShell.ShellApps
                 }
             }
             
-            lvFileSystemView.Items.Add(icon);
+            _activeExplorer.Items.Add(icon);
             return icon;
         }
 
@@ -471,8 +468,10 @@ namespace AquariusShell.ShellApps
         /// </summary>
         private void ResetToolbarAndContextMenu()
         {
+            // flip our flag so that it is more readable :-)
+            string currentTabDirectory = GetCurrentDirectoryForTab(_activeTab);
             bool editActionsEnabled = !_editActionsOnListViewItemsIsDisabled;
-            bool isRecycleBinFolder = (_currentDirectory == PATHKEY_RECYCLEBIN);
+            bool isRecycleBinFolder = (currentTabDirectory == PATHKEY_RECYCLEBIN);
 
             tsDDBNew.Enabled = editActionsEnabled;
             tsbEditCopy.Enabled = editActionsEnabled;
@@ -601,7 +600,7 @@ namespace AquariusShell.ShellApps
         /// </summary>
         private void HandleCutOrCopy(ClipboardActionTypesEnum action)
         {
-            if (lvFileSystemView.SelectedItems.Count == 0)
+            if (_activeExplorer.SelectedItems.Count == 0)
             {
                 MessageBox.Show("Select at least one item for this operation.", "Aquarius Shell", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
@@ -609,7 +608,7 @@ namespace AquariusShell.ShellApps
 
             StringCollection fileNamesList = new();
             Clipboard.Clear();
-            foreach (ListViewItem item in lvFileSystemView.SelectedItems)
+            foreach (ListViewItem item in _activeExplorer.SelectedItems)
             {
                 fileNamesList.Add(GetPathFromListViewItem(item));
                 if (action == ClipboardActionTypesEnum.Cut)
@@ -631,7 +630,7 @@ namespace AquariusShell.ShellApps
             {
                 // go up to the parent level. If we are at My PC, beep!
                 string? jump = null;
-                foreach(ListViewItem lv in lvFileSystemView.Items)
+                foreach(ListViewItem lv in _activeExplorer.Items)
                 {
                     if (lv.Text == "(..)")
                     {

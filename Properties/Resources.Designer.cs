@@ -183,6 +183,16 @@ namespace AquariusShell.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap list_solid {
+            get {
+                object obj = ResourceManager.GetObject("list_solid", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap openNew {
             get {
                 object obj = ResourceManager.GetObject("openNew", resourceCulture);
@@ -253,6 +263,26 @@ namespace AquariusShell.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap terminal_solid {
+            get {
+                object obj = ResourceManager.GetObject("terminal-solid", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap trash_solid {
+            get {
+                object obj = ResourceManager.GetObject("trash_solid", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap undo_restart {
             get {
                 object obj = ResourceManager.GetObject("undo_restart", resourceCulture);
@@ -276,16 +306,6 @@ namespace AquariusShell.Properties {
         internal static System.Drawing.Bitmap windows_logo {
             get {
                 object obj = ResourceManager.GetObject("windows_logo", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap WINLOGO {
-            get {
-                object obj = ResourceManager.GetObject("WINLOGO", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

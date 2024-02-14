@@ -89,6 +89,49 @@ namespace AquariusShell.Modules
             return ((process == null) ? -1 : process.Id);
         }
 
+        /// <summary>
+        /// Execute a program directly
+        /// </summary>
+        /// <param name="executablePath">Full executable path</param>
+        /// <param name="workingDirectory">The working directory to set</param>
+        /// <param name="verb">Verb to send. Set to None for no verb</param>
+        /// <param name="quietMode">Quiet mode -- no windows to be created</param>
+        /// <param name="arguments">List of arguments to pass into the program</param>
+        /// <returns>PID of the process or -1</returns>
+        public static int ExecuteProgramWithWorkingDirectory(string executablePath, string workingDirectory, ShellExecuteVerbsEnum verb = ShellExecuteVerbsEnum.None, bool quietMode = false, params string[] arguments)
+        {
+            ProcessStartInfo startInfo = new(executablePath)
+            {
+                WorkingDirectory = workingDirectory,
+                UseShellExecute = false
+            };
+
+            if (verb != ShellExecuteVerbsEnum.None)
+            {
+                startInfo.Verb = verb.ToString().ToLower();
+            }
+            if (quietMode)
+            {
+                startInfo.CreateNoWindow = true;
+            }
+
+            if ((arguments != null) && (arguments.Length > 0))
+            {
+                startInfo.Arguments = string.Join(' ', arguments.Where(a => (!string.IsNullOrWhiteSpace(a))));
+            }
+
+            Process? process = null;
+            try
+            {
+                process = Process.Start(startInfo);
+            }
+            catch
+            {
+            }
+
+            return ((process == null) ? -1 : process.Id);
+        }
+
 
 
 

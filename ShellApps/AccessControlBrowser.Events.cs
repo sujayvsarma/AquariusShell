@@ -450,9 +450,11 @@ namespace AquariusShell.ShellApps
         /// </summary>
         private void AccessControlBrowser_Shown(object sender, EventArgs e)
         {
-            _disableTreeViewActivation = true;
-            tvFilesystemBrowser.Refresh();
-            _disableTreeViewActivation = false;
+            this.Text = Caption;
+
+            //_disableTreeViewActivation = true;
+            //tvFilesystemBrowser.Refresh();
+            //_disableTreeViewActivation = false;
 
             // Also trigger loading the final leaf item's principals... 
             tvFilesystemBrowser.SelectedNode = _hierarchy.Last!.Value;

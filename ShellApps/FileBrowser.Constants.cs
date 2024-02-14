@@ -16,11 +16,6 @@ namespace AquariusShell.ShellApps
         };
 
         /// <summary>
-        /// Image key for "Folder" icons
-        /// </summary>
-        const string IMAGEKEY_FOLDER = "_AQSHELL_FOLDER";
-
-        /// <summary>
         /// Image key for the item that shows an "up to parent"
         /// </summary>
         const string IMAGEKEY_PARENTCONTAINER = "_AQSHELL_PARENT";
@@ -36,6 +31,12 @@ namespace AquariusShell.ShellApps
         /// </summary>
         const string IMAGEKEY_PRINTERS = "_AQSHELL_PRINTERS";
         const string PATHKEY_PRINTERS = "print:";
+
+        /// <summary>
+        /// Constant key code for ALT:
+        /// </summary>
+        /// <remarks>ref: https://learn.microsoft.com/en-us/dotnet/api/system.windows.forms.drageventargs.keystate?view=windowsdesktop-8.0</remarks>
+        const int ALT_KEY = 32;
 
         /// <summary>
         /// Type of action from clipboard

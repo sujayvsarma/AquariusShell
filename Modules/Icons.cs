@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Drawing;
+using System.IO;
+using System.Windows.Forms;
 
 using AquariusShell.Runtime;
 
@@ -29,7 +31,7 @@ namespace AquariusShell.Modules
                     icon = icon.Resize(size.Value);
                 }
             }
-            catch 
+            catch
             {
                 icon = SystemIcons.GetStockIcon(StockIconId.DocumentNoAssociation);
             }
@@ -113,5 +115,110 @@ namespace AquariusShell.Modules
 
             return size;
         }
-    }    
+
+        /// <summary>
+        /// Load icons for a all known drive types into the given ImageList controls
+        /// </summary>
+        /// <param name="imageLists">Array of ImageList to load the icons into</param>
+        public static void LoadDriveIcons(params ImageList[] imageLists)
+        {
+            foreach (StockIconId iconId in Enum.GetValues<StockIconId>())
+            {
+                string id = iconId.ToString();
+                if (id.StartsWith("Drive") || id.EndsWith("Drive"))
+                {
+                    foreach (ImageList list in imageLists)
+                    {
+                        list.Images.Add(id, SystemIcons.GetStockIcon(iconId));
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Get the image key associated with a drive
+        /// </summary>
+        /// <param name="drive">Drive to get the key for</param>
+        /// <returns>Image key</returns>
+        public static string GetImageKey(DriveInfo drive)
+            => drive.DriveType switch
+            {
+                DriveType.CDRom => StockIconId.DriveCD.ToString(),
+                DriveType.Fixed => StockIconId.DriveFixed.ToString(),
+                DriveType.Network => (drive.IsReady ? StockIconId.DriveNet.ToString() : StockIconId.DriveNetDisabled.ToString()),
+                DriveType.NoRootDirectory => StockIconId.DriveUnknown.ToString(),
+                DriveType.Ram => StockIconId.DriveRam.ToString(),
+                DriveType.Removable => StockIconId.DriveRemovable.ToString(),
+
+                _ => StockIconId.DriveUnknown.ToString()
+            };
+
+
+        /// <summary>
+        /// Get the image key associated with a file or directory (by path). The image is added to the 
+        /// provided ImageLists if it is not already present!
+        /// </summary>
+        /// <param name="filePath">Absolute path to file or directory</param>
+        /// <param name="imageLists">Array of ImageList controls on the form</param>
+        /// <returns>The associated image key</returns>
+        public static string GetImageKey(string filePath, params ImageList[] imageLists)
+        {
+            string imageKey = string.Empty;
+            if (Directory.Exists(filePath))
+            {
+                imageKey = ShellEnvironment.IMAGEKEY_FOLDER;
+            }
+            else
+            {
+                imageKey = Path.GetExtension(filePath).ToUpperInvariant();
+                if ((imageKey == ".LNK") || (imageKey == ".EXE"))
+                {
+                    // each .lnk/.exe will have its own icon, based on its target
+
+                    int groupItemsCount = 0;
+                    foreach (string? s in imageLists[0].Images.Keys)
+                    {
+                        if ((!string.IsNullOrWhiteSpace(s)) && (s.EndsWith(imageKey)))
+                        {
+                            groupItemsCount++;
+                        }
+                    }
+
+                    imageKey = $"{groupItemsCount}{imageKey}";
+                }
+
+                Icon icon = ExtractAssociatedIcon(filePath);
+                foreach (ImageList list in imageLists)
+                {
+                    if (!list.Images.ContainsKey(imageKey))
+                    {
+                        list.Images.Add(imageKey, icon);
+                    }
+                }
+            }
+
+            return imageKey;
+        }
+
+        /// <summary>
+        /// Get a "generic file" icon
+        /// </summary>
+        /// <param name="imageLists">ImageLists to add the icon to if not already</param>
+        /// <returns>Imagekey (hard-coded: .FILE.GENERIC)</returns>
+        public static string GetGenericFileIcon(params ImageList[] imageLists)
+        {
+            string imageKey = ".FILE.GENERIC";
+
+            Icon icon = SystemIcons.GetStockIcon(StockIconId.DocumentWithAssociation);
+            foreach (ImageList list in imageLists)
+            {
+                if (!list.Images.ContainsKey(imageKey))
+                {
+                    list.Images.Add(imageKey, icon);
+                }
+            }
+
+            return imageKey;
+        }
+    }
 }

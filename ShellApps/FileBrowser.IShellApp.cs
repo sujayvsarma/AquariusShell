@@ -88,7 +88,7 @@ namespace AquariusShell.ShellApps
                             case 0:
                                 if (Directory.Exists(parameters[i]))
                                 {
-                                    _currentDirectory = parameters[i];
+                                    NoteCurrentDirectoryForTab(tpDefaultPage, parameters[i]);
                                 }
                                 break;
 

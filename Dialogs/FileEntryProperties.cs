@@ -434,9 +434,6 @@ namespace AquariusShell.Forms
                 // SECURITY MODE!
                 IShellAppModule? aclBrowser = ShellEnvironment.ShellApps.GetInstanceOf($"{IShellAppModule.CommandSignifierPrefix}aclbrowser");
                 aclBrowser?.Execute(aclBrowser.Command, this, _fileInfo.FullName);
-
-                //ManageSecurityLists secModifyForm = new(_fileInfo);
-                //secModifyForm.Show(this);
             }
         }
 

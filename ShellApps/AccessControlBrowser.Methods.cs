@@ -7,6 +7,8 @@ using System.Security.AccessControl;
 using System.Security.Principal;
 using System.Windows.Forms;
 
+using AquariusShell.Modules;
+
 namespace AquariusShell.ShellApps
 {
 
@@ -15,6 +17,86 @@ namespace AquariusShell.ShellApps
     /// </summary>
     public partial class AccessControlBrowser
     {
+        /// <summary>
+        /// Loads the treeview with the contextual path and sets up the UI.
+        /// This method is called when the ACLB is invoked with a specific path
+        /// </summary>
+        /// <param name="path">The contextual path</param>
+        private void LoadContextPath(string path)
+        {
+            // Recursively load the items upto and including the provided path.
+            string[] partsOfThePath = path.Split(Path.DirectorySeparatorChar, StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
+
+            // path[0] would be the drive label ("C:"), let's \\ it
+            partsOfThePath[0] = $"{partsOfThePath[0]}\\";
+            DriveInfo? parentDrive = DriveInfo.GetDrives().FirstOrDefault(d => (d.Name == partsOfThePath[0]));
+            FileSystemNode? parentNode = null;
+
+            _disableTreeViewActivation = true;
+
+            if (parentDrive != null)
+            {
+                string imageKey = Icons.GetImageKey(parentDrive);
+
+                try
+                {
+                    parentNode = AddItemToTreeView(
+                            null,
+                            $"{parentDrive.VolumeLabel}{Environment.NewLine}({parentDrive.Name})",
+                            imageKey,
+                            parentDrive.Name
+                        );
+                }
+                catch (IOException)
+                {
+                    parentNode = AddItemToTreeView(
+                            null,
+                            $"(Not Formatted) {Environment.NewLine}({parentDrive.Name})",
+                            imageKey,
+                            parentDrive.Name
+                        );
+                }
+            }
+
+            if (parentNode == null)
+            {
+                MessageBox.Show($"A drive or root path by the name '{partsOfThePath[0]}' could not be found.", "Aquarius Shell", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            // populate our hierarchy LL
+            _hierarchy.AddFirst(parentNode);
+
+            // Load up our path, recursively
+            string pathString = partsOfThePath[0];
+            for (int i = 1; i < partsOfThePath.Length; i++)
+            {
+                pathString = Path.Combine(pathString, partsOfThePath[i]);
+
+                string currentPathSegment = pathString;
+                string imageKey = Icons.GetImageKey(currentPathSegment, ilFileSystemImages);
+
+                // We dont hide any files/directories here
+                parentNode = AddItemToTreeView(
+                        parentNode,
+                        partsOfThePath[i],
+                        imageKey,
+                        currentPathSegment
+                    );
+
+                // populate our hierarchy LL
+                _hierarchy.AddLast(parentNode);
+            }
+
+            // clear the last node's children if we have them
+            if (parentNode.IsExpandable)
+            {
+                parentNode.Nodes.Clear();
+            }
+
+            _disableTreeViewActivation = false;
+        }
+
 
         /// <summary>
         /// Load security principals for the specified path
@@ -24,101 +106,110 @@ namespace AquariusShell.ShellApps
         {
             List<string> uniqueList = new();
 
-            if (Directory.Exists(path))
-            {
-                _type = ObjectTypes.Directory;
+            this.Text = $"{Caption} ({path})";
 
-                DirectoryInfo directory = new(path);
-                DirectorySecurity sec = directory.GetAccessControl(AccessControlSections.Access | AccessControlSections.Owner);
-                IdentityReference? fileOwner = sec.GetOwner(typeof(SecurityIdentifier));
-                if (fileOwner != null)
+            try
+            {
+                if (Directory.Exists(path))
                 {
-                    try
+                    _type = ObjectTypes.Directory;
+
+                    DirectoryInfo directory = new(path);
+                    DirectorySecurity sec = directory.GetAccessControl(AccessControlSections.Access | AccessControlSections.Owner);
+                    IdentityReference? fileOwner = sec.GetOwner(typeof(SecurityIdentifier));
+                    if (fileOwner != null)
                     {
-                        NTAccount ownerAccount = (NTAccount)fileOwner.Translate(typeof(NTAccount));
-                        tbCurrentOwnerPrincipal.Text = ownerAccount.Value;
-                        tbCurrentOwnerPrincipal.Tag = fileOwner.Value;
-                        btnTakeOwnership.Enabled = (fileOwner.Value != _currentUserSID.Value);
+                        try
+                        {
+                            NTAccount ownerAccount = (NTAccount)fileOwner.Translate(typeof(NTAccount));
+                            tbCurrentOwnerPrincipal.Text = ownerAccount.Value;
+                            tbCurrentOwnerPrincipal.Tag = fileOwner.Value;
+                            btnTakeOwnership.Enabled = (fileOwner.Value != _currentUserSID.Value);
+                        }
+                        catch (IdentityNotMappedException)
+                        {
+                            tbCurrentOwnerPrincipal.Text = UNRESOLVED_ACCOUNT_NAME;
+                            tbCurrentOwnerPrincipal.Tag = null;
+                            btnTakeOwnership.Enabled = false;
+                        }
                     }
-                    catch (IdentityNotMappedException)
+
+                    foreach (FileSystemAccessRule rule in sec.GetAccessRules(includeExplicit: true, includeInherited: true, targetType: typeof(SecurityIdentifier)))
                     {
-                        tbCurrentOwnerPrincipal.Text = UNRESOLVED_ACCOUNT_NAME;
-                        tbCurrentOwnerPrincipal.Tag = null;
-                        btnTakeOwnership.Enabled = false;
+                        string accountName;
+                        try
+                        {
+                            NTAccount ruleAccount = (NTAccount)rule.IdentityReference.Translate(typeof(NTAccount));
+                            accountName = ruleAccount.ToString();
+                        }
+                        catch (IdentityNotMappedException)
+                        {
+                            accountName = UNRESOLVED_ACCOUNT_NAME;
+                        }
+
+                        if (!uniqueList.Any(i => i.Equals(rule.IdentityReference.Value, StringComparison.InvariantCultureIgnoreCase)))
+                        {
+                            uniqueList.Add(rule.IdentityReference.Value);
+
+                            ListItem principal = new(accountName, rule.IdentityReference);
+                            lbPrincipalsList.Items.Add(principal);
+                        }
                     }
                 }
-
-                foreach (FileSystemAccessRule rule in sec.GetAccessRules(includeExplicit: true, includeInherited: true, targetType: typeof(SecurityIdentifier)))
+                else if (File.Exists(path))
                 {
-                    string accountName;
-                    try
+                    _type = ObjectTypes.File;
+
+                    FileInfo file = new(path);
+                    FileSecurity sec = file.GetAccessControl(AccessControlSections.Access | AccessControlSections.Owner);
+                    IdentityReference? fileOwner = sec.GetOwner(typeof(SecurityIdentifier));
+                    if (fileOwner != null)
                     {
-                        NTAccount ruleAccount = (NTAccount)rule.IdentityReference.Translate(typeof(NTAccount));
-                        accountName = ruleAccount.ToString();
-                    }
-                    catch (IdentityNotMappedException)
-                    {
-                        accountName = UNRESOLVED_ACCOUNT_NAME;
+                        try
+                        {
+                            NTAccount ownerAccount = (NTAccount)fileOwner.Translate(typeof(NTAccount));
+                            tbCurrentOwnerPrincipal.Text = ownerAccount.Value;
+                            tbCurrentOwnerPrincipal.Tag = fileOwner.Value;
+                            btnTakeOwnership.Enabled = (fileOwner.Value != _currentUserSID.Value);
+                        }
+                        catch (IdentityNotMappedException)
+                        {
+                            tbCurrentOwnerPrincipal.Text = UNRESOLVED_ACCOUNT_NAME;
+                            tbCurrentOwnerPrincipal.Tag = null;
+                            btnTakeOwnership.Enabled = false;
+                        }
                     }
 
-                    if (!uniqueList.Any(i => i.Equals(rule.IdentityReference.Value, StringComparison.InvariantCultureIgnoreCase)))
+                    foreach (FileSystemAccessRule rule in sec.GetAccessRules(includeExplicit: true, includeInherited: true, targetType: typeof(SecurityIdentifier)))
                     {
-                        uniqueList.Add(rule.IdentityReference.Value);
+                        string accountName;
+                        try
+                        {
+                            NTAccount ruleAccount = (NTAccount)rule.IdentityReference.Translate(typeof(NTAccount));
+                            accountName = ruleAccount.ToString();
+                        }
+                        catch (IdentityNotMappedException)
+                        {
+                            accountName = UNRESOLVED_ACCOUNT_NAME;
+                        }
 
-                        ListItem principal = new(accountName, rule.IdentityReference);
-                        lbPrincipalsList.Items.Add(principal);
+                        if (!uniqueList.Any(i => i.Equals(rule.IdentityReference.Value, StringComparison.InvariantCultureIgnoreCase)))
+                        {
+                            uniqueList.Add(rule.IdentityReference.Value);
+
+                            ListItem principal = new(accountName, rule.IdentityReference);
+                            lbPrincipalsList.Items.Add(principal);
+                        }
                     }
+                }
+                else
+                {
+                    //TODO: Handle non-FS objects
                 }
             }
-            else if (File.Exists(path))
+            catch (Exception ex)
             {
-                _type = ObjectTypes.File;
-
-                FileInfo file = new(path);
-                FileSecurity sec = file.GetAccessControl(AccessControlSections.Access | AccessControlSections.Owner);
-                IdentityReference? fileOwner = sec.GetOwner(typeof(SecurityIdentifier));
-                if (fileOwner != null)
-                {
-                    try
-                    {
-                        NTAccount ownerAccount = (NTAccount)fileOwner.Translate(typeof(NTAccount));
-                        tbCurrentOwnerPrincipal.Text = ownerAccount.Value;
-                        tbCurrentOwnerPrincipal.Tag = fileOwner.Value;
-                        btnTakeOwnership.Enabled = (fileOwner.Value != _currentUserSID.Value);
-                    }
-                    catch (IdentityNotMappedException)
-                    {
-                        tbCurrentOwnerPrincipal.Text = UNRESOLVED_ACCOUNT_NAME;
-                        tbCurrentOwnerPrincipal.Tag = null;
-                        btnTakeOwnership.Enabled = false;
-                    }
-                }
-
-                foreach (FileSystemAccessRule rule in sec.GetAccessRules(includeExplicit: true, includeInherited: true, targetType: typeof(SecurityIdentifier)))
-                {
-                    string accountName;
-                    try
-                    {
-                        NTAccount ruleAccount = (NTAccount)rule.IdentityReference.Translate(typeof(NTAccount));
-                        accountName = ruleAccount.ToString();
-                    }
-                    catch (IdentityNotMappedException)
-                    {
-                        accountName = UNRESOLVED_ACCOUNT_NAME;
-                    }
-
-                    if (!uniqueList.Any(i => i.Equals(rule.IdentityReference.Value, StringComparison.InvariantCultureIgnoreCase)))
-                    {
-                        uniqueList.Add(rule.IdentityReference.Value);
-
-                        ListItem principal = new(accountName, rule.IdentityReference);
-                        lbPrincipalsList.Items.Add(principal);
-                    }
-                }
-            }
-            else
-            {
-                //TODO: Handle non-FS objects
+                MessageBox.Show("Error loading security information for object: " + ex.Message, "Aquarius Shell", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
         }
 

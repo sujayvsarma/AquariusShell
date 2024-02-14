@@ -8,11 +8,6 @@ namespace AquariusShell.ShellApps
     public partial class AccessControlBrowser
     {
         /// <summary>
-        /// Image key for "Folder" icons
-        /// </summary>
-        const string IMAGEKEY_FOLDER = "_AQSHELL_FOLDER";
-
-        /// <summary>
         /// Display name for unresolved account SIDs
         /// </summary>
         const string UNRESOLVED_ACCOUNT_NAME = "Reserved System Account";

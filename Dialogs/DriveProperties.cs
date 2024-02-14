@@ -239,9 +239,6 @@ namespace AquariusShell.Forms
             // we want the root directory of the drive:
             IShellAppModule? aclBrowser = ShellEnvironment.ShellApps.GetInstanceOf($"{IShellAppModule.CommandSignifierPrefix}aclbrowser");
             aclBrowser?.Execute(aclBrowser.Command, this, _drive.RootDirectory.FullName);
-
-            //ManageSecurityLists secModifyForm = new(_drive.RootDirectory);
-            //secModifyForm.Show(this);
         }
 
         /// <summary>

@@ -202,7 +202,8 @@ namespace AquariusShell.Runtime
             if ((_printers.Count == 0) || forceRefresh)
             {
                 // no Windows system will have zero printers!
-                _printers = AquariusShell.Modules.Printers.GetLocalAndNetworkConnectedPrinters();
+                // This is a WMI call
+                _printers = Printers.GetLocalAndNetworkConnectedPrinters();
             }
 
             return _printers;
@@ -214,6 +215,12 @@ namespace AquariusShell.Runtime
         /// Key in the Windows registry where we store our settings
         /// </summary>
         public static string SHELL_REGISTRYKEY = "Software\\SujaySarma\\Shell";
+
+        /// <summary>
+        /// The image key for a folder across all of our forms
+        /// </summary>
+        public static string IMAGEKEY_FOLDER = "_AQSHELL_FOLDER";
+
 
         /// <summary>
         /// Clear all the heavy-weight caches we are holding on to, as we are about to terminate

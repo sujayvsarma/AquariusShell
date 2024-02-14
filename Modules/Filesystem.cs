@@ -52,13 +52,18 @@ namespace AquariusShell.Modules
                         {
                             dynamic? itemInFolder = recyclebinContents.Item(i);
 
-                            // "D:\src\$RECYCLE.BIN\Recycle Bin\helloworld.cs"
+                            // Result: "D:\src\$RECYCLE.BIN\Recycle Bin\helloworld.cs"
                             string rbPath = recyclebinFolder.GetDetailsOf(itemInFolder, RecyclebinItemDetailColumnNames.FullyQualifiedRecyclebinPath);
 
-                            // "D:\src\$RECYCLE.BIN\Recycle Bin"
+                            // Recycle bin for every folder gets its own randomised folder name.
+                            // But the VISIBLE name for it is ALWAYS "Recycle Bin".
+                            // However, we need the actual path behind that visible name... so, we resolve it
+                            // RecyclebinItemDetailColumnNames.RecyclebinFolder = Give me the actual folder name for itemInFolder
+                            // Result: "D:\src\$RECYCLE.BIN\S-X-Y-JHSDKJASDKAHSD"
                             string resolvedRbPath = recyclebinFolder.GetDetailsOf(itemInFolder, RecyclebinItemDetailColumnNames.RecyclebinFolder);
 
-                            // "D:\src\$RECYCLE.BIN\S-X-Y-JHSDKJASDKAHSD\helloworld.cs"
+                            // Re-create the path for the item we enumerated earlier
+                            // Result: "D:\src\$RECYCLE.BIN\S-X-Y-JHSDKJASDKAHSD\helloworld.cs"
                             string diskRbPath = Path.Combine(
                                     Path.GetDirectoryName(resolvedRbPath)!,
                                     ShellEnvironment.CurrentUserSID
@@ -86,12 +91,15 @@ namespace AquariusShell.Modules
                             items.Add(item);
                         }
 
+                        // release COM object
                         recyclebinContents = null;
                     }
 
+                    // release COM object
                     recyclebinFolder = null;
                 }
 
+                // release COM object
                 shell = null;
             }
 

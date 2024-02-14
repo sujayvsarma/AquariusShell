@@ -1,9 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Drawing;
 using System.Security.AccessControl;
 using System.Security.Principal;
 using System.Windows.Forms;
+
+using AquariusShell.Modules;
+using AquariusShell.Runtime;
 
 namespace AquariusShell.ShellApps
 {
@@ -22,17 +24,10 @@ namespace AquariusShell.ShellApps
             InitializeComponent();
 
             // Adds all the "Drive" icons
-            foreach (StockIconId iconId in Enum.GetValues<StockIconId>())
-            {
-                string id = iconId.ToString();
-                if (id.StartsWith("Drive") || id.EndsWith("Drive"))
-                {
-                    AddIconToImageLists(id, SystemIcons.GetStockIcon(iconId));
-                }
-            }
+            Icons.LoadDriveIcons(ilFileSystemImages);
 
             // Add the folder icon
-            AddIconToImageLists(IMAGEKEY_FOLDER, SystemIcons.GetStockIcon(StockIconId.Folder));
+            AddIconToImageLists(ShellEnvironment.IMAGEKEY_FOLDER, SystemIcons.GetStockIcon(StockIconId.Folder));
             _hierarchy = new();
 
             lbPrincipalsList.DisplayMember = "Caption";

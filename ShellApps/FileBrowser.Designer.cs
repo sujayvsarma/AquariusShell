@@ -32,6 +32,7 @@
             viewImagesLarge = new System.Windows.Forms.ImageList(components);
             fsWatcher = new System.IO.FileSystemWatcher();
             explorerToolbar = new System.Windows.Forms.ToolStrip();
+            tsbRefresh = new System.Windows.Forms.ToolStripButton();
             tssbMyComputer = new System.Windows.Forms.ToolStripSplitButton();
             toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             tsDDBNew = new System.Windows.Forms.ToolStripDropDownButton();
@@ -42,17 +43,17 @@
             tsbEditCopy = new System.Windows.Forms.ToolStripButton();
             tsbEditPaste = new System.Windows.Forms.ToolStripButton();
             tsbEditDelete = new System.Windows.Forms.ToolStripButton();
+            tsbRecyclebinRestore = new System.Windows.Forms.ToolStripButton();
             toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
-            tsbProperties = new System.Windows.Forms.ToolStripButton();
-            toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
             toolStripDropDownButton1 = new System.Windows.Forms.ToolStripDropDownButton();
             largeIconsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             smallIconsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             detailsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
+            tsbProperties = new System.Windows.Forms.ToolStripButton();
             toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
-            tsbRefresh = new System.Windows.Forms.ToolStripButton();
-            tsbRecyclebinRestore = new System.Windows.Forms.ToolStripButton();
-            lvFileSystemView = new System.Windows.Forms.ListView();
+            tspCloseActiveTab = new System.Windows.Forms.ToolStripButton();
+            tsbOpenTabNewWindow = new System.Windows.Forms.ToolStripButton();
             viewImagesSmall = new System.Windows.Forms.ImageList(components);
             chIcon = new System.Windows.Forms.ColumnHeader();
             chSync = new System.Windows.Forms.ColumnHeader();
@@ -70,12 +71,19 @@
             toolStripMenuItem2 = new System.Windows.Forms.ToolStripSeparator();
             refreshToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             propertiesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            btnJumpGo = new System.Windows.Forms.Button();
             tbJumpAddress = new System.Windows.Forms.TextBox();
             label1 = new System.Windows.Forms.Label();
+            tbTabbedPages = new System.Windows.Forms.TabControl();
+            tpDefaultPage = new System.Windows.Forms.TabPage();
+            lvDefaultFileBrowser = new System.Windows.Forms.ListView();
+            tpAddNewPage = new System.Windows.Forms.TabPage();
+            ilTabImages = new System.Windows.Forms.ImageList(components);
+            tsbOpenInTerminal = new System.Windows.Forms.ToolStripButton();
             ((System.ComponentModel.ISupportInitialize)fsWatcher).BeginInit();
             explorerToolbar.SuspendLayout();
             cmsContextMenu.SuspendLayout();
+            tbTabbedPages.SuspendLayout();
+            tpDefaultPage.SuspendLayout();
             SuspendLayout();
             // 
             // viewImagesLarge
@@ -93,18 +101,31 @@
             // explorerToolbar
             // 
             explorerToolbar.BackColor = System.Drawing.SystemColors.ButtonFace;
-            explorerToolbar.Items.AddRange(new System.Windows.Forms.ToolStripItem[] { tssbMyComputer, toolStripSeparator2, tsDDBNew, toolStripSeparator1, tsbEditCut, tsbEditCopy, tsbEditPaste, tsbEditDelete, toolStripSeparator3, tsbProperties, toolStripSeparator5, toolStripDropDownButton1, toolStripSeparator4, tsbRefresh, tsbRecyclebinRestore });
+            explorerToolbar.Items.AddRange(new System.Windows.Forms.ToolStripItem[] { tsbRefresh, tssbMyComputer, toolStripSeparator2, tsDDBNew, toolStripSeparator1, tsbEditCut, tsbEditCopy, tsbEditPaste, tsbEditDelete, tsbRecyclebinRestore, toolStripSeparator3, toolStripDropDownButton1, toolStripSeparator5, tsbProperties, toolStripSeparator4, tspCloseActiveTab, tsbOpenTabNewWindow, tsbOpenInTerminal });
             explorerToolbar.Location = new System.Drawing.Point(0, 0);
             explorerToolbar.Name = "explorerToolbar";
-            explorerToolbar.Size = new System.Drawing.Size(957, 38);
+            explorerToolbar.RenderMode = System.Windows.Forms.ToolStripRenderMode.Professional;
+            explorerToolbar.Size = new System.Drawing.Size(957, 25);
             explorerToolbar.TabIndex = 1;
+            // 
+            // tsbRefresh
+            // 
+            tsbRefresh.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            tsbRefresh.Image = Properties.Resources.undo_restart;
+            tsbRefresh.ImageTransparentColor = System.Drawing.Color.Magenta;
+            tsbRefresh.Name = "tsbRefresh";
+            tsbRefresh.Size = new System.Drawing.Size(23, 22);
+            tsbRefresh.Text = "Re&fresh";
+            tsbRefresh.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
+            tsbRefresh.Click += ToolbarOrContextAction_RefreshViewEvent;
             // 
             // tssbMyComputer
             // 
-            tssbMyComputer.Image = Properties.Resources.computer;
+            tssbMyComputer.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            tssbMyComputer.Image = Properties.Resources.home;
             tssbMyComputer.ImageTransparentColor = System.Drawing.Color.Magenta;
             tssbMyComputer.Name = "tssbMyComputer";
-            tssbMyComputer.Size = new System.Drawing.Size(58, 35);
+            tssbMyComputer.Size = new System.Drawing.Size(32, 22);
             tssbMyComputer.Text = "My PC";
             tssbMyComputer.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
             tssbMyComputer.ButtonClick += ToolstripButton_MyComputer_ClickEvent;
@@ -112,15 +133,16 @@
             // toolStripSeparator2
             // 
             toolStripSeparator2.Name = "toolStripSeparator2";
-            toolStripSeparator2.Size = new System.Drawing.Size(6, 38);
+            toolStripSeparator2.Size = new System.Drawing.Size(6, 25);
             // 
             // tsDDBNew
             // 
+            tsDDBNew.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             tsDDBNew.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { tsmiCreateNewFolder, tsmiFile });
             tsDDBNew.Image = Properties.Resources.add_circle_filled;
             tsDDBNew.ImageTransparentColor = System.Drawing.Color.Magenta;
             tsDDBNew.Name = "tsDDBNew";
-            tsDDBNew.Size = new System.Drawing.Size(44, 35);
+            tsDDBNew.Size = new System.Drawing.Size(29, 22);
             tsDDBNew.Text = "&New";
             tsDDBNew.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
             tsDDBNew.ToolTipText = "Create new file or folder";
@@ -145,149 +167,143 @@
             // toolStripSeparator1
             // 
             toolStripSeparator1.Name = "toolStripSeparator1";
-            toolStripSeparator1.Size = new System.Drawing.Size(6, 38);
+            toolStripSeparator1.Size = new System.Drawing.Size(6, 25);
             // 
             // tsbEditCut
             // 
+            tsbEditCut.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             tsbEditCut.Image = Properties.Resources.cut;
             tsbEditCut.ImageTransparentColor = System.Drawing.Color.Magenta;
             tsbEditCut.Name = "tsbEditCut";
-            tsbEditCut.Size = new System.Drawing.Size(30, 35);
+            tsbEditCut.Size = new System.Drawing.Size(23, 22);
             tsbEditCut.Text = "C&ut";
             tsbEditCut.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
             tsbEditCut.Click += ToolbarOrContextAction_CutItemsEvent;
             // 
             // tsbEditCopy
             // 
+            tsbEditCopy.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             tsbEditCopy.Image = Properties.Resources.copy;
             tsbEditCopy.ImageTransparentColor = System.Drawing.Color.Magenta;
             tsbEditCopy.Name = "tsbEditCopy";
-            tsbEditCopy.Size = new System.Drawing.Size(39, 35);
+            tsbEditCopy.Size = new System.Drawing.Size(23, 22);
             tsbEditCopy.Text = "C&opy";
             tsbEditCopy.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
             tsbEditCopy.Click += ToolbarOrContextAction_CopyItemsEvent;
             // 
             // tsbEditPaste
             // 
+            tsbEditPaste.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             tsbEditPaste.Image = Properties.Resources.paste;
             tsbEditPaste.ImageTransparentColor = System.Drawing.Color.Magenta;
             tsbEditPaste.Name = "tsbEditPaste";
-            tsbEditPaste.Size = new System.Drawing.Size(39, 35);
+            tsbEditPaste.Size = new System.Drawing.Size(23, 22);
             tsbEditPaste.Text = "P&aste";
             tsbEditPaste.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
             tsbEditPaste.Click += ToolbarOrContextAction_PasteEvent;
             // 
             // tsbEditDelete
             // 
+            tsbEditDelete.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             tsbEditDelete.ForeColor = System.Drawing.Color.DarkRed;
-            tsbEditDelete.Image = Properties.Resources.delete_stop_error;
+            tsbEditDelete.Image = Properties.Resources.trash_solid;
             tsbEditDelete.ImageTransparentColor = System.Drawing.Color.Magenta;
             tsbEditDelete.Name = "tsbEditDelete";
-            tsbEditDelete.Size = new System.Drawing.Size(44, 35);
+            tsbEditDelete.Size = new System.Drawing.Size(23, 22);
             tsbEditDelete.Text = "D&elete";
             tsbEditDelete.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
             tsbEditDelete.Click += ToolbarOrContextAction_DeleteEvent;
             // 
+            // tsbRecyclebinRestore
+            // 
+            tsbRecyclebinRestore.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            tsbRecyclebinRestore.Enabled = false;
+            tsbRecyclebinRestore.Image = Properties.Resources.share_forward;
+            tsbRecyclebinRestore.ImageTransparentColor = System.Drawing.Color.Magenta;
+            tsbRecyclebinRestore.Name = "tsbRecyclebinRestore";
+            tsbRecyclebinRestore.Size = new System.Drawing.Size(23, 22);
+            tsbRecyclebinRestore.Text = "Restore";
+            tsbRecyclebinRestore.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
+            tsbRecyclebinRestore.Click += ToolbarOrContextAction_RestoreFromRecycleBinEvent;
+            // 
             // toolStripSeparator3
             // 
             toolStripSeparator3.Name = "toolStripSeparator3";
-            toolStripSeparator3.Size = new System.Drawing.Size(6, 38);
-            // 
-            // tsbProperties
-            // 
-            tsbProperties.Image = Properties.Resources.properties_settings_wrench;
-            tsbProperties.ImageTransparentColor = System.Drawing.Color.Magenta;
-            tsbProperties.Name = "tsbProperties";
-            tsbProperties.Size = new System.Drawing.Size(64, 35);
-            tsbProperties.Text = "P&roperties";
-            tsbProperties.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
-            tsbProperties.Click += ToolbarOrContextAction_ShowPropertiesBoxEvent;
-            // 
-            // toolStripSeparator5
-            // 
-            toolStripSeparator5.Name = "toolStripSeparator5";
-            toolStripSeparator5.Size = new System.Drawing.Size(6, 38);
+            toolStripSeparator3.Size = new System.Drawing.Size(6, 25);
             // 
             // toolStripDropDownButton1
             // 
+            toolStripDropDownButton1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             toolStripDropDownButton1.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] { largeIconsToolStripMenuItem, smallIconsToolStripMenuItem, detailsToolStripMenuItem });
-            toolStripDropDownButton1.Image = Properties.Resources.show;
+            toolStripDropDownButton1.Image = Properties.Resources.list_solid;
             toolStripDropDownButton1.ImageTransparentColor = System.Drawing.Color.Magenta;
             toolStripDropDownButton1.Name = "toolStripDropDownButton1";
-            toolStripDropDownButton1.Size = new System.Drawing.Size(45, 35);
+            toolStripDropDownButton1.Size = new System.Drawing.Size(29, 22);
             toolStripDropDownButton1.Text = "&View";
             toolStripDropDownButton1.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
             // 
             // largeIconsToolStripMenuItem
             // 
             largeIconsToolStripMenuItem.Name = "largeIconsToolStripMenuItem";
-            largeIconsToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            largeIconsToolStripMenuItem.Size = new System.Drawing.Size(134, 22);
             largeIconsToolStripMenuItem.Text = "&Large icons";
             largeIconsToolStripMenuItem.Click += largeIconsToolStripMenuItem_Click;
             // 
             // smallIconsToolStripMenuItem
             // 
             smallIconsToolStripMenuItem.Name = "smallIconsToolStripMenuItem";
-            smallIconsToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            smallIconsToolStripMenuItem.Size = new System.Drawing.Size(134, 22);
             smallIconsToolStripMenuItem.Text = "&Small icons";
             smallIconsToolStripMenuItem.Click += smallIconsToolStripMenuItem_Click;
             // 
             // detailsToolStripMenuItem
             // 
             detailsToolStripMenuItem.Name = "detailsToolStripMenuItem";
-            detailsToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            detailsToolStripMenuItem.Size = new System.Drawing.Size(134, 22);
             detailsToolStripMenuItem.Text = "&Details";
             detailsToolStripMenuItem.Click += detailsToolStripMenuItem_Click;
+            // 
+            // toolStripSeparator5
+            // 
+            toolStripSeparator5.Name = "toolStripSeparator5";
+            toolStripSeparator5.Size = new System.Drawing.Size(6, 25);
+            // 
+            // tsbProperties
+            // 
+            tsbProperties.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            tsbProperties.Image = Properties.Resources.properties_settings_gears;
+            tsbProperties.ImageTransparentColor = System.Drawing.Color.Magenta;
+            tsbProperties.Name = "tsbProperties";
+            tsbProperties.Size = new System.Drawing.Size(23, 22);
+            tsbProperties.Text = "P&roperties";
+            tsbProperties.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
+            tsbProperties.Click += ToolbarOrContextAction_ShowPropertiesBoxEvent;
             // 
             // toolStripSeparator4
             // 
             toolStripSeparator4.Name = "toolStripSeparator4";
-            toolStripSeparator4.Size = new System.Drawing.Size(6, 38);
+            toolStripSeparator4.Size = new System.Drawing.Size(6, 25);
             // 
-            // tsbRefresh
+            // tspCloseActiveTab
             // 
-            tsbRefresh.Image = Properties.Resources.undo_restart;
-            tsbRefresh.ImageTransparentColor = System.Drawing.Color.Magenta;
-            tsbRefresh.Name = "tsbRefresh";
-            tsbRefresh.Size = new System.Drawing.Size(50, 35);
-            tsbRefresh.Text = "Re&fresh";
-            tsbRefresh.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
-            tsbRefresh.Click += ToolbarOrContextAction_RefreshViewEvent;
+            tspCloseActiveTab.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            tspCloseActiveTab.Image = Properties.Resources.delete_stop_error;
+            tspCloseActiveTab.ImageTransparentColor = System.Drawing.Color.Magenta;
+            tspCloseActiveTab.Name = "tspCloseActiveTab";
+            tspCloseActiveTab.Size = new System.Drawing.Size(23, 22);
+            tspCloseActiveTab.Text = "Close Tab";
+            tspCloseActiveTab.ToolTipText = "Close active tab";
+            tspCloseActiveTab.Click += tspCloseActiveTab_Click;
             // 
-            // tsbRecyclebinRestore
+            // tsbOpenTabNewWindow
             // 
-            tsbRecyclebinRestore.Enabled = false;
-            tsbRecyclebinRestore.Image = Properties.Resources.share_forward;
-            tsbRecyclebinRestore.ImageTransparentColor = System.Drawing.Color.Magenta;
-            tsbRecyclebinRestore.Name = "tsbRecyclebinRestore";
-            tsbRecyclebinRestore.Size = new System.Drawing.Size(50, 35);
-            tsbRecyclebinRestore.Text = "Restore";
-            tsbRecyclebinRestore.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageAboveText;
-            tsbRecyclebinRestore.Click += ToolbarOrContextAction_RestoreFromRecycleBinEvent;
-            // 
-            // lvFileSystemView
-            // 
-            lvFileSystemView.Activation = System.Windows.Forms.ItemActivation.TwoClick;
-            lvFileSystemView.AllowDrop = true;
-            lvFileSystemView.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
-            lvFileSystemView.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            lvFileSystemView.Font = new System.Drawing.Font("Segoe UI", 8F);
-            lvFileSystemView.FullRowSelect = true;
-            lvFileSystemView.LabelEdit = true;
-            lvFileSystemView.LargeImageList = viewImagesLarge;
-            lvFileSystemView.Location = new System.Drawing.Point(3, 69);
-            lvFileSystemView.Name = "lvFileSystemView";
-            lvFileSystemView.ShowItemToolTips = true;
-            lvFileSystemView.Size = new System.Drawing.Size(952, 453);
-            lvFileSystemView.SmallImageList = viewImagesSmall;
-            lvFileSystemView.TabIndex = 2;
-            lvFileSystemView.UseCompatibleStateImageBehavior = false;
-            lvFileSystemView.ItemActivate += lvFileSystemView_ItemActivate;
-            lvFileSystemView.DragDrop += lvFileSystemView_DragDrop;
-            lvFileSystemView.DragEnter += lvFileSystemView_DragEnter;
-            lvFileSystemView.QueryContinueDrag += lvFileSystemView_QueryContinueDrag;
-            lvFileSystemView.MouseDown += lvFileSystemView_MouseDown;
-            lvFileSystemView.MouseUp += lvFileSystemView_MouseUp;
+            tsbOpenTabNewWindow.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            tsbOpenTabNewWindow.Image = Properties.Resources.openNew;
+            tsbOpenTabNewWindow.ImageTransparentColor = System.Drawing.Color.Magenta;
+            tsbOpenTabNewWindow.Name = "tsbOpenTabNewWindow";
+            tsbOpenTabNewWindow.Size = new System.Drawing.Size(23, 22);
+            tsbOpenTabNewWindow.Text = "Open tab in new window";
+            tsbOpenTabNewWindow.Click += tsbOpenTabNewWindow_Click;
             // 
             // viewImagesSmall
             // 
@@ -373,23 +389,11 @@
             propertiesToolStripMenuItem.Text = "P&roperties";
             propertiesToolStripMenuItem.Click += ToolbarOrContextAction_ShowPropertiesBoxEvent;
             // 
-            // btnJumpGo
-            // 
-            btnJumpGo.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
-            btnJumpGo.BackgroundImage = Properties.Resources.openNew;
-            btnJumpGo.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
-            btnJumpGo.Location = new System.Drawing.Point(924, 41);
-            btnJumpGo.Name = "btnJumpGo";
-            btnJumpGo.Size = new System.Drawing.Size(27, 27);
-            btnJumpGo.TabIndex = 5;
-            btnJumpGo.UseVisualStyleBackColor = true;
-            btnJumpGo.Click += JumpAddressGoButton_ClickEvent;
-            // 
             // tbJumpAddress
             // 
-            tbJumpAddress.Location = new System.Drawing.Point(57, 44);
+            tbJumpAddress.Location = new System.Drawing.Point(49, 29);
             tbJumpAddress.Name = "tbJumpAddress";
-            tbJumpAddress.Size = new System.Drawing.Size(861, 23);
+            tbJumpAddress.Size = new System.Drawing.Size(902, 23);
             tbJumpAddress.TabIndex = 6;
             tbJumpAddress.WordWrap = false;
             tbJumpAddress.KeyUp += JumpAddressTextbox_EnterKeyPressedEvent;
@@ -397,20 +401,100 @@
             // label1
             // 
             label1.AutoSize = true;
-            label1.Location = new System.Drawing.Point(12, 47);
+            label1.Location = new System.Drawing.Point(4, 32);
             label1.Name = "label1";
             label1.Size = new System.Drawing.Size(39, 15);
             label1.TabIndex = 7;
             label1.Text = "Go to:";
             // 
+            // tbTabbedPages
+            // 
+            tbTabbedPages.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
+            tbTabbedPages.Appearance = System.Windows.Forms.TabAppearance.FlatButtons;
+            tbTabbedPages.Controls.Add(tpDefaultPage);
+            tbTabbedPages.Controls.Add(tpAddNewPage);
+            tbTabbedPages.ImageList = ilTabImages;
+            tbTabbedPages.ItemSize = new System.Drawing.Size(120, 32);
+            tbTabbedPages.Location = new System.Drawing.Point(3, 58);
+            tbTabbedPages.Multiline = true;
+            tbTabbedPages.Name = "tbTabbedPages";
+            tbTabbedPages.Padding = new System.Drawing.Point(3, 3);
+            tbTabbedPages.SelectedIndex = 0;
+            tbTabbedPages.Size = new System.Drawing.Size(948, 554);
+            tbTabbedPages.SizeMode = System.Windows.Forms.TabSizeMode.Fixed;
+            tbTabbedPages.TabIndex = 8;
+            tbTabbedPages.Selecting += TabPageBeforeClicked_AddNewTabOrRefreshView;
+            // 
+            // tpDefaultPage
+            // 
+            tpDefaultPage.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            tpDefaultPage.Controls.Add(lvDefaultFileBrowser);
+            tpDefaultPage.Location = new System.Drawing.Point(4, 36);
+            tpDefaultPage.Name = "tpDefaultPage";
+            tpDefaultPage.Padding = new System.Windows.Forms.Padding(3);
+            tpDefaultPage.Size = new System.Drawing.Size(940, 514);
+            tpDefaultPage.TabIndex = 0;
+            tpDefaultPage.Text = "My Computer";
+            tpDefaultPage.UseVisualStyleBackColor = true;
+            // 
+            // lvDefaultFileBrowser
+            // 
+            lvDefaultFileBrowser.Activation = System.Windows.Forms.ItemActivation.TwoClick;
+            lvDefaultFileBrowser.AllowDrop = true;
+            lvDefaultFileBrowser.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            lvDefaultFileBrowser.Dock = System.Windows.Forms.DockStyle.Fill;
+            lvDefaultFileBrowser.Font = new System.Drawing.Font("Segoe UI", 8F);
+            lvDefaultFileBrowser.FullRowSelect = true;
+            lvDefaultFileBrowser.LabelEdit = true;
+            lvDefaultFileBrowser.LargeImageList = viewImagesLarge;
+            lvDefaultFileBrowser.Location = new System.Drawing.Point(3, 3);
+            lvDefaultFileBrowser.Name = "lvDefaultFileBrowser";
+            lvDefaultFileBrowser.ShowItemToolTips = true;
+            lvDefaultFileBrowser.Size = new System.Drawing.Size(930, 504);
+            lvDefaultFileBrowser.SmallImageList = viewImagesSmall;
+            lvDefaultFileBrowser.TabIndex = 3;
+            lvDefaultFileBrowser.UseCompatibleStateImageBehavior = false;
+            lvDefaultFileBrowser.ItemActivate += lvActiveFileExplorer_ItemActivate;
+            lvDefaultFileBrowser.DragDrop += lvActiveFileExplorer_DragDrop;
+            lvDefaultFileBrowser.DragEnter += lvActiveFileExplorer_DragEnter;
+            lvDefaultFileBrowser.QueryContinueDrag += lvActiveFileExplorer_QueryContinueDrag;
+            lvDefaultFileBrowser.MouseDown += lvActiveFileExplorer_MouseDown;
+            lvDefaultFileBrowser.MouseUp += lvActiveFileExplorer_MouseUp;
+            // 
+            // tpAddNewPage
+            // 
+            tpAddNewPage.Location = new System.Drawing.Point(4, 36);
+            tpAddNewPage.Name = "tpAddNewPage";
+            tpAddNewPage.Padding = new System.Windows.Forms.Padding(3);
+            tpAddNewPage.Size = new System.Drawing.Size(940, 514);
+            tpAddNewPage.TabIndex = 1;
+            tpAddNewPage.Text = "+ New tab";
+            tpAddNewPage.ToolTipText = "Click on this tab to open a new tab that starts in My Computer view.";
+            tpAddNewPage.UseVisualStyleBackColor = true;
+            // 
+            // ilTabImages
+            // 
+            ilTabImages.ColorDepth = System.Windows.Forms.ColorDepth.Depth32Bit;
+            ilTabImages.ImageSize = new System.Drawing.Size(16, 16);
+            ilTabImages.TransparentColor = System.Drawing.Color.Transparent;
+            // 
+            // tsbOpenInTerminal
+            // 
+            tsbOpenInTerminal.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            tsbOpenInTerminal.Image = Properties.Resources.terminal_solid;
+            tsbOpenInTerminal.ImageTransparentColor = System.Drawing.Color.Magenta;
+            tsbOpenInTerminal.Name = "tsbOpenInTerminal";
+            tsbOpenInTerminal.Size = new System.Drawing.Size(23, 22);
+            tsbOpenInTerminal.Text = "Open in command prompt (terminal)";
+            tsbOpenInTerminal.Click += tsbOpenInTerminal_Click;
+            // 
             // FileBrowser
             // 
             AutoScroll = true;
-            ClientSize = new System.Drawing.Size(957, 526);
+            ClientSize = new System.Drawing.Size(957, 619);
+            Controls.Add(tbTabbedPages);
             Controls.Add(label1);
             Controls.Add(tbJumpAddress);
-            Controls.Add(btnJumpGo);
-            Controls.Add(lvFileSystemView);
             Controls.Add(explorerToolbar);
             Name = "FileBrowser";
             Text = "File browser";
@@ -420,6 +504,8 @@
             explorerToolbar.ResumeLayout(false);
             explorerToolbar.PerformLayout();
             cmsContextMenu.ResumeLayout(false);
+            tbTabbedPages.ResumeLayout(false);
+            tpDefaultPage.ResumeLayout(false);
             ResumeLayout(false);
             PerformLayout();
         }
@@ -442,7 +528,6 @@
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
         private System.Windows.Forms.ToolStripButton tsbProperties;
         private System.Windows.Forms.ToolStripSplitButton tssbMyComputer;
-        private System.Windows.Forms.ListView lvFileSystemView;
         private System.Windows.Forms.ImageList viewImagesSmall;
         private System.Windows.Forms.ColumnHeader chIcon;
         private System.Windows.Forms.ColumnHeader chSync;
@@ -458,8 +543,6 @@
         private System.Windows.Forms.ToolStripMenuItem deleteToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripMenuItem2;
         private System.Windows.Forms.ToolStripMenuItem propertiesToolStripMenuItem;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator4;
-        private System.Windows.Forms.Button btnJumpGo;
         private System.Windows.Forms.TextBox tbJumpAddress;
         private System.Windows.Forms.ToolStripMenuItem refreshToolStripMenuItem;
         private System.Windows.Forms.ToolStripButton tsbRefresh;
@@ -471,5 +554,14 @@
         private System.Windows.Forms.ToolStripButton tsbRecyclebinRestore;
         private System.Windows.Forms.ToolStripMenuItem restoreToolStripMenuItem;
         private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.TabControl tbTabbedPages;
+        private System.Windows.Forms.TabPage tpDefaultPage;
+        private System.Windows.Forms.ListView lvDefaultFileBrowser;
+        private System.Windows.Forms.TabPage tpAddNewPage;
+        private System.Windows.Forms.ImageList ilTabImages;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator4;
+        private System.Windows.Forms.ToolStripButton tspCloseActiveTab;
+        private System.Windows.Forms.ToolStripButton tsbOpenTabNewWindow;
+        private System.Windows.Forms.ToolStripButton tsbOpenInTerminal;
     }
 }

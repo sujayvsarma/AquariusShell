@@ -17,21 +17,22 @@ namespace AquariusShell.ShellApps
         /// <summary>
         /// An item on the listview was double-clicked
         /// </summary>
-        private void lvFileSystemView_ItemActivate(object sender, EventArgs e)
+        private void lvActiveFileExplorer_ItemActivate(object? sender, EventArgs e)
         {
-            if (lvFileSystemView.SelectedItems.Count == 0)
+            if (_activeExplorer.SelectedItems.Count == 0)
             {
                 return;
             }
 
-            if (lvFileSystemView.SelectedItems.Count > 1)
+            if (_activeExplorer.SelectedItems.Count > 1)
             {
                 MessageBox.Show("Please select only one item for this action.", "Aquarius Shell", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 return;
             }
 
-            string path = GetPathFromListViewItem(lvFileSystemView.SelectedItems[0]);
-            if ((_currentDirectory == PATHKEY_RECYCLEBIN) && (path != DIRECTORY_MYCOMPUTER))
+            string path = GetPathFromListViewItem(_activeExplorer.SelectedItems[0]);
+            string currentTabDirectory = GetCurrentDirectoryForTab(_activeTab);
+            if ((currentTabDirectory == PATHKEY_RECYCLEBIN) && (path != DIRECTORY_MYCOMPUTER))
             {
                 // we cannot go into or launch things in recycle bin!
                 // only action we allow is to .. out to the parent folder (My Computer)
@@ -39,28 +40,32 @@ namespace AquariusShell.ShellApps
                 MessageBox.Show("You cannot do that here.", "Aquarius Shell", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 return;
             }
+
+            if (currentTabDirectory == PATHKEY_PRINTERS)
+            {
+                // cause properties to be shown
+                ToolbarOrContextAction_ShowPropertiesBoxEvent(default!, default!);
+                return;
+            }
+
             if (File.Exists(path))
             {
                 Shell32.ExecuteOrLaunchTarget(path);
                 return;
             }
 
-            _historyList.Push(_currentDirectory);
+            _historyList.Push(currentTabDirectory);
             LoadCurrentDirectoryView(path);
         }
 
         /// <summary>
         /// Enter control dragging something
         /// </summary>
-        private void lvFileSystemView_DragEnter(object sender, DragEventArgs e)
+        private void lvActiveFileExplorer_DragEnter(object? sender, DragEventArgs e)
         {
             if ((!_editActionsOnListViewItemsIsDisabled) && (e.Data != null) && e.Data.GetDataPresent(DataFormats.FileDrop))
             {
-                // 32 is apparently keycode for ALT ??
-                // ref: https://learn.microsoft.com/en-us/dotnet/api/system.windows.forms.drageventargs.keystate?view=windowsdesktop-8.0 
-                // (see the code sample)
-
-                bool isCtrlKeyPressed = ((e.KeyState & 32) == 32);
+                bool isCtrlKeyPressed = ((e.KeyState & ALT_KEY) == ALT_KEY);
                 string[]? files = (string[]?)e.Data.GetData(DataFormats.FileDrop);
                 if ((files != null) && (files.Length > 0))
                 {
@@ -81,7 +86,7 @@ namespace AquariusShell.ShellApps
         /// <summary>
         /// Drop something onto the control
         /// </summary>
-        private void lvFileSystemView_DragDrop(object sender, DragEventArgs e)
+        private void lvActiveFileExplorer_DragDrop(object? sender, DragEventArgs e)
         {
             if ((!_editActionsOnListViewItemsIsDisabled) && (e.Data != null) && e.Data.GetDataPresent(DataFormats.FileDrop)
                 && ((e.Effect == DragDropEffects.Copy) || (e.Effect == DragDropEffects.Move)))
@@ -89,7 +94,8 @@ namespace AquariusShell.ShellApps
                 string[]? files = (string[]?)e.Data.GetData(DataFormats.FileDrop);
                 if ((files != null) && (files.Length > 0))
                 {
-                    FileOperationWithProgress doPasteOperation = new(_currentDirectory, files);
+                    string currentTabDirectory = GetCurrentDirectoryForTab(_activeTab);
+                    FileOperationWithProgress doPasteOperation = new(currentTabDirectory, files);
                     doPasteOperation.Show(this);
                     if (e.Effect == DragDropEffects.Move)
                     {
@@ -106,7 +112,7 @@ namespace AquariusShell.ShellApps
         /// <summary>
         /// Start dragging a ListViewITEM
         /// </summary>
-        private void lvFileSystemView_QueryContinueDrag(object sender, QueryContinueDragEventArgs e)
+        private void lvActiveFileExplorer_QueryContinueDrag(object? sender, QueryContinueDragEventArgs e)
         {
             if (_editActionsOnListViewItemsIsDisabled)
             {
@@ -117,7 +123,7 @@ namespace AquariusShell.ShellApps
         /// <summary>
         /// Mouse button down - hide the context menu if shown
         /// </summary>
-        private void lvFileSystemView_MouseDown(object sender, MouseEventArgs e)
+        private void lvActiveFileExplorer_MouseDown(object? sender, MouseEventArgs e)
         {
             if (cmsContextMenu.Visible)
             {
@@ -128,11 +134,11 @@ namespace AquariusShell.ShellApps
         /// <summary>
         /// Mouse button up - show the context menu if required
         /// </summary>
-        private void lvFileSystemView_MouseUp(object sender, MouseEventArgs e)
+        private void lvActiveFileExplorer_MouseUp(object? sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Right)
             {
-                ListViewItem? item = lvFileSystemView.GetItemAt(e.X, e.Y);
+                ListViewItem? item = _activeExplorer.GetItemAt(e.X, e.Y);
                 if (item != null)
                 {
                     bool isAnyMenuItemEnabled = false;
@@ -147,7 +153,7 @@ namespace AquariusShell.ShellApps
 
                     if (isAnyMenuItemEnabled)
                     {
-                        cmsContextMenu.Show(lvFileSystemView, new Point(e.X, e.Y), ToolStripDropDownDirection.BelowRight);
+                        cmsContextMenu.Show(_activeExplorer, new Point(e.X, e.Y), ToolStripDropDownDirection.BelowRight);
                     }
                 }
             }

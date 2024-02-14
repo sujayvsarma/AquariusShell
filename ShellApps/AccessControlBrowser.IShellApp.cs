@@ -1,13 +1,9 @@
 
 using System;
 using System.Drawing;
-using System.IO;
-using System.Linq;
-using System.Text;
 using System.Windows.Forms;
 
 using AquariusShell.Controls;
-using AquariusShell.Modules;
 using AquariusShell.Runtime;
 
 namespace AquariusShell.ShellApps
@@ -55,7 +51,7 @@ namespace AquariusShell.ShellApps
         /// <summary>
         /// When set, this app is not shown on the Launcher UI
         /// </summary>
-        public bool HideFromLauncher => true;
+        public bool HideFromLauncher => false;      //true;
 
         #endregion
 
@@ -80,116 +76,16 @@ namespace AquariusShell.ShellApps
         {
             if (_command.Equals(command, StringComparison.InvariantCultureIgnoreCase))
             {
-                // param#0 should be the path we want to show (from a context menu)
+                // If we were provided a parameter, it would be the context-path. Otherwise, we do the whole filesystem
                 if ((parameters.Length > 0) && (!string.IsNullOrWhiteSpace(parameters[0])))
                 {
-                    // Recursively load the items upto and including the provided path.
-                    string[] path = parameters[0].Split(Path.DirectorySeparatorChar, StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
-
-                    // path[0] would be the drive label ("C:"), let's \\ it
-                    path[0] = $"{path[0]}\\";
-                    DriveInfo? parentDrive = DriveInfo.GetDrives().FirstOrDefault(d => (d.Name == path[0]));
-                    FileSystemNode? parentNode = null;
-
-                    _disableTreeViewActivation = true;
-
-                    if (parentDrive != null)
-                    {
-                        string imageKey = parentDrive.DriveType switch
-                        {
-                            DriveType.CDRom => StockIconId.DriveCD.ToString(),
-                            DriveType.Fixed => StockIconId.DriveFixed.ToString(),
-                            DriveType.Network => (parentDrive.IsReady ? StockIconId.DriveNet.ToString() : StockIconId.DriveNetDisabled.ToString()),
-                            DriveType.NoRootDirectory => StockIconId.DriveUnknown.ToString(),
-                            DriveType.Ram => StockIconId.DriveRam.ToString(),
-                            DriveType.Removable => StockIconId.DriveRemovable.ToString(),
-
-                            _ => StockIconId.DriveUnknown.ToString()
-                        };
-
-                        try
-                        {
-                            parentNode = AddItemToTreeView(
-                                    null,
-                                    $"{parentDrive.VolumeLabel}{Environment.NewLine}({parentDrive.Name})",
-                                    imageKey,
-                                    parentDrive.Name
-                                );
-                        }
-                        catch (IOException)
-                        {
-                            parentNode = AddItemToTreeView(
-                                    null,
-                                    $"(Not Formatted) {Environment.NewLine}({parentDrive.Name})",
-                                    imageKey,
-                                    parentDrive.Name
-                                );
-                        }
-                    }
-
-                    if (parentNode == null)
-                    {
-                        MessageBox.Show($"A drive or root path by the name '{path[0]}' could not be found.", "Aquarius Shell", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        return;
-                    }
-
-                    // populate our hierarchy LL
-                    _hierarchy.AddFirst(parentNode);
-
-                    // Load up our path, recursively
-                    string pathString = path[0];
-                    for (int i = 1; i < path.Length; i++)
-                    {
-                        pathString = Path.Combine(pathString, path[i]);
-
-                        string currentPathSegment = pathString.ToString(), imageKey;
-                        if (Directory.Exists(currentPathSegment))
-                        {
-                            imageKey = IMAGEKEY_FOLDER;
-                        }
-                        else
-                        {
-                            imageKey = Path.GetExtension(path[i]).ToUpperInvariant();
-                            if (imageKey == ".LNK")
-                            {
-                                // each .lnk will have its own icon, based on its target
-                                int linkItemsCount = 0;
-                                foreach (string? s in ilFileSystemImages.Images.Keys)
-                                {
-                                    if ((!string.IsNullOrWhiteSpace(s)) && (s.EndsWith(".LNK")))
-                                    {
-                                        linkItemsCount++;
-                                    }
-                                }
-
-                                imageKey = $"{linkItemsCount}.LNK";
-                            }
-
-                            if (!ilFileSystemImages.Images.ContainsKey(imageKey))
-                            {
-                                Icon icon = Icons.ExtractAssociatedIcon(currentPathSegment);
-                                AddIconToImageLists(imageKey, icon);
-                            }
-                        }
-
-                        parentNode = AddItemToTreeView(
-                                parentNode,
-                                path[i],
-                                imageKey,
-                                currentPathSegment
-                            );
-
-                        // populate our hierarchy LL
-                        _hierarchy.AddLast(parentNode);
-                    }
-
-                    // clear the last node's children if we have them
-                    if (parentNode.IsExpandable)
-                    {
-                        parentNode.Nodes.Clear();
-                    }
-
-                    _disableTreeViewActivation = false;
+                    // Load the contextual path
+                    LoadContextPath(parameters[0]);
+                }
+                else
+                {
+                    // prep for lazy loading
+                    LazyLoadInitialiseTree();
                 }
 
                 this.Show((parentWindowHandle ?? ShellEnvironment.WorkArea));

@@ -140,6 +140,7 @@
             tvFilesystemBrowser.SelectedImageIndex = 0;
             tvFilesystemBrowser.Size = new System.Drawing.Size(246, 712);
             tvFilesystemBrowser.TabIndex = 1;
+            tvFilesystemBrowser.BeforeExpand += TreeViewFileSystem_LazyLoadChildren;
             tvFilesystemBrowser.AfterSelect += TreeViewFileSystem_ShowPrincipalsOnItemClick;
             // 
             // ilFileSystemImages
