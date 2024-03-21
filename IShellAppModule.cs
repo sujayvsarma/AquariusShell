@@ -1,8 +1,5 @@
-﻿using System;
-using System.Drawing;
+﻿using System.Drawing;
 using System.Windows.Forms;
-
-using AquariusShell.Controls;
 
 namespace AquariusShell
 {
@@ -63,7 +60,7 @@ namespace AquariusShell
         /// <summary>
         /// Notify that this app was closed by the user
         /// </summary>
-        public event BuiltInAppClosed AppClosed;
+        event BuiltInAppClosed AppClosed;
     }
 
     /// <summary>

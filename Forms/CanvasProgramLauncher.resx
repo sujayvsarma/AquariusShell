@@ -117,33 +117,21 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <metadata name="lvAppsListIcons32.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>485, 21</value>
+  <metadata name="lvShellAppsListIcons32.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>214, 17</value>
   </metadata>
-  <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
-  <data name="btnCloseLauncher.Image" type="System.Drawing.Bitmap, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
-    <value>
-        iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAO
-        vAAADrwBlbxySQAAAepJREFUaEPtVQuuwjAM4+g7GjfjvTCypZnb5jcGEpYsrdaS2m0Gt388vpxQdHNZ
-        lifv9/tGBq/5HVSfIBRNZENRFAWC4pC0qTzhLKgX2sdIKHZZaVwjGASKB2ZGxQvnWEGx4Zmn3oMjBBQ3
-        XmGeYRwpKD55pXmGIQQUP8I8YzJOR/GdH6wVgxCtYDHP11pxS55e0qdgK8zAGzIzIby99Psv7ovZ6Xca
-        hEJEe4FR2hczyHc1PSF65pkjgNr1wTP7PVpCVPRQNfZCQsZAhXmCGqP1wYOIkSrzDFEb+933GKo2TxD1
-        8T8ui7EzzBPEGMWbEGYGR8zs2wTIIhIiY54g9swHIHhCZM0TygMQLCEqzBN+ATQs5pkVIUoDeMwzsyGa
-        AJlmEfPMzL7Nz+jX/5FFAniMnRFC1K8PHkQMVYcQtb4GGSNVIcT4ENcHyxhVGKjooWr2xQzyXU3r6RFm
-        IUYAtftidgu9jT3mGdFeanyIzeL1Wh9644h5hreXfv/FVvB8CxnzDE8v6VPwKFpCvBtgdJhQLDndKvAt
-        dQjFJz8BE/NEKG688iYM5olQbHhFiMHMa0LxwHd+2A7zRChCUuMzb8M4MppQHLI6CPVynrokFE2kTYlR
-        cD3q7SAU3WQzdJr6dlhLnnSPUPwS3h5/XhaSKSK6//UAAAAASUVORK5CYII=
-</value>
-  </data>
-  <metadata name="chevronImages.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+  <metadata name="lvWindowsAppsListIcons32.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>17, 17</value>
+  </metadata>
+  <metadata name="chevronImages.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>387, 17</value>
   </metadata>
   <data name="chevronImages.ImageStream" mimetype="application/x-microsoft.net.object.binary.base64">
     <value>
         AAEAAAD/////AQAAAAAAAAAMAgAAAEZTeXN0ZW0uV2luZG93cy5Gb3JtcywgQ3VsdHVyZT1uZXV0cmFs
         LCBQdWJsaWNLZXlUb2tlbj1iNzdhNWM1NjE5MzRlMDg5BQEAAAAmU3lzdGVtLldpbmRvd3MuRm9ybXMu
         SW1hZ2VMaXN0U3RyZWFtZXIBAAAABERhdGEHAgIAAAAJAwAAAA8DAAAACBUAAAJNU0Z0AUkBTAIBAQIB
-        AAEYAQEBGAEBASABAAEgAQAD/wEAASEBAAj/AUIBTQE2BwABNgMAASgDAAGAAwABIAMAAQEBAAEgBgAB
+        AAFwAQEBcAEBASABAAEgAQAD/wEAASEBAAj/AUIBTQE2BwABNgMAASgDAAGAAwABIAMAAQEBAAEgBgAB
         QP8A/wD/AP8AQgADBgEHAy0BRQNGAX0DUQGiA1YBswNWAbMDUQGhA0YBfQMtAUYDBgEIWAADBgEHAy0B
         RQNGAX0DUQGiA1YBswNWAbMDUQGhA0YBfQMtAUYDBgEI/wBRAAMWAR4DTQGTA14B8AMAAf8DAAH/AwAB
         /wMAAf8DAAH/AwAB/wMAAf8DAAH/A14B8ANNAZMDFgEeSAADFgEeA00BkwNeAfADAAH/AwAB/wMAAf8D
@@ -235,10 +223,4 @@
         gAEBAf8IAAH/AeABBwL/AeABBwH/CAAI/wgACP8IAAs=
 </value>
   </data>
-  <metadata name="prgGlobalFilesWatcher.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>152, 17</value>
-  </metadata>
-  <metadata name="prgUserFilesWatcher.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>325, 17</value>
-  </metadata>
 </root>

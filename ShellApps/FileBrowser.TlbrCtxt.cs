@@ -42,7 +42,7 @@ namespace AquariusShell.ShellApps
         /// </summary>
         private void ToolstripButton_CreateNewFolder_ClickEvent(object sender, EventArgs e)
         {
-            PopupTextInput popupInput = new PopupTextInput()
+            PopupTextInput popupInput = new()
             {
                 Prompt = "Name of the folder"
             };
@@ -73,7 +73,7 @@ namespace AquariusShell.ShellApps
         /// </summary>
         private void ToolstripButton_CreateNewFile_ClickEvent(object sender, EventArgs e)
         {
-            PopupTextInput popupInput = new PopupTextInput()
+            PopupTextInput popupInput = new()
             {
                 Prompt = "Name of the file with extension (eg: 'untitled.txt')"
             };
@@ -112,15 +112,10 @@ namespace AquariusShell.ShellApps
             {
                 ValidateAndNavigateToJumpAddress();
                 e.Handled = true;
+                return;
             }
-        }
 
-        /// <summary>
-        /// Clicked on the JUMP button, navigate to the path in the textbox if it is a valid path
-        /// </summary>
-        private void JumpAddressGoButton_ClickEvent(object sender, EventArgs e)
-        {
-            ValidateAndNavigateToJumpAddress();
+            e.Handled = false;
         }
 
         /// <summary>
@@ -189,24 +184,20 @@ namespace AquariusShell.ShellApps
         /// </summary>
         private void ToolbarOrContextAction_DeleteEvent(object sender, EventArgs e)
         {
-            bool isPermanentDelete = Control.ModifierKeys.HasFlag(Keys.Shift);
-            if (isPermanentDelete)
-            {
-                if (MessageBox.Show($"Do you wish to delete {_activeExplorer.SelectedItems.Count} items? This action cannot be undone!", "Aquarius Shell", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.No)
-                {
-                    return;
-                }
-            }
-
             string currentTabDirectory = GetCurrentDirectoryForTab(_activeTab);
 
-            // Ensure:
-            //  1. View is NOT readonly
-            //  2. Listing is a regular filesystem directory (not a special folder!)
-            //  3. We have something to delete
-            //
+            // If we are in a regular folder and one or more items has been selected
             if ((!_editActionsOnListViewItemsIsDisabled) && (_listingState == ListViewListingStatesEnum.FileSystemDirectory) && (_activeExplorer.SelectedItems.Count > 0))
             {
+                bool isPermanentDelete = Control.ModifierKeys.HasFlag(Keys.Shift);
+                if (isPermanentDelete)
+                {
+                    if (MessageBox.Show($"Do you wish to delete {_activeExplorer.SelectedItems.Count} items? This action cannot be undone!", "Aquarius Shell", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.No)
+                    {
+                        return;
+                    }
+                }
+
                 List<string> source = new();
                 foreach (ListViewItem item in _activeExplorer.SelectedItems)
                 {
@@ -215,30 +206,38 @@ namespace AquariusShell.ShellApps
 
                 if (source.Count > 0)
                 {
-                    FileOperationWithProgress fileOperationWithProgress = new(currentTabDirectory, source);
-                    fileOperationWithProgress.Show(this);
-                    fileOperationWithProgress.DeleteSpecificFilesOrDirectories(isPermanentDelete);
+                    if (isPermanentDelete)
+                    {
+                        // Delete permanently
 
-                    LoadCurrentDirectoryView();
+                        FileOperationWithProgress fileOperationWithProgress = new(currentTabDirectory, source);
+                        fileOperationWithProgress.Show(this);
+                        fileOperationWithProgress.DeleteSpecificFilesOrDirectories(isPermanentDelete);
+                    }
+                    else
+                    {
+                        // Send items to recycle bin
+                        // if only 1 item, then use SendFileToRecycleBin otherwise SendFilesToRecycleBin
+                        if (source.Count == 1)
+                        {
+                            Filesystem.SendFileToRecycleBin(source[0]);
+                        }
+                        else
+                        {
+                            Filesystem.SendFilesToRecycleBin(source);
+                        }
+                    }
                 }
             }
 
-            if (currentTabDirectory.Equals(PATHKEY_RECYCLEBIN, StringComparison.Ordinal))
+            if (!currentTabDirectory.Equals(PATHKEY_RECYCLEBIN, StringComparison.Ordinal))
             {
-                List<string> source = new();
-                foreach (ListViewItem item in _activeExplorer.SelectedItems)
+                if (MessageBox.Show($"Do you wish to delete all {_activeExplorer.Items.Count} items from Deleted Items? This action cannot be undone!", "Aquarius Shell", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.No)
                 {
-                    source.Add(GetPathFromListViewItem(item));
+                    return;
                 }
 
-                if (source.Count == 1)
-                {
-                    Filesystem.SendItemToRecycleBin(source[0]);
-                }
-                else
-                {
-                    Filesystem.SendFilesToRecycleBin(source);
-                }
+                Filesystem.EmptyRecycleBin();
             }
 
             // Reload

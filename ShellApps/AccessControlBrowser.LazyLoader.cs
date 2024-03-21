@@ -3,6 +3,7 @@ using System.IO;
 using System.Windows.Forms;
 
 using AquariusShell.Modules;
+using AquariusShell.Objects;
 using AquariusShell.Runtime;
 
 namespace AquariusShell.ShellApps
@@ -141,7 +142,7 @@ namespace AquariusShell.ShellApps
                 // If we have a node that's a FileSystemNode that's expandable (is a directory node)
                 // and its first child is a fake node, then....
                 // PS: We would have added fake nodes to all directories to enable the TV to show a "+". (See FileSystemNode..ctor)
-                if ((e.Node != null) && (e.Node is FileSystemNode fsn) && fsn.IsExpandable && (fsn.Nodes[0] is FileSystemNode firstChild) && firstChild.IsFake)
+                if ((e.Node != null) && (e.Node is FileSystemNode fsn) && (!fsn.IsAlreadyEnumerated))
                 {
                     fsn.Nodes.Clear();
 

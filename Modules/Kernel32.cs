@@ -11,13 +11,6 @@ namespace AquariusShell.Modules
     internal static partial class Kernel32
     {
         /// <summary>
-        /// Get the last API error code
-        /// </summary>
-        /// <returns>Raw Error code</returns>
-        public static uint GetLastWin32Error() => GetLastError();
-
-
-        /// <summary>
         /// Get the executable file name that started the given process
         /// </summary>
         /// <param name="pid">PID of the process</param>
@@ -53,7 +46,7 @@ namespace AquariusShell.Modules
                 {
                     // WMI needs path \s escaped twice (instead of '\\', '\\\\')!
                     string directoryPath = "Win32_Directory.Name=" + "'" + fullPathToTarget.Replace("\\", @"\\").TrimEnd('\\') + "'";
-                    using (ManagementObject mgmt = new ManagementObject(directoryPath))
+                    using (ManagementObject mgmt = new(directoryPath))
                     {
                         mgmt.InvokeMethod("Compress", null, null);
                     }
@@ -62,7 +55,9 @@ namespace AquariusShell.Modules
                 {
                     using (FileStream stream = File.Open(fullPathToTarget, FileMode.Open, FileAccess.ReadWrite, FileShare.None))
                     {
+#pragma warning disable CA1806 // Do not ignore method results
                         DeviceIoControl(stream.SafeFileHandle.DangerousGetHandle(), FSCTL_SET_COMPRESSION, ref inBuffer, sizeof(short), IntPtr.Zero, 0, ref bytesReturned, IntPtr.Zero);
+#pragma warning restore CA1806 // Do not ignore method results
                     }
                 }
             }
@@ -84,7 +79,7 @@ namespace AquariusShell.Modules
                 {
                     // WMI needs path \s escaped twice (instead of '\\', '\\\\')!
                     string directoryPath = "Win32_Directory.Name=" + "'" + fullPathToTarget.Replace("\\", @"\\").TrimEnd('\\') + "'";
-                    using (ManagementObject mgmt = new ManagementObject(directoryPath))
+                    using (ManagementObject mgmt = new(directoryPath))
                     {
                         mgmt.InvokeMethod("Uncompress", null, null);
                     }
@@ -93,7 +88,9 @@ namespace AquariusShell.Modules
                 {
                     using (FileStream stream = File.Open(fullPathToTarget, FileMode.Open, FileAccess.ReadWrite, FileShare.None))
                     {
+#pragma warning disable CA1806 // Do not ignore method results
                         DeviceIoControl(stream.SafeFileHandle.DangerousGetHandle(), FSCTL_SET_COMPRESSION, ref inBuffer, sizeof(short), IntPtr.Zero, 0, ref bytesReturned, IntPtr.Zero);
+#pragma warning restore CA1806 // Do not ignore method results
                     }
                 }
             }

@@ -29,7 +29,7 @@ namespace AquariusShell.ShellApps
 
             if (e.TabPage == tpAddNewPage)
             {
-                TabPage newPage = new TabPage();
+                TabPage newPage = new();
                 
                 tabbedPageId++;
 
@@ -100,7 +100,7 @@ namespace AquariusShell.ShellApps
 
                 // Remove the tab
                 int tabIndex = (int)_activeTab.Tag!;
-                int setFocusToTabIndex = 0;
+                int setFocusToTabIndex;
                 if (tabIndex > 0)
                 {
                     // Current tab is not 1st tab

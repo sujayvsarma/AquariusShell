@@ -19,10 +19,7 @@ namespace AquariusShell.Runtime
         /// <param name="command">The command matching the app</param>
         public void ReleaseAppInstance(string command)
         {
-            if (_appInstances.ContainsKey(command))
-            {
-                _appInstances.Remove(command);
-            }
+            _appInstances.Remove(command);
         }
 
 
@@ -36,11 +33,11 @@ namespace AquariusShell.Runtime
             AppIconOrShortcut? appReference = GetAppReferenceFromCommand(command);
             if (appReference != null)
             {
-                if (_appInstances.ContainsKey(command))
+                if (_appInstances.TryGetValue(command, out IShellAppModule? value))
                 {
                     if (appReference.InstancingMode == ShellAppInstancingModeEnum.Single)
                     {
-                        return _appInstances[command];
+                        return value;
                     }
                 }
 
@@ -145,7 +142,7 @@ namespace AquariusShell.Runtime
 
         #endregion
 
-        private List<AppIconOrShortcut> _discoveredAppTypesCache;
-        private Dictionary<string, IShellAppModule> _appInstances;
+        private readonly List<AppIconOrShortcut> _discoveredAppTypesCache;
+        private readonly Dictionary<string, IShellAppModule> _appInstances;
     }
 }

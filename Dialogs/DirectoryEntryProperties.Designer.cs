@@ -31,8 +31,9 @@
             horizontalLine1 = new Controls.HorizontalLine();
             lblFileNameWithoutExtension = new System.Windows.Forms.Label();
             pbFileTypeIcon = new System.Windows.Forms.PictureBox();
-            tabControl1 = new System.Windows.Forms.TabControl();
+            tbProperties = new System.Windows.Forms.TabControl();
             tpGeneral = new System.Windows.Forms.TabPage();
+            btnManageSecurity = new System.Windows.Forms.Button();
             btnCopyDirectory = new System.Windows.Forms.Button();
             btnMoveDirectory = new System.Windows.Forms.Button();
             btnDeleteDirectory = new System.Windows.Forms.Button();
@@ -54,9 +55,8 @@
             columnHeader1 = new System.Windows.Forms.ColumnHeader();
             columnHeader2 = new System.Windows.Forms.ColumnHeader();
             fbdDestinationPicker = new System.Windows.Forms.FolderBrowserDialog();
-            btnManageSecurity = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)pbFileTypeIcon).BeginInit();
-            tabControl1.SuspendLayout();
+            tbProperties.SuspendLayout();
             tpGeneral.SuspendLayout();
             groupBox1.SuspendLayout();
             basicInfoLayoutTable.SuspendLayout();
@@ -90,18 +90,19 @@
             pbFileTypeIcon.TabIndex = 10;
             pbFileTypeIcon.TabStop = false;
             // 
-            // tabControl1
+            // tbProperties
             // 
-            tabControl1.Controls.Add(tpGeneral);
-            tabControl1.Controls.Add(tpMetadata);
-            tabControl1.Location = new System.Drawing.Point(6, 49);
-            tabControl1.Name = "tabControl1";
-            tabControl1.SelectedIndex = 0;
-            tabControl1.Size = new System.Drawing.Size(411, 416);
-            tabControl1.TabIndex = 13;
+            tbProperties.Controls.Add(tpGeneral);
+            tbProperties.Controls.Add(tpMetadata);
+            tbProperties.Location = new System.Drawing.Point(6, 49);
+            tbProperties.Name = "tbProperties";
+            tbProperties.SelectedIndex = 0;
+            tbProperties.Size = new System.Drawing.Size(411, 416);
+            tbProperties.TabIndex = 13;
             // 
             // tpGeneral
             // 
+            tpGeneral.BackColor = System.Drawing.Color.SteelBlue;
             tpGeneral.Controls.Add(btnManageSecurity);
             tpGeneral.Controls.Add(btnCopyDirectory);
             tpGeneral.Controls.Add(btnMoveDirectory);
@@ -114,26 +115,44 @@
             tpGeneral.Size = new System.Drawing.Size(403, 388);
             tpGeneral.TabIndex = 0;
             tpGeneral.Text = "General";
-            tpGeneral.UseVisualStyleBackColor = true;
+            // 
+            // btnManageSecurity
+            // 
+            btnManageSecurity.BackColor = System.Drawing.Color.SteelBlue;
+            btnManageSecurity.FlatAppearance.BorderColor = System.Drawing.Color.White;
+            btnManageSecurity.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            btnManageSecurity.Location = new System.Drawing.Point(311, 352);
+            btnManageSecurity.Name = "btnManageSecurity";
+            btnManageSecurity.Size = new System.Drawing.Size(86, 30);
+            btnManageSecurity.TabIndex = 15;
+            btnManageSecurity.Text = "&Security...";
+            btnManageSecurity.UseVisualStyleBackColor = false;
+            btnManageSecurity.Click += btnManageSecurity_Click;
             // 
             // btnCopyDirectory
             // 
+            btnCopyDirectory.BackColor = System.Drawing.Color.SteelBlue;
+            btnCopyDirectory.FlatAppearance.BorderColor = System.Drawing.Color.White;
+            btnCopyDirectory.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             btnCopyDirectory.Location = new System.Drawing.Point(170, 352);
             btnCopyDirectory.Name = "btnCopyDirectory";
             btnCopyDirectory.Size = new System.Drawing.Size(75, 30);
             btnCopyDirectory.TabIndex = 15;
             btnCopyDirectory.Text = "C&opy";
-            btnCopyDirectory.UseVisualStyleBackColor = true;
+            btnCopyDirectory.UseVisualStyleBackColor = false;
             btnCopyDirectory.Click += btnCopyDirectory_Click;
             // 
             // btnMoveDirectory
             // 
+            btnMoveDirectory.BackColor = System.Drawing.Color.SteelBlue;
+            btnMoveDirectory.FlatAppearance.BorderColor = System.Drawing.Color.White;
+            btnMoveDirectory.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             btnMoveDirectory.Location = new System.Drawing.Point(89, 352);
             btnMoveDirectory.Name = "btnMoveDirectory";
             btnMoveDirectory.Size = new System.Drawing.Size(75, 30);
             btnMoveDirectory.TabIndex = 16;
             btnMoveDirectory.Text = "&Move";
-            btnMoveDirectory.UseVisualStyleBackColor = true;
+            btnMoveDirectory.UseVisualStyleBackColor = false;
             btnMoveDirectory.Click += btnMoveDirectory_Click;
             // 
             // btnDeleteDirectory
@@ -314,6 +333,7 @@
             // 
             // tpMetadata
             // 
+            tpMetadata.BackColor = System.Drawing.Color.SteelBlue;
             tpMetadata.Controls.Add(lvMetadata);
             tpMetadata.Location = new System.Drawing.Point(4, 24);
             tpMetadata.Name = "tpMetadata";
@@ -321,13 +341,14 @@
             tpMetadata.Size = new System.Drawing.Size(403, 388);
             tpMetadata.TabIndex = 1;
             tpMetadata.Text = "Metadata";
-            tpMetadata.UseVisualStyleBackColor = true;
             // 
             // lvMetadata
             // 
+            lvMetadata.BackColor = System.Drawing.Color.SteelBlue;
             lvMetadata.BorderStyle = System.Windows.Forms.BorderStyle.None;
             lvMetadata.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] { columnHeader1, columnHeader2 });
             lvMetadata.Dock = System.Windows.Forms.DockStyle.Fill;
+            lvMetadata.ForeColor = System.Drawing.Color.White;
             lvMetadata.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
             lvMetadata.LabelWrap = false;
             lvMetadata.Location = new System.Drawing.Point(3, 3);
@@ -355,25 +376,17 @@
             fbdDestinationPicker.OkRequiresInteraction = true;
             fbdDestinationPicker.RootFolder = System.Environment.SpecialFolder.MyComputer;
             // 
-            // btnManageSecurity
-            // 
-            btnManageSecurity.Location = new System.Drawing.Point(311, 352);
-            btnManageSecurity.Name = "btnManageSecurity";
-            btnManageSecurity.Size = new System.Drawing.Size(86, 30);
-            btnManageSecurity.TabIndex = 15;
-            btnManageSecurity.Text = "&Security...";
-            btnManageSecurity.UseVisualStyleBackColor = true;
-            btnManageSecurity.Click += btnManageSecurity_Click;
-            // 
             // DirectoryEntryProperties
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            BackColor = System.Drawing.Color.SteelBlue;
             ClientSize = new System.Drawing.Size(420, 470);
-            Controls.Add(tabControl1);
+            Controls.Add(tbProperties);
             Controls.Add(pbFileTypeIcon);
             Controls.Add(lblFileNameWithoutExtension);
             Controls.Add(horizontalLine1);
+            ForeColor = System.Drawing.Color.White;
             FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             MaximizeBox = false;
             MinimizeBox = false;
@@ -382,7 +395,7 @@
             StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             Text = "Properties";
             ((System.ComponentModel.ISupportInitialize)pbFileTypeIcon).EndInit();
-            tabControl1.ResumeLayout(false);
+            tbProperties.ResumeLayout(false);
             tpGeneral.ResumeLayout(false);
             tpGeneral.PerformLayout();
             groupBox1.ResumeLayout(false);
@@ -396,7 +409,7 @@
         private Controls.HorizontalLine horizontalLine1;
         private System.Windows.Forms.Label lblFileNameWithoutExtension;
         private System.Windows.Forms.PictureBox pbFileTypeIcon;
-        private System.Windows.Forms.TabControl tabControl1;
+        private System.Windows.Forms.TabControl tbProperties;
         private System.Windows.Forms.TabPage tpGeneral;
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.FlowLayoutPanel layoutAttributesList;

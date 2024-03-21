@@ -166,6 +166,7 @@
             // btnCancelOperation
             // 
             btnCancelOperation.Anchor = System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right;
+            btnCancelOperation.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             btnCancelOperation.Location = new System.Drawing.Point(487, 179);
             btnCancelOperation.Name = "btnCancelOperation";
             btnCancelOperation.Size = new System.Drawing.Size(84, 29);
@@ -178,12 +179,14 @@
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            BackColor = System.Drawing.Color.SteelBlue;
             ClientSize = new System.Drawing.Size(578, 217);
             ControlBox = false;
             Controls.Add(btnCancelOperation);
             Controls.Add(prgOperationProgressLabel);
             Controls.Add(prgOperationProgress);
             Controls.Add(tableLayoutPanel1);
+            ForeColor = System.Drawing.Color.White;
             FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             MaximizeBox = false;
             Name = "FileOperationWithProgress";

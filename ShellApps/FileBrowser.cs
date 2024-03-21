@@ -4,6 +4,8 @@ using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
 
+using AquariusShell.ConfigurationManagement;
+using AquariusShell.ConfigurationManagement.Settings;
 using AquariusShell.Runtime;
 
 namespace AquariusShell.ShellApps
@@ -82,6 +84,8 @@ namespace AquariusShell.ShellApps
         {
             InitializeComponent();
 
+            _settings = ConfigurationProvider<FileBrowserSettings>.Get();
+
             DIRECTORY_MYCOMPUTER = Environment.GetFolderPath(Environment.SpecialFolder.MyComputer);
 
             _historyList = new();
@@ -105,18 +109,28 @@ namespace AquariusShell.ShellApps
             {
                 { 0, DIRECTORY_MYCOMPUTER }
             };
+
+            tbJumpAddress.Enabled = _settings.AllowJumpToAddress;
+            tsbOpenTabNewWindow.Enabled = _settings.EnableTabbedBrowsing && _settings.EnabledButtons.HasFlag(ConfigurationManagement.Constants.FileBrowserToolbarButtonsEnumFlags.OpenActiveTabInNewWindow);
+            if (!_settings.EnableTabbedBrowsing)
+            {
+                //tpAddNewPage
+                tbTabbedPages.TabPages.Remove(tpAddNewPage);
+            }
         }
 
         private TabPage _activeTab;
         private ListView _activeExplorer;
-        private Dictionary<int, string> _tabwiseCurrentDirectory;
 
         private string? _preselectedItem = null;
-        private readonly Stack<string> _historyList;
         private ClipboardActionTypesEnum _clipboardCurrentAction;
-        private FileBrowserItemDisplayFlags _displayFlags;
         private ListViewListingStatesEnum _listingState;
         private bool _editActionsOnListViewItemsIsDisabled;
+
+        private readonly Dictionary<int, string> _tabwiseCurrentDirectory;
+        private readonly FileBrowserItemDisplayFlags _displayFlags;
+        private readonly Stack<string> _historyList;
+        private readonly FileBrowserSettings _settings;
 
         private readonly string DIRECTORY_MYCOMPUTER;
     }

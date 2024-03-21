@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Drawing;
 using System.IO;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
-using AquariusShell.Controls;
+using AquariusShell.ConfigurationManagement;
+using AquariusShell.ConfigurationManagement.Settings;
 using AquariusShell.Modules;
 using AquariusShell.Runtime;
 
@@ -23,14 +25,11 @@ namespace AquariusShell.ShellApps
         {
             get
             {
-                if (_icon == null)
-                {
-                    _icon = Icon.ExtractIcon(
+                _icon ??= Icon.ExtractIcon(
                                 Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.System), "shell32.dll"),
                                 24,                                                                                             // RUN icon
                                 ShellEnvironment.ConfiguredSizeOfIconsInPixels)!
                                 .ToBitmap();
-                }
 
                 return _icon;
             }
@@ -46,7 +45,7 @@ namespace AquariusShell.ShellApps
         /// The launch command for this module
         /// </summary>
         public string Command => _command;
-        private static string _command = $"{IShellAppModule.CommandSignifierPrefix}runUri";
+        private static readonly string _command = $"{IShellAppModule.CommandSignifierPrefix}runUri";
 
         /// <summary>
         /// Instancing mode
@@ -101,20 +100,48 @@ namespace AquariusShell.ShellApps
         {
             InitializeComponent();
 
+            _settings = ConfigurationProvider<RunDialogSettings>.Get();
+
             pbRunIcon.Image = LauncherOrTaskManagerIcon;
 
             // Load the MRU
             cbURI.Items.Clear();
 
-            int count = Int32.Parse(Win32Registry.Get("RunMRU", "count", "0")!.ToString()!);
-            for (int i = 0; i < count; i++)
+            if (_settings.ShowPreviouslyRunItemsList)
             {
-                string? item = (string?)Win32Registry.Get("RunMRU", i.ToString(), null);
-                if (! string.IsNullOrWhiteSpace(item))
+                int startAt = 0, count = Int32.Parse(Win32Registry.Get("RunMRU", "count", "0")!.ToString()!);
+                if (count > _settings.PreviouslyRunItemsListMaximumCount)
                 {
-                    cbURI.Items.Add(item);
+                    startAt = count - _settings.PreviouslyRunItemsListMaximumCount;
+                }
+
+                for (int i = startAt; i < count; i++)
+                {
+                    string? item = (string?)Win32Registry.Get("RunMRU", i.ToString(), null);
+                    if (!string.IsNullOrWhiteSpace(item))
+                    {
+                        cbURI.Items.Add(item);
+                        foreach(string s in _settings.AlwaysAppendedURI)
+                        {
+                            if (s.Equals(item, StringComparison.InvariantCultureIgnoreCase))
+                            {
+                                _settings.AlwaysAppendedURI.Remove(s);
+                                break;
+                            }
+                        }
+                    }
                 }
             }
+
+            if ((_settings.AlwaysAppendedURI.Count > 0) || (! _settings.AllowBrowse) || (!_settings.AllowRunningNonMRI))
+            {
+                // Loop above if run, removes duplicates
+                // If it didn't run (condition) then we are unique anyways!
+                cbURI.Items.AddRange(_settings.AlwaysAppendedURI.ToArray());
+            }
+
+            cbURI.DropDownStyle = _settings.AllowRunningNonMRI ? ComboBoxStyle.DropDown : ComboBoxStyle.DropDownList;
+            btnBrowse.Enabled = _settings.AllowBrowse;
 
             // positions!
             this.Location = new(
@@ -175,10 +202,25 @@ namespace AquariusShell.ShellApps
 
             if (Shell32.ExecuteOrLaunchTarget(cbURI.Text) != IntPtr.Zero)
             {
-                // add to MRU
-                int count = Int32.Parse(Win32Registry.Get("RunMRU", "count", "0")!.ToString()!);
-                Win32Registry.Set("RunMRU", (count++).ToString(), cbURI.Text);
-                Win32Registry.Set("RunMRU", "count", count);
+                bool skipStoreUri = false;
+                Regex rex;
+                foreach (string s in _settings.DoNotStoreURI)
+                {
+                    rex = new(s);
+                    if (s.Equals(cbURI.Text, StringComparison.InvariantCultureIgnoreCase) || rex.Match(cbURI.Text).Success)
+                    {
+                        skipStoreUri = true;
+                        break;
+                    }
+                }
+
+                if (!skipStoreUri)
+                {
+                    // add to MRU
+                    int count = Int32.Parse(Win32Registry.Get("RunMRU", "count", "0")!.ToString()!);
+                    Win32Registry.Set("RunMRU", (count++).ToString(), cbURI.Text);
+                    Win32Registry.Set("RunMRU", "count", count);
+                }
             }
 
             this.Close();
@@ -201,5 +243,7 @@ namespace AquariusShell.ShellApps
         /// Notify that this app was closed by the user
         /// </summary>
         public event BuiltInAppClosed? AppClosed;
+
+        private readonly RunDialogSettings _settings;
     }
 }

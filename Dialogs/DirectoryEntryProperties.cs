@@ -5,7 +5,8 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
-using AquariusShell.Controls;
+using AquariusShell.ConfigurationManagement;
+using AquariusShell.ConfigurationManagement.Settings;
 using AquariusShell.Runtime;
 
 namespace AquariusShell.Forms
@@ -24,11 +25,15 @@ namespace AquariusShell.Forms
 
             _disableEvents = true;
 
+            _uiCustomisationSettings = ConfigurationProvider<FilesystemPropertyPageSettings>.Get();
+
             layoutAttributesList.HorizontalScroll.Maximum = 0;
             layoutAttributesList.VerticalScroll.Visible = true;
             layoutAttributesList.AutoScroll = true;
 
             _attributeCheckboxes = new();
+            string compressionName = FileAttributes.Compressed.ToString();
+
             foreach (string attribute in Enum.GetNames<FileAttributes>())
             {
                 CheckBox cb = new()
@@ -45,7 +50,8 @@ namespace AquariusShell.Forms
                         _ => attribute
                     },
                     TextAlign = ContentAlignment.MiddleLeft,
-                    Enabled = attribute switch
+
+                    Enabled = _uiCustomisationSettings.AllowChangeAttributes && attribute switch
                     {
                         "Hidden" => true,
                         _ => false
@@ -56,6 +62,12 @@ namespace AquariusShell.Forms
                     Margin = new(1),
                     Tag = attribute
                 };
+
+                if (attribute == compressionName)
+                {
+                    cb.Enabled = _uiCustomisationSettings.AllowChangeAttributes 
+                                        && _uiCustomisationSettings.AllowChangeCompressionSettings;
+                }
 
                 if (cb.Enabled)
                 {
@@ -101,6 +113,10 @@ namespace AquariusShell.Forms
             {
                 lvMetadata.Items.Add(new ListViewItem(new string[] { meta.Key, meta.Value }));
             }
+
+            btnDeleteDirectory.Enabled = _uiCustomisationSettings.AllowDelete;
+            btnCopyDirectory.Enabled = _uiCustomisationSettings.AllowCopy;
+            btnMoveDirectory.Enabled = _uiCustomisationSettings.AllowMove;
 
             _disableEvents = false;
         }
@@ -155,7 +171,7 @@ namespace AquariusShell.Forms
         /// The file was affected because IT was changed other than by a simple update.
         /// For example: its attributes were changed, security modified or was deleted
         /// </summary>
-        public event FileSystemItemAffected? DirectoryAffected;
+        internal event FileSystemItemAffected? DirectoryAffected;
 
         /// <summary>
         /// Attribute checkbox clicked to change its state
@@ -198,10 +214,7 @@ namespace AquariusShell.Forms
         /// </summary>
         private void OnDirectoryAffected()
         {
-            if (DirectoryAffected != null)
-            {
-                DirectoryAffected(_dirInfo.FullName);
-            }
+            DirectoryAffected?.Invoke(_dirInfo.FullName);
         }
 
         /// <summary>
@@ -209,7 +222,8 @@ namespace AquariusShell.Forms
         /// </summary>
         private void btnDeleteDirectory_Click(object sender, EventArgs e)
         {
-            bool hasShiftPressed = Control.ModifierKeys.HasFlag(Keys.Shift);
+            bool hasShiftPressed = _uiCustomisationSettings.AllowDelete && _uiCustomisationSettings.AllowBypassDeletedItems 
+                                        && Control.ModifierKeys.HasFlag(Keys.Shift);
 
             if (MessageBox.Show(
                     $"This will {(hasShiftPressed ? "send the directory and its contents to Deleted Items" : "permanently delete the directory and its contents")}! {Environment.NewLine}{Environment.NewLine}{_dirInfo.FullName}",
@@ -294,8 +308,10 @@ namespace AquariusShell.Forms
             return base.ProcessCmdKey(ref msg, keyData);
         }
 
-        private bool _disableEvents = false;
+        private readonly bool _disableEvents = false;
+        private readonly Dictionary<string, CheckBox> _attributeCheckboxes;
         private DirectoryInfo _dirInfo = default!;
-        private Dictionary<string, CheckBox> _attributeCheckboxes;
+
+        private readonly FilesystemPropertyPageSettings _uiCustomisationSettings;
     }
 }

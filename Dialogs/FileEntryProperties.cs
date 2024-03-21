@@ -6,7 +6,8 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
 
-using AquariusShell.Controls;
+using AquariusShell.ConfigurationManagement;
+using AquariusShell.ConfigurationManagement.Settings;
 using AquariusShell.Modules;
 using AquariusShell.Runtime;
 
@@ -28,6 +29,8 @@ namespace AquariusShell.Forms
             InitializeComponent();
 
             _disableEvents = true;
+
+            _uiCustomisationSettings = ConfigurationProvider<FilesystemPropertyPageSettings>.Get();
 
             layoutAttributesList.HorizontalScroll.Maximum = 0;
             layoutAttributesList.VerticalScroll.Visible = true;
@@ -128,7 +131,7 @@ namespace AquariusShell.Forms
 
                     if (line.StartsWith("HostUrl="))
                     {
-                        zInfo.Append(" (").Append(line.Replace("HostUrl=", string.Empty)).Append(")");
+                        zInfo.Append(" (").Append(line.Replace("HostUrl=", string.Empty)).Append(')');
                     }
                 }
 
@@ -148,6 +151,11 @@ namespace AquariusShell.Forms
                 lvMetadata.Items.Add(new ListViewItem(new string[] { meta.Key, meta.Value }));
             }
 
+            btnDeleteFile.Enabled = _uiCustomisationSettings.AllowDelete;
+            btnCopyFile.Enabled = _uiCustomisationSettings.AllowCopy;
+            btnMoveFile.Enabled = _uiCustomisationSettings.AllowMove;
+            btnUnblockFileOrManageAcl.Enabled = _uiCustomisationSettings.AllowUnblockDownloadedFiles;
+
             _disableEvents = false;
         }
 
@@ -159,7 +167,7 @@ namespace AquariusShell.Forms
         /// </summary>
         /// <param name="extension">Filename Extension</param>
         /// <returns>List of string names</returns>
-        private List<string> GetFileAssociations(string extension)
+        private static List<string> GetFileAssociations(string extension)
         {
             List<string> associations = new();
 
@@ -203,7 +211,7 @@ namespace AquariusShell.Forms
         /// </summary>
         /// <param name="associationName">Name of the top-level association</param>
         /// <returns>Friendly name if one exists</returns>
-        private string GetAssociationFriendlyName(string associationName)
+        private static string GetAssociationFriendlyName(string associationName)
         {
             string friendlyName = associationName;
             RegistryKey? assocClassName = Registry.ClassesRoot.OpenSubKey(associationName);
@@ -325,17 +333,14 @@ namespace AquariusShell.Forms
         /// The file was affected because IT was changed other than by a simple update.
         /// For example: its attributes were changed, security modified or was deleted
         /// </summary>
-        public event FileSystemItemAffected? FileAffected;
+        internal event FileSystemItemAffected? FileAffected;
 
         /// <summary>
         /// Raise the FileAffected event
         /// </summary>
         private void OnFileAffected()
         {
-            if (FileAffected != null)
-            {
-                FileAffected(_fileInfo.FullName);
-            }
+            FileAffected?.Invoke(_fileInfo.FullName);
         }
 
         /// <summary>
@@ -343,7 +348,8 @@ namespace AquariusShell.Forms
         /// </summary>
         private void btnDeleteFile_Click(object sender, EventArgs e)
         {
-            bool hasShiftPressed = Control.ModifierKeys.HasFlag(Keys.Shift);
+            bool hasShiftPressed = _uiCustomisationSettings.AllowDelete && _uiCustomisationSettings.AllowBypassDeletedItems
+                                        && Control.ModifierKeys.HasFlag(Keys.Shift);
 
             if (MessageBox.Show(
                     $"This will {(hasShiftPressed ? "send the file to Deleted Items" : "permanently delete the file")}! {Environment.NewLine}{Environment.NewLine}{_fileInfo.FullName}",
@@ -453,9 +459,11 @@ namespace AquariusShell.Forms
             return base.ProcessCmdKey(ref msg, keyData);
         }
 
-        private bool _disableEvents = false;
+        private readonly bool _disableEvents = false;
+        private readonly string? _unsafeFileStreamFile = null;
+        private readonly Dictionary<string, CheckBox> _attributeCheckboxes;
         private FileInfo _fileInfo = default!;
-        private string? _unsafeFileStreamFile = null;
-        private Dictionary<string, CheckBox> _attributeCheckboxes;
+
+        private readonly FilesystemPropertyPageSettings _uiCustomisationSettings;
     }
 }

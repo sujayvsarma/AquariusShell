@@ -1,14 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Drawing;
 using System.IO;
-using System.Linq;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
-using AquariusShell.Controls;
+using AquariusShell.ConfigurationManagement;
+using AquariusShell.ConfigurationManagement.Settings;
 using AquariusShell.Modules;
+using AquariusShell.Objects;
 using AquariusShell.Runtime;
+
+using Microsoft.WindowsAPICodePack.Shell;
 
 namespace AquariusShell.Forms
 {
@@ -21,40 +24,63 @@ namespace AquariusShell.Forms
     /// </summary>
     public partial class CanvasProgramLauncher : Form
     {
-        /// <summary>
-        /// Where this launcher should be positioned
-        /// </summary>
-        public CanvasProgramLauncherPositionsEnum Position
-        {
-            get;
-            set;
-
-        } = CanvasProgramLauncherPositionsEnum.Right;
-
 
         /// <summary>
-        /// Initialise
+        /// Enumerate items to display
         /// </summary>
-        public CanvasProgramLauncher()
+        private void EnumerateWindowsProgramsItems()
         {
-            InitializeComponent();
+            imgListWindowsAppIcons.Images.Clear();
+            _allWindowsApps.Clear();
 
-            tbWinProgsSearchBox.AutoCompleteCustomSource = new();
-            tbWinProgsSearchBox.AutoCompleteMode = AutoCompleteMode.Suggest;
-            tbWinProgsSearchBox.AutoCompleteSource = AutoCompleteSource.CustomSource;
+            Size sz = new(ShellEnvironment.ConfiguredSizeOfIconsInPixels * 2, ShellEnvironment.ConfiguredSizeOfIconsInPixels * 2);
+            foreach (ShellObject file in (IKnownFolder)AppsAndProgramsFolderReference)
+            {
+                if (IsAppVisible(file.Name, file.ParsingName))
+                {
+                    string imageKey = imgListWindowsAppIcons.Images.Count.ToString();
+                    ShellThumbnail? thumbnail = file.Thumbnail;
 
-            prgGlobalFilesWatcher.EnableRaisingEvents = false;
-            prgUserFilesWatcher.EnableRaisingEvents = false;
+                    Icon icon = SystemIcons.Application;
+                    if (thumbnail != null)
+                    {
+                        thumbnail.FormatOption = ShellThumbnailFormatOption.IconOnly;
+                        Bitmap bmp = thumbnail.LargeBitmap;
+                        bmp.MakeTransparent();
 
-            int itemKey = 0;
+                        icon = Icon.FromHandle(bmp.GetHicon());
+                    }
+
+                    imgListWindowsAppIcons.Images.Add(imageKey, Icons.Resize(icon, ShellEnvironment.ConfiguredSizeOfIcons).ToBitmap());
+
+                    ListViewItem item = new()
+                    {
+                        Text = file.Name,
+                        ImageKey = imageKey,
+                        Tag = file.ParsingName
+                    };
+                    item.Bounds.Inflate(sz);
+
+                    _allWindowsApps.Add(item);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Enumerate our shell apps for list
+        /// </summary>
+        private void EnumerateShellApps()
+        {
+            imgListShellAppIcons.Images.Clear();
+            lvShellApps.Items.Clear();
 
             // Add Shell Apps
             foreach (AppIconOrShortcut shellApp in ShellEnvironment.ShellApps)
             {
-                if (!shellApp.HideFromLauncher)
+                if ((!shellApp.HideFromLauncher) && IsAppVisible(shellApp.AppName, shellApp.Command))
                 {
-                    string imageKey = itemKey.ToString();
-                    lvAppsListIcons32.Images.Add(imageKey, shellApp.Icon!);
+                    string imageKey = imgListShellAppIcons.Images.Count.ToString();
+                    imgListShellAppIcons.Images.Add(imageKey, shellApp.Icon!);
                     ListViewItem item = new()
                     {
                         Text = shellApp.AppName,
@@ -62,106 +88,61 @@ namespace AquariusShell.Forms
                         Tag = shellApp.Command
                     };
                     lvShellApps.Items.Add(item);
-                    itemKey++;
                 }
             }
-
-            // Add Windows Apps
-            // we must re-enumerate to account for any programs that were installed or uninstalled since the last time
-            List<string> items = Directory.GetFiles(Environment.GetFolderPath(Environment.SpecialFolder.CommonPrograms), "*.*", SearchOption.AllDirectories)
-                                       .Union(Directory.GetFiles(Environment.GetFolderPath(Environment.SpecialFolder.Programs), "*.*", SearchOption.AllDirectories))
-                                            .OrderBy(itm => Path.GetFileNameWithoutExtension(itm))
-                                                .ThenBy(itm => Path.GetDirectoryName(itm))
-                                                    .ToList();
-
-            prgGlobalFilesWatcher.Path = Environment.GetFolderPath(Environment.SpecialFolder.CommonPrograms);
-            prgUserFilesWatcher.Path = Environment.GetFolderPath(Environment.SpecialFolder.Programs);
-
-            foreach (string launchableItem in items)
-            {
-                if (programShortcutFileExtensions.Contains(Path.GetExtension(launchableItem)))
-                {
-                    string imageKey = itemKey.ToString();
-                    lvAppsListIcons32.Images.Add(imageKey, (Icons.ExtractAssociatedIcon(launchableItem, ShellEnvironment.ConfiguredSizeOfIcons) ?? SystemIcons.Application).ToBitmap());
-                    ListViewItem item = new()
-                    {
-                        Text = Path.GetFileNameWithoutExtension(launchableItem),
-                        ImageKey = imageKey,
-                        Tag = launchableItem
-                    };
-                    _allItems.Add(item);
-                    itemKey++;
-                }
-            }
-
-            // cause the text-changed event to fire
-            tbWinProgsSearchBox.Text = string.Empty;
-            tbWinProgsSearchBox_TextChanged(tbWinProgsSearchBox, new EventArgs());
-
-            prgGlobalFilesWatcher.EnableRaisingEvents = true;
-            prgUserFilesWatcher.EnableRaisingEvents = true;
         }
 
-        #region Event Subscriptions
 
         /// <summary>
-        /// Load, we only set the sizes and positions on screen. All essential "load" activity happens in the constructor
+        /// Apply launcher settings
         /// </summary>
-        private void CanvasProgramLauncher_Load(object sender, EventArgs e)
+        private void ApplySettings()
         {
-            if (Position == CanvasProgramLauncherPositionsEnum.Right)
-            {
-                this.SetBounds(
-                        ShellEnvironment.WorkareaBounds.Right - this.Width - 2,
-                        ShellEnvironment.WorkareaBounds.Top - 1,
-                        this.Width,
-                        ShellEnvironment.WorkareaBounds.Height - ShellEnvironment.TaskbarBounds.Height - 2
-                    );
-            }
-            else if (Position == CanvasProgramLauncherPositionsEnum.Left)
-            {
-                this.SetBounds(
-                        ShellEnvironment.WorkareaBounds.Left + 1,
-                        ShellEnvironment.WorkareaBounds.Top - 1,
-                        this.Width,
-                        ShellEnvironment.WorkareaBounds.Height - ShellEnvironment.TaskbarBounds.Height - 2
-                    );
-            }
+            this.SetFormBusyState(true);
 
-            panelAquariusShellApps.Width = this.Width - 6;
-            btnAquariusShellAppsAccordionHeader.Width = panelAquariusShellApps.Width - 6;
-            btnCloseLauncher.Left = btnAquariusShellAppsAccordionHeader.Width - btnCloseLauncher.Width;
-            lvShellApps.Width = btnAquariusShellAppsAccordionHeader.Width - 6;
+            EnumerateShellApps();
+            EnumerateWindowsProgramsItems();
 
-            lvWindowsApps.SetBounds(
-                    lvWindowsApps.Left, lvWindowsApps.Top,
-                    accordionPanel.Width - 6,
-                    accordionPanel.Height - panelAquariusShellApps.Height - tbWinProgsSearchBox.Height - 22
-                );
-
-            // Save the boundaries of everything
-            boundaries = new()
-            {
-                { panelAquariusShellApps.Name, panelAquariusShellApps.Bounds },
-                { lvShellApps.Name, lvShellApps.Bounds },
-                { lvWindowsApps.Name, lvWindowsApps.Bounds }
-            };
+            this.SetFormBusyState(false);
+            
+            FilterWindowsAppsList();
+            tbWinProgsSearchBox.Visible = _settings.ShowSearchBox;
         }
+
+
+        #region Event Subscriptions
 
         /// <summary>
         /// Double-click on ShellApps icon
         /// </summary>
         private void lvShellApps_ItemActivate(object sender, EventArgs e)
         {
+            string shellAppCommand = lvShellApps.SelectedItems[0].Tag!.ToString()!;
+            if (IsPasswordRequired(lvShellApps.SelectedItems[0].Text, shellAppCommand))
+            {
+                PopupTextInput input = new()
+                {
+                    Prompt = "Launching this app, program or file requires a password. Please enter the password if you know it.",
+                    IsCancellable = true
+                };
+
+                if (input.ShowDialog() == DialogResult.Cancel)
+                {
+                    return;
+                }
+
+                if (!PasswordManagement.VerifyPassword(PasswordModuleNames.Shell, PasswordUsagePurposes.LaunchPasswordProtectedApp, input.Value))
+                {
+                    MessageBox.Show("That is not the required password!", "Aquarius Shell", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+            }
+
             this.Hide();
 
             // we are set to SINGLE select mode
-            string shellAppCommand = lvShellApps.SelectedItems[0].Tag!.ToString()!;
             IShellAppModule? app = ShellEnvironment.ShellApps.GetInstanceOf(shellAppCommand);
-            if (app != null)
-            {
-                app.Execute(shellAppCommand, ShellEnvironment.WorkArea);
-            }
+            app?.Execute(shellAppCommand, ShellEnvironment.WorkArea);
         }
 
         /// <summary>
@@ -169,10 +150,31 @@ namespace AquariusShell.Forms
         /// </summary>
         private void lvWindowsApps_ItemActivate(object sender, EventArgs e)
         {
+            string command = lvWindowsApps.SelectedItems[0].Tag!.ToString()!;
+            if (IsPasswordRequired(lvWindowsApps.SelectedItems[0].Text, command))
+            {
+                PopupTextInput input = new()
+                {
+                    Prompt = "Launching this app, program or file requires a password. Please enter the password if you know it.",
+                    IsCancellable = true
+                };
+
+                if (input.ShowDialog() == DialogResult.Cancel)
+                {
+                    return;
+                }
+
+                if (!PasswordManagement.VerifyPassword(PasswordModuleNames.Shell, PasswordUsagePurposes.LaunchPasswordProtectedApp, input.Value))
+                {
+                    MessageBox.Show("That is not the required password!", "Aquarius Shell", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+            }
+
             this.Hide();
 
             // we are set to SINGLE select mode
-            Shell32.ExecuteProgram(lvWindowsApps.SelectedItems[0].Tag!.ToString()!);
+            Shell32.ExecuteProgram("explorer.exe", Shell32.ShellExecuteVerbsEnum.None, false, $"shell:appsFolder\\{command}");
         }
 
         /// <summary>
@@ -193,168 +195,262 @@ namespace AquariusShell.Forms
                 case Keys.Escape or Keys.LWin or Keys.RWin:
                     this.Hide();
                     return true;
+
+                case >= Keys.A and <= Keys.Z:
+                case >= Keys.D0 and <= Keys.D9:
+                case >= Keys.NumPad0 and <= Keys.NumPad9:
+                    // send the keystroke to the textbox
+                    if ((! tbWinProgsSearchBox.Focused) || (msg.HWnd != tbWinProgsSearchBox.Handle))
+                    {                        
+                        if ((keyData >= Keys.A) && (keyData <= Keys.Z))
+                        {
+                            tbWinProgsSearchBox.Text = ((char)('A' + (keyData - (int)Keys.A))).ToString();
+                        }
+                        else if ((keyData >= Keys.D0) && (keyData <= Keys.D9))
+                        {
+                            tbWinProgsSearchBox.Text = (keyData - (int)Keys.D0).ToString();
+                        }
+                        else if ((keyData >= Keys.NumPad0) && (keyData <= Keys.NumPad9))
+                        {
+                            tbWinProgsSearchBox.Text = (keyData - (int)Keys.NumPad0).ToString();
+                        }
+
+                        tbWinProgsSearchBox.SelectionStart = tbWinProgsSearchBox.Text.Length;
+                        tbWinProgsSearchBox.SelectionLength = 0;
+                        tbWinProgsSearchBox.Focus();
+                    }
+                    break;
             }
 
             return base.ProcessCmdKey(ref msg, keyData);
         }
 
         /// <summary>
-        /// User clicked on the "Aquarius Apps" header (accordion). So we do the expand/collapse toggle, 
-        /// moving the Windows Apps panel up or down as well
+        /// Handles searching for (Windows-only) apps from the textbox on the panel
         /// </summary>
-        private void btnAquariusShellAppsAccordionHeader_Click(object sender, EventArgs e)
+        private void tbWinProgsSearchBox_TextChanged(object? sender, EventArgs e)
         {
-            if (btnAquariusShellAppsAccordionHeader.ImageKey == "DN")
-            {
-                // COLLAPSE
-                btnAquariusShellAppsAccordionHeader.ImageKey = "UP";
-
-                int heightDecrease = panelAquariusShellApps.Size.Height - lvShellApps.Size.Height;
-
-                panelAquariusShellApps.Size = new(panelAquariusShellApps.Size.Width, heightDecrease);
-                lvShellApps.Size = new(lvShellApps.Size.Width, 0);
-                lvWindowsApps.Size = new(lvWindowsApps.Width, accordionPanel.Height - panelAquariusShellApps.Height - tbWinProgsSearchBox.Height - 27);
-            }
-            else
-            {
-                btnAquariusShellAppsAccordionHeader.ImageKey = "DN";
-
-                Rectangle rect = boundaries[lvShellApps.Name];
-                lvShellApps.Size = new(rect.Width, rect.Height);
-
-                rect = boundaries[panelAquariusShellApps.Name];
-                panelAquariusShellApps.Size = new(rect.Width, rect.Height);
-
-                rect = boundaries[lvWindowsApps.Name];
-                lvWindowsApps.Size = new(rect.Width, rect.Height);
-            }
+            FilterWindowsAppsList(tbWinProgsSearchBox.Text);            
         }
 
         /// <summary>
-        /// Handles searching for (Windows-only) apps from the textbox on the panel
+        /// App or Program deleted
         /// </summary>
-        private void tbWinProgsSearchBox_TextChanged(object sender, EventArgs e)
+        private void AppsAndProgramsFolderWatcher_ItemDeleted(object? sender, ShellObjectChangedEventArgs e)
         {
-            string search = tbWinProgsSearchBox.Text;
-            bool isEmpty = string.IsNullOrWhiteSpace(search);
+            EnumerateWindowsProgramsItems();
+            FilterWindowsAppsList();
+        }
+
+        /// <summary>
+        /// App or Program added
+        /// </summary>
+        private void AppsAndProgramsFolderWatcher_ItemCreated(object? sender, ShellObjectChangedEventArgs e)
+        {
+            EnumerateWindowsProgramsItems();
+            FilterWindowsAppsList();
+        }
+
+        /// <summary>
+        /// Configuration updated
+        /// </summary>
+        /// <param name="updatedSettings">Copy of updated settings</param>
+        private void ConfigurationProvider_ConfigurationUpdated(IAquariusShellSettings updatedSettings)
+        {
+            _settings = (CanvasLauncherSettings)updatedSettings;
+            ApplySettings();
+        }
+
+        #endregion
+
+
+        /// <summary>
+        /// Initialise
+        /// </summary>
+        public CanvasProgramLauncher()
+        {
+            InitializeComponent();
+
+            _settings = ConfigurationProvider<CanvasLauncherSettings>.Get();
+            ConfigurationProvider<CanvasLauncherSettings>.ConfigurationUpdated += ConfigurationProvider_ConfigurationUpdated;
+
+            AppsAndProgramsFolderReference = (ShellObject)KnownFolderHelper.FromKnownFolderId(AppsAndProgramsFolderId);
+            AppsAndProgramsFolderWatcher = new ShellObjectWatcher(AppsAndProgramsFolderReference, true);
+            AppsAndProgramsFolderWatcher.ItemCreated += AppsAndProgramsFolderWatcher_ItemCreated;
+            AppsAndProgramsFolderWatcher.ItemDeleted += AppsAndProgramsFolderWatcher_ItemDeleted;
+
+            ApplySettings();
+        }
+
+        /// <summary>
+        /// Filter the Windows Apps list
+        /// </summary>
+        /// <param name="filterString">Filter string</param>
+        private void FilterWindowsAppsList(string filterString = "")
+        {
+            bool isEmpty = string.IsNullOrWhiteSpace(filterString);
+
+            this.SetFormBusyState(true);
 
             lvWindowsApps.BeginUpdate();
             lvWindowsApps.Items.Clear();
             if (isEmpty)
             {
-                foreach (ListViewItem item in _allItems)
+                foreach (ListViewItem item in _allWindowsApps)
                 {
                     lvWindowsApps.Items.Add(item);
                 }
             }
             else
             {
-                dynamic? wsShell = null;
+                foreach (ListViewItem item in _allWindowsApps)
+                {
+                    string targetPath = item.Tag!.ToString()!;
+                    string resolvedShortcutPath = ResolveShortcut(targetPath);
+
+                    if (item.Text.Contains(filterString, StringComparison.InvariantCultureIgnoreCase)
+                        || targetPath.Contains(filterString, StringComparison.InvariantCultureIgnoreCase)
+                        || ((resolvedShortcutPath != string.Empty) && resolvedShortcutPath.Contains(filterString, StringComparison.InvariantCultureIgnoreCase)))
+                    {
+                        lvWindowsApps.Items.Add(item);
+                    }
+                }
+            }
+            lvWindowsApps.EndUpdate();
+            this.SetFormBusyState(false);
+
+            Application.DoEvents(); // give ourselves a chance to repaint
+        }
+
+
+        /// <summary>
+        /// Returns if an app described by the provided attributes is visible
+        /// </summary>
+        /// <param name="attributes">App name, path, shortcut name etc</param>
+        /// <returns>True if app is visible</returns>
+        private bool IsAppVisible(params string[] attributes)
+        {
+            foreach(NameValuePair<string> hidden in _settings.HiddenPrograms)
+            {
+                foreach(string attrib in attributes)
+                {
+                    if (attrib.Equals(hidden.Value!, StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        return false;
+                    }
+
+                    if (Path.IsPathFullyQualified(attrib))
+                    {
+                        string directoryName = Path.GetDirectoryName(attrib)!, fileName = Path.GetFileName(attrib);
+                        if (directoryName.StartsWith(hidden.Value!, StringComparison.InvariantCultureIgnoreCase) || fileName.Equals(hidden.Value!, StringComparison.InvariantCultureIgnoreCase))
+                        {
+                            return false;
+                        }
+                    }
+
+                    Regex r = new(hidden.Value!);
+                    if (r.IsMatch(attrib))
+                    {
+                        return false;
+                    }
+                }
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Returns if an app described by the provided attributes requires a password before it can be launched
+        /// </summary>
+        /// <param name="attributes">App name, path, shortcut name, etc</param>
+        /// <returns>True if app requires a launch password</returns>
+        private bool IsPasswordRequired(params string[] attributes)
+        {
+            foreach (NameValuePair<string> requiresPassword in _settings.PasswordProtectedPrograms)
+            {
+                foreach (string attrib in attributes)
+                {
+                    if (attrib.Equals(requiresPassword.Value!, StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        return true;
+                    }
+
+                    if (Path.IsPathFullyQualified(attrib))
+                    {
+                        string directoryName = Path.GetDirectoryName(attrib)!, fileName = Path.GetFileName(attrib);
+                        if (directoryName.StartsWith(requiresPassword.Value!, StringComparison.InvariantCultureIgnoreCase) || fileName.Equals(requiresPassword.Value!, StringComparison.InvariantCultureIgnoreCase))
+                        {
+                            return true;
+                        }
+                    }
+
+                    Regex r = new(requiresPassword.Value!);
+                    if (r.IsMatch(attrib))
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Resolve a shortcut and retrieve its target path
+        /// </summary>
+        /// <param name="shortcutPath">Path to a shortcut (.lnk) file</param>
+        /// <returns>The resolved shortcut</returns>
+        private string ResolveShortcut(string shortcutPath)
+        {
+            string result = shortcutPath;
+            if (!shortcutPath.EndsWith(".lnk", StringComparison.InvariantCultureIgnoreCase))
+            {
+                return shortcutPath;
+            }
+
+            if (_wscript_Shell == null)
+            {
                 try
                 {
                     Type? shType = Type.GetTypeFromProgID("WScript.Shell");
                     if (shType != null)
                     {
-                        wsShell = Activator.CreateInstance(shType);
+                        _wscript_Shell = Activator.CreateInstance(shType);
                     }
                 }
                 catch { }
-
-                foreach (ListViewItem item in _allItems)
-                {
-                    string targetPath = item.Tag!.ToString()!;
-                    string resolvedShortcutPath = string.Empty;
-
-                    if (targetPath.EndsWith(".lnk", StringComparison.InvariantCultureIgnoreCase))
-                    {
-                        if (wsShell != null)
-                        {
-                            dynamic? wsShortcut;
-                            try
-                            {
-                                wsShortcut = wsShell.CreateShortcut(targetPath);
-                                resolvedShortcutPath = wsShortcut.TargetPath;
-
-                                wsShortcut = null;
-                            }
-                            finally
-                            {
-                                wsShortcut = null;
-                            }
-                        }
-                    }
-
-                    if (item.Text.Contains(search, StringComparison.InvariantCultureIgnoreCase)
-                        || targetPath.Contains(search, StringComparison.InvariantCultureIgnoreCase)
-                        || ((resolvedShortcutPath != string.Empty) && resolvedShortcutPath.Contains(search, StringComparison.InvariantCultureIgnoreCase)))
-                    {
-                        lvWindowsApps.Items.Add(item);
-                    }
-                }
-
-                wsShell = null;
             }
-            lvWindowsApps.EndUpdate();
-            Application.DoEvents(); // give ourselves a chance to repaint
-        }
 
-        /// <summary>
-        /// New shortcut created
-        /// </summary>
-        private void prgFilesWatcher_Created(object sender, FileSystemEventArgs e)
-        {
-            if (programShortcutFileExtensions.Contains(Path.GetExtension(e.FullPath)))
+            if (_wscript_Shell != null)
             {
-                if (programShortcutFileExtensions.Contains(Path.GetExtension(e.FullPath)))
+                dynamic? wsShortcut;
+                try
                 {
-                    string imageKey = lvAppsListIcons32.Images.Count.ToString();
-                    lvAppsListIcons32.Images.Add(imageKey, (Icons.ExtractAssociatedIcon(e.FullPath, ShellEnvironment.ConfiguredSizeOfIcons) ?? SystemIcons.Application).ToBitmap());
-                    ListViewItem item = new()
-                    {
-                        Text = Path.GetFileNameWithoutExtension(e.FullPath),
-                        ImageKey = imageKey,
-                        Tag = e.FullPath
-                    };
-                    lvWindowsApps.Items.Add(item);
+                    wsShortcut = _wscript_Shell.CreateShortcut(shortcutPath);
+                    result = wsShortcut.TargetPath;
                 }
+                catch
+                {                    
+                }
+
+#pragma warning disable IDE0059 // unnecessary assignment
+                wsShortcut = null;
+#pragma warning restore IDE0059 // unnecessary assignment
             }
+
+            return result;
         }
 
-        /// <summary>
-        /// Shortcut deleted
-        /// </summary>
-        private void prgFilesWatcher_Deleted(object sender, FileSystemEventArgs e)
-        {
-            foreach (ListViewItem item in lvWindowsApps.Items)
-            {
-                if (item.Tag!.ToString()!.Equals(e.FullPath, StringComparison.InvariantCultureIgnoreCase))
-                {
-                    lvWindowsApps.Items.Remove(item);
-                    return;
-                }
-            }
-        }
 
-        #endregion
+        private dynamic? _wscript_Shell = null;
+        private readonly List<ListViewItem> _allWindowsApps = new();
+        private CanvasLauncherSettings _settings;
 
-        private List<ListViewItem> _allItems = new();
-        private Dictionary<string, Rectangle> boundaries = default!;
-        private readonly string[] programShortcutFileExtensions = [".lnk", ".url"];
-    }
+        const int FORM_WIDTH = 800, FORM_HEIGHT = 600;
 
-    /// <summary>
-    /// Possible positions where the CanvasProgramLauncher can be shown
-    /// </summary>
-    public enum CanvasProgramLauncherPositionsEnum
-    {
-        /// <summary>
-        /// Right-hand edge of the screen
-        /// </summary>
-        Right = 0,
 
-        /// <summary>
-        /// Left-hand edge of the screen
-        /// </summary>
-        Left
+        private readonly Guid AppsAndProgramsFolderId = new("1e87508d-89c2-42f0-8a7e-645a0f50ca58");
+        private readonly ShellObject AppsAndProgramsFolderReference;
+        private readonly ShellObjectWatcher AppsAndProgramsFolderWatcher;
     }
 }

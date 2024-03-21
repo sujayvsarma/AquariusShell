@@ -4,7 +4,8 @@ using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 
-using AquariusShell.Controls;
+using AquariusShell.ConfigurationManagement;
+using AquariusShell.ConfigurationManagement.Settings;
 using AquariusShell.Modules;
 using AquariusShell.Runtime;
 
@@ -22,6 +23,8 @@ namespace AquariusShell.Forms
         {
             InitializeComponent();
 
+            _uiCustomisationSettings = ConfigurationProvider<FilesystemPropertyPageSettings>.Get();
+
             _drive = default!;
         }
 
@@ -33,6 +36,7 @@ namespace AquariusShell.Forms
             : this()
         {
             _drive = drive;
+
             DisplayDiskInfo();
         }
 
@@ -41,36 +45,88 @@ namespace AquariusShell.Forms
             string driveTypeName;
             StockIconId imageKey;
 
+            btnInvokeRenameVolume.Enabled = _uiCustomisationSettings.AllowRename;
+            btnInvokeTakeOffline.Enabled = _uiCustomisationSettings.AllowTakeDiskOffline;
+            btnInvokeManageBitlocker.Enabled = _uiCustomisationSettings.AllowChangeBitlocker;
+
             switch (_drive.DriveType)
             {
                 case DriveType.CDRom:
                     imageKey = StockIconId.DriveCD;
                     driveTypeName = "Optical drive";
+
+                    btnInvokeFormatDisk.Enabled = false;
+                    btnInvokeRenameVolume.Enabled = false;
+                    btnInvokeTakeOffline.Enabled = false;
+                    btnInvokeManageBitlocker.Enabled = false;
+                    btnInvokeCheckdisk.Enabled = false;
+                    btnInvokeDefrag.Enabled = false;
+                    btnManageSecurity.Enabled = false;
                     break;
 
                 case DriveType.Fixed:
                     imageKey = StockIconId.DriveFixed;
                     driveTypeName = "Hard disk";
+
+                    btnInvokeFormatDisk.Enabled = _uiCustomisationSettings.AllowFormatAnyDrive;
+                    btnInvokeRenameVolume.Enabled = _uiCustomisationSettings.AllowRename;
+                    btnInvokeTakeOffline.Enabled = _uiCustomisationSettings.AllowTakeDiskOffline;
+                    btnInvokeManageBitlocker.Enabled = _uiCustomisationSettings.AllowChangeBitlocker;
+                    btnInvokeCheckdisk.Enabled = false;
+                    btnInvokeDefrag.Enabled = false;
+                    btnManageSecurity.Enabled = false;
                     break;
 
                 case DriveType.Network:
                     imageKey = (_drive.IsReady ? StockIconId.DriveNet : StockIconId.DriveNetDisabled);
                     driveTypeName = "Network-mapped drive";
+
+                    btnInvokeFormatDisk.Enabled = false;
+                    btnInvokeRenameVolume.Enabled = false;
+                    btnInvokeTakeOffline.Enabled = false;
+                    btnInvokeManageBitlocker.Enabled = false;
+                    btnInvokeCheckdisk.Enabled = false;
+                    btnInvokeDefrag.Enabled = false;
+                    btnManageSecurity.Enabled = false;
                     break;
 
                 case DriveType.Ram:
                     imageKey = StockIconId.DriveRam;
                     driveTypeName = "RAM disk";
+
+                    btnInvokeFormatDisk.Enabled = false;
+                    btnInvokeRenameVolume.Enabled = false;
+                    btnInvokeTakeOffline.Enabled = false;
+                    btnInvokeManageBitlocker.Enabled = false;
+                    btnInvokeCheckdisk.Enabled = false;
+                    btnInvokeDefrag.Enabled = false;
+                    btnManageSecurity.Enabled = false;
                     break;
 
                 case DriveType.Removable:
                     imageKey = StockIconId.DriveRemovable;
                     driveTypeName = "USB/removable drive";
+
+                    btnInvokeFormatDisk.Enabled = _uiCustomisationSettings.AllowFormatAnyDrive && _uiCustomisationSettings.AllowFormatRemovableDrives;
+                    btnInvokeRenameVolume.Enabled = _uiCustomisationSettings.AllowRename;
+                    btnInvokeTakeOffline.Enabled = false;
+                    btnInvokeManageBitlocker.Enabled = false;
+                    btnInvokeCheckdisk.Enabled = false;
+                    btnInvokeDefrag.Enabled = false;
+                    btnManageSecurity.Enabled = false;
                     break;
 
                 default:
                     imageKey = StockIconId.DriveUnknown;
                     driveTypeName = "Unknown";
+
+                    btnInvokeFormatDisk.Enabled = false;
+                    btnInvokeRenameVolume.Enabled = false;
+                    btnInvokeTakeOffline.Enabled = false;
+                    btnInvokeManageBitlocker.Enabled = false;
+                    btnInvokeCheckdisk.Enabled = false;
+                    btnInvokeDefrag.Enabled = false;
+                    btnManageSecurity.Enabled = false;
                     break;
             }
 
@@ -146,7 +202,7 @@ namespace AquariusShell.Forms
         /// </summary>
         private void btnInvokeRenameVolume_Click(object sender, EventArgs e)
         {
-            PopupTextInput popupInput = new PopupTextInput()
+            PopupTextInput popupInput = new()
             {
                 Prompt = "New name of the volume"
             };
@@ -245,17 +301,14 @@ namespace AquariusShell.Forms
         /// The file was affected because IT was changed other than by a simple update.
         /// For example: its attributes were changed, security modified or was deleted
         /// </summary>
-        public event FileSystemItemAffected? DriveAffected;
+        internal event FileSystemItemAffected? DriveAffected;
 
         /// <summary>
         /// Raise the FileAffected event
         /// </summary>
         private void OnDriveAffected()
         {
-            if (DriveAffected != null)
-            {
-                DriveAffected(_drive.Name);
-            }
+            DriveAffected?.Invoke(_drive.Name);
         }
 
         /// <summary>
@@ -263,7 +316,9 @@ namespace AquariusShell.Forms
         /// </summary>
         private string DriveLetter => _drive.Name[..1].ToUpperInvariant();
 
-        private string System32 = Environment.GetFolderPath(Environment.SpecialFolder.System);
+        private readonly string System32 = Environment.GetFolderPath(Environment.SpecialFolder.System);
         private DriveInfo _drive;
+
+        private readonly FilesystemPropertyPageSettings _uiCustomisationSettings;
     }
 }

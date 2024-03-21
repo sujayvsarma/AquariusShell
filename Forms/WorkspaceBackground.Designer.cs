@@ -55,7 +55,6 @@
             SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             StartPosition = System.Windows.Forms.FormStartPosition.Manual;
             WindowState = System.Windows.Forms.FormWindowState.Maximized;
-            FormClosing += WorkspaceBackground_FormClosing;
             Shown += WorkspaceBackground_Shown;
             ResizeEnd += WorkspaceBackground_ResizeEnd;
             DragDrop += WorkspaceBackground_DragDrop;

@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 
-using AquariusShell.Controls;
 using AquariusShell.Runtime;
 
 namespace AquariusShell.ShellApps
@@ -23,10 +22,7 @@ namespace AquariusShell.ShellApps
         {
             get
             {
-                if (_icon == null)
-                {
-                    _icon = SystemIcons.GetStockIcon(StockIconId.DesktopPC, ShellEnvironment.ConfiguredSizeOfIconsInPixels).ToBitmap();
-                }
+                _icon ??= SystemIcons.GetStockIcon(StockIconId.DesktopPC, ShellEnvironment.ConfiguredSizeOfIconsInPixels).ToBitmap();
 
                 return _icon;
             }
@@ -42,7 +38,7 @@ namespace AquariusShell.ShellApps
         /// The launch command for this module
         /// </summary>
         public string Command => _command;
-        private static string _command = $"{IShellAppModule.CommandSignifierPrefix}file";
+        private static readonly string _command = $"{IShellAppModule.CommandSignifierPrefix}file";
 
         /// <summary>
         /// Instancing mode
@@ -70,7 +66,6 @@ namespace AquariusShell.ShellApps
         /// <summary>
         /// Execute the module
         /// </summary>
-
         /// <param name="command">Command string</param>
         /// <param name="parentWindowHandle">Parent window. If NULL, sets to Workarea</param>
         /// <param name="parameters">Any parameters for this command (context)</param>

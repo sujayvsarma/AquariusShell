@@ -29,18 +29,11 @@
         private void InitializeComponent()
         {
             label1 = new System.Windows.Forms.Label();
-            rbShutdown = new System.Windows.Forms.RadioButton();
-            rbReboot = new System.Windows.Forms.RadioButton();
-            rbLogOff = new System.Windows.Forms.RadioButton();
-            rbSwitchShell = new System.Windows.Forms.RadioButton();
-            rbAdvancedExitShell = new System.Windows.Forms.RadioButton();
-            cbRebootSwitchToExplorer = new System.Windows.Forms.CheckBox();
             cbShutdownSwitchToExplorer = new System.Windows.Forms.CheckBox();
             btnAction = new System.Windows.Forms.Button();
             btnCancel = new System.Windows.Forms.Button();
-            horizontalLine1 = new Controls.HorizontalLine();
-            horizontalLine2 = new Controls.HorizontalLine();
             cbForce = new System.Windows.Forms.CheckBox();
+            cbShutdownAction = new System.Windows.Forms.ComboBox();
             SuspendLayout();
             // 
             // label1
@@ -51,75 +44,10 @@
             label1.TabIndex = 0;
             label1.Text = "Select the action to perform. No further confirmations will be prompted.";
             // 
-            // rbShutdown
-            // 
-            rbShutdown.AutoSize = true;
-            rbShutdown.Location = new System.Drawing.Point(12, 38);
-            rbShutdown.Name = "rbShutdown";
-            rbShutdown.Size = new System.Drawing.Size(333, 19);
-            rbShutdown.TabIndex = 1;
-            rbShutdown.TabStop = true;
-            rbShutdown.Text = "Shutdown the computer (will be powered off if supported)";
-            rbShutdown.UseVisualStyleBackColor = true;
-            // 
-            // rbReboot
-            // 
-            rbReboot.AutoSize = true;
-            rbReboot.Location = new System.Drawing.Point(12, 84);
-            rbReboot.Name = "rbReboot";
-            rbReboot.Size = new System.Drawing.Size(138, 19);
-            rbReboot.TabIndex = 1;
-            rbReboot.TabStop = true;
-            rbReboot.Text = "Reboot the computer";
-            rbReboot.UseVisualStyleBackColor = true;
-            // 
-            // rbLogOff
-            // 
-            rbLogOff.AutoSize = true;
-            rbLogOff.Location = new System.Drawing.Point(12, 134);
-            rbLogOff.Name = "rbLogOff";
-            rbLogOff.Size = new System.Drawing.Size(86, 19);
-            rbLogOff.TabIndex = 1;
-            rbLogOff.TabStop = true;
-            rbLogOff.Text = "Log me out";
-            rbLogOff.UseVisualStyleBackColor = true;
-            // 
-            // rbSwitchShell
-            // 
-            rbSwitchShell.AutoSize = true;
-            rbSwitchShell.Location = new System.Drawing.Point(12, 159);
-            rbSwitchShell.Name = "rbSwitchShell";
-            rbSwitchShell.Size = new System.Drawing.Size(172, 19);
-            rbSwitchShell.TabIndex = 1;
-            rbSwitchShell.TabStop = true;
-            rbSwitchShell.Text = "Switch to Windows Explorer";
-            rbSwitchShell.UseVisualStyleBackColor = true;
-            // 
-            // rbAdvancedExitShell
-            // 
-            rbAdvancedExitShell.AutoSize = true;
-            rbAdvancedExitShell.Location = new System.Drawing.Point(12, 184);
-            rbAdvancedExitShell.Name = "rbAdvancedExitShell";
-            rbAdvancedExitShell.Size = new System.Drawing.Size(184, 19);
-            rbAdvancedExitShell.TabIndex = 1;
-            rbAdvancedExitShell.TabStop = true;
-            rbAdvancedExitShell.Text = "Exit Shell (...to a blank screen!)";
-            rbAdvancedExitShell.UseVisualStyleBackColor = true;
-            // 
-            // cbRebootSwitchToExplorer
-            // 
-            cbRebootSwitchToExplorer.AutoSize = true;
-            cbRebootSwitchToExplorer.Location = new System.Drawing.Point(31, 109);
-            cbRebootSwitchToExplorer.Name = "cbRebootSwitchToExplorer";
-            cbRebootSwitchToExplorer.Size = new System.Drawing.Size(352, 19);
-            cbRebootSwitchToExplorer.TabIndex = 2;
-            cbRebootSwitchToExplorer.Text = "Switch to Windows Explorer the next time my computer starts";
-            cbRebootSwitchToExplorer.UseVisualStyleBackColor = true;
-            // 
             // cbShutdownSwitchToExplorer
             // 
             cbShutdownSwitchToExplorer.AutoSize = true;
-            cbShutdownSwitchToExplorer.Location = new System.Drawing.Point(31, 63);
+            cbShutdownSwitchToExplorer.Location = new System.Drawing.Point(9, 54);
             cbShutdownSwitchToExplorer.Name = "cbShutdownSwitchToExplorer";
             cbShutdownSwitchToExplorer.Size = new System.Drawing.Size(352, 19);
             cbShutdownSwitchToExplorer.TabIndex = 2;
@@ -128,9 +56,10 @@
             // 
             // btnAction
             // 
-            btnAction.Anchor = System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left;
+            btnAction.Anchor = System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right;
             btnAction.DialogResult = System.Windows.Forms.DialogResult.OK;
-            btnAction.Location = new System.Drawing.Point(12, 224);
+            btnAction.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            btnAction.Location = new System.Drawing.Point(319, 119);
             btnAction.Name = "btnAction";
             btnAction.Size = new System.Drawing.Size(75, 23);
             btnAction.TabIndex = 3;
@@ -142,7 +71,8 @@
             // 
             btnCancel.Anchor = System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right;
             btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            btnCancel.Location = new System.Drawing.Point(507, 224);
+            btnCancel.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            btnCancel.Location = new System.Drawing.Point(12, 119);
             btnCancel.Name = "btnCancel";
             btnCancel.Size = new System.Drawing.Size(75, 23);
             btnCancel.TabIndex = 4;
@@ -150,52 +80,40 @@
             btnCancel.UseVisualStyleBackColor = true;
             btnCancel.Click += btnCancel_Click;
             // 
-            // horizontalLine1
-            // 
-            horizontalLine1.BackColor = System.Drawing.SystemColors.ControlText;
-            horizontalLine1.Location = new System.Drawing.Point(4, 31);
-            horizontalLine1.Name = "horizontalLine1";
-            horizontalLine1.Size = new System.Drawing.Size(578, 1);
-            horizontalLine1.TabIndex = 5;
-            // 
-            // horizontalLine2
-            // 
-            horizontalLine2.BackColor = System.Drawing.SystemColors.ControlText;
-            horizontalLine2.Location = new System.Drawing.Point(4, 209);
-            horizontalLine2.Name = "horizontalLine2";
-            horizontalLine2.Size = new System.Drawing.Size(578, 1);
-            horizontalLine2.TabIndex = 5;
-            // 
             // cbForce
             // 
             cbForce.AutoSize = true;
-            cbForce.Location = new System.Drawing.Point(93, 227);
+            cbForce.Location = new System.Drawing.Point(9, 79);
             cbForce.Name = "cbForce";
             cbForce.Size = new System.Drawing.Size(283, 19);
             cbForce.TabIndex = 6;
             cbForce.Text = "Force (ignore running apps and logged on users)";
             cbForce.UseVisualStyleBackColor = true;
             // 
+            // cbShutdownAction
+            // 
+            cbShutdownAction.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            cbShutdownAction.FormattingEnabled = true;
+            cbShutdownAction.Location = new System.Drawing.Point(9, 25);
+            cbShutdownAction.Name = "cbShutdownAction";
+            cbShutdownAction.Size = new System.Drawing.Size(386, 23);
+            cbShutdownAction.TabIndex = 7;
+            // 
             // TerminateShell
             // 
             AcceptButton = btnAction;
             AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            BackColor = System.Drawing.Color.SteelBlue;
             CancelButton = btnCancel;
-            ClientSize = new System.Drawing.Size(594, 259);
+            ClientSize = new System.Drawing.Size(406, 154);
+            Controls.Add(cbShutdownAction);
             Controls.Add(cbForce);
-            Controls.Add(horizontalLine2);
-            Controls.Add(horizontalLine1);
             Controls.Add(btnCancel);
             Controls.Add(btnAction);
             Controls.Add(cbShutdownSwitchToExplorer);
-            Controls.Add(cbRebootSwitchToExplorer);
-            Controls.Add(rbAdvancedExitShell);
-            Controls.Add(rbSwitchShell);
-            Controls.Add(rbLogOff);
-            Controls.Add(rbReboot);
-            Controls.Add(rbShutdown);
             Controls.Add(label1);
+            ForeColor = System.Drawing.Color.White;
             FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             MaximizeBox = false;
             MinimizeBox = false;
@@ -213,17 +131,10 @@
         #endregion
 
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.RadioButton rbShutdown;
-        private System.Windows.Forms.RadioButton rbReboot;
-        private System.Windows.Forms.RadioButton rbLogOff;
-        private System.Windows.Forms.RadioButton rbSwitchShell;
-        private System.Windows.Forms.RadioButton rbAdvancedExitShell;
-        private System.Windows.Forms.CheckBox cbRebootSwitchToExplorer;
         private System.Windows.Forms.CheckBox cbShutdownSwitchToExplorer;
         private System.Windows.Forms.Button btnAction;
         private System.Windows.Forms.Button btnCancel;
-        private Controls.HorizontalLine horizontalLine1;
-        private Controls.HorizontalLine horizontalLine2;
         private System.Windows.Forms.CheckBox cbForce;
+        private System.Windows.Forms.ComboBox cbShutdownAction;
     }
 }

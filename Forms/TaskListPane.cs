@@ -73,7 +73,7 @@ namespace AquariusShell.Forms
             ListViewItem item = lvTasksList.SelectedItems[0];
             IntPtr hWnd = (IntPtr)item.Tag!;
 
-            if (!Modules.Windows.ToggleWindowShown(hWnd))
+            if (!Modules.Windows.SwitchToWindow(hWnd))
             {
                 if (MessageBox.Show("The app did not appear to respond normally. Would you like to attempt to terminate it?", "Aquarius Shell", MessageBoxButtons.YesNo) == DialogResult.Yes)
                 {
@@ -110,6 +110,6 @@ namespace AquariusShell.Forms
 
         #endregion
 
-        private Dictionary<IntPtr, ListViewItem> _map;
+        private readonly Dictionary<IntPtr, ListViewItem> _map;
     }
 }

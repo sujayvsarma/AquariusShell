@@ -8,6 +8,8 @@ using System.Security.Principal;
 using System.Windows.Forms;
 
 using AquariusShell.Modules;
+using AquariusShell.Objects;
+using AquariusShell.Runtime;
 
 namespace AquariusShell.ShellApps
 {
@@ -106,6 +108,7 @@ namespace AquariusShell.ShellApps
         {
             List<string> uniqueList = new();
 
+            this.SetFormBusyState(true);
             this.Text = $"{Caption} ({path})";
 
             try
@@ -211,6 +214,11 @@ namespace AquariusShell.ShellApps
             {
                 MessageBox.Show("Error loading security information for object: " + ex.Message, "Aquarius Shell", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
             }
+
+            // Respect choices made above
+            btnTakeOwnership.Enabled &= _settings.AllowTakeOwnership;
+
+            this.SetFormBusyState(false);
         }
 
         /// <summary>
@@ -235,20 +243,49 @@ namespace AquariusShell.ShellApps
             btnResolvePrincipalNameRaw.Enabled = false;
             chkMarkPrincipalOwner.Enabled = false;
 
+
+
             foreach (FileSystemRights right in _enumRightsValues)
             {
                 string controlName = RightControlName(right);
                 if (controlName == string.Empty)
                 {
-                    return;
+                    continue;
                 }
 
-                ((ComboBox)aclLayoutTable.Controls[$"aclType{controlName}"]!).SelectedIndex = -1;
-                ((CheckBox)aclLayoutTable.Controls[$"di{controlName}"]!).Checked = false;
-                ((CheckBox)aclLayoutTable.Controls[$"oi{controlName}"]!).Checked = false;
-                ((CheckBox)aclLayoutTable.Controls[$"break{controlName}"]!).Checked = false;
+                ComboBox cmb = ((ComboBox)aclLayoutTable.Controls[$"aclType{controlName}"]!);
+                cmb.Items.Clear();
+                if (_settings.AllowSettingAllowAcls || _settings.AllowSettingDenyAcls)
+                {
+                    if (_settings.AllowSettingAllowAcls)
+                    {
+                        cmb.Items.Add("Allow");
+                    }
+                    if (_settings.AllowSettingDenyAcls)
+                    {
+                        cmb.Items.Add("Deny");
+                    }
+                }
+                else
+                {
+                    cmb.Enabled = false;
+                }
+                cmb.SelectedIndex = -1;
+
+                CheckBox chk = ((CheckBox)aclLayoutTable.Controls[$"di{controlName}"]!);
+                chk.Enabled = _settings.AllowSettingDirectoryInheritedAcls;
+                chk.Checked = false;
+
+                chk = ((CheckBox)aclLayoutTable.Controls[$"oi{controlName}"]!);
+                chk.Enabled = _settings.AllowSettingObjectInheritedAcls;
+                chk.Checked = false;
+
+                chk = ((CheckBox)aclLayoutTable.Controls[$"break{controlName}"]!);
+                chk.Enabled = _settings.AllowSettingStandaloneAcls;
+                chk.Checked = false;
             }
 
+            _areAclEditControlsDirty = false;
             btnSavePermissionEdits.Enabled = false;
             SetAclEditControls(readOnly: true);
         }
@@ -259,6 +296,8 @@ namespace AquariusShell.ShellApps
         /// <param name="readOnly">True to set them to readonly!</param>
         private void SetAclEditControls(bool readOnly = true)
         {
+            this.SetFormBusyState(true);
+
             tbPrincipalNameRaw.Enabled = !readOnly;
             if (tbPrincipalNameRaw.Font.Underline)
             {
@@ -283,12 +322,15 @@ namespace AquariusShell.ShellApps
                     return;
                 }
 
-                ((ComboBox)aclLayoutTable.Controls[$"aclType{controlName}"]!).Enabled = !readOnly;
-                ((CheckBox)aclLayoutTable.Controls[$"di{controlName}"]!).Enabled = !readOnly;
-                ((CheckBox)aclLayoutTable.Controls[$"oi{controlName}"]!).Enabled = !readOnly;
-                ((CheckBox)aclLayoutTable.Controls[$"break{controlName}"]!).Enabled = !readOnly;
+                ((ComboBox)aclLayoutTable.Controls[$"aclType{controlName}"]!).Enabled &= (!readOnly);
+                ((CheckBox)aclLayoutTable.Controls[$"di{controlName}"]!).Enabled &= !readOnly;
+                ((CheckBox)aclLayoutTable.Controls[$"oi{controlName}"]!).Enabled &= !readOnly;
+                ((CheckBox)aclLayoutTable.Controls[$"break{controlName}"]!).Enabled &= !readOnly;
             }
             btnSavePermissionEdits.Enabled = !readOnly;
+            _areAclEditControlsDirty = !readOnly;
+
+            this.SetFormBusyState(false);
         }
 
 
@@ -331,30 +373,6 @@ namespace AquariusShell.ShellApps
         {
             ilFileSystemImages.Images.Add(key, icon);
         }
-
-        /// <summary>
-        /// Returns the stringed equivalent of the FSR
-        /// </summary>
-        /// <param name="right">An FSR to resolve</param>
-        /// <returns>Human-readable name</returns>
-        private static bool IsConsideredRight(FileSystemRights right)
-            => right switch
-            {
-                FileSystemRights.CreateDirectories
-                or FileSystemRights.CreateFiles
-                or FileSystemRights.ReadAttributes
-                or FileSystemRights.ListDirectory
-                or FileSystemRights.ReadPermissions 
-                or FileSystemRights.Delete 
-                or FileSystemRights.DeleteSubdirectoriesAndFiles 
-                or FileSystemRights.ChangePermissions 
-                or FileSystemRights.ExecuteFile 
-                or FileSystemRights.WriteAttributes 
-                or FileSystemRights.WriteExtendedAttributes => true,
-
-                // we only do pure rights
-                _ => false
-            };
 
         /// <summary>
         /// Returns the suffix for the control names for the given FSR

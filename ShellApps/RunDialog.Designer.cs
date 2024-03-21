@@ -67,6 +67,7 @@
             // btnCancel
             // 
             btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+            btnCancel.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             btnCancel.Location = new System.Drawing.Point(7, 80);
             btnCancel.Name = "btnCancel";
             btnCancel.Size = new System.Drawing.Size(75, 23);
@@ -78,6 +79,7 @@
             // btnExecute
             // 
             btnExecute.DialogResult = System.Windows.Forms.DialogResult.OK;
+            btnExecute.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             btnExecute.Location = new System.Drawing.Point(343, 80);
             btnExecute.Name = "btnExecute";
             btnExecute.Size = new System.Drawing.Size(75, 23);
@@ -88,6 +90,7 @@
             // 
             // btnBrowse
             // 
+            btnBrowse.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             btnBrowse.Location = new System.Drawing.Point(262, 80);
             btnBrowse.Name = "btnBrowse";
             btnBrowse.Size = new System.Drawing.Size(75, 23);
@@ -110,6 +113,7 @@
             AcceptButton = btnExecute;
             AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            BackColor = System.Drawing.Color.SteelBlue;
             CancelButton = btnCancel;
             ClientSize = new System.Drawing.Size(430, 110);
             Controls.Add(btnBrowse);
@@ -118,6 +122,7 @@
             Controls.Add(cbURI);
             Controls.Add(pbRunIcon);
             Controls.Add(label1);
+            ForeColor = System.Drawing.Color.White;
             FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             MaximizeBox = false;
             MinimizeBox = false;

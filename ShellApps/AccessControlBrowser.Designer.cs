@@ -105,7 +105,6 @@
             chkMarkPrincipalOwner = new System.Windows.Forms.CheckBox();
             btnResolvePrincipalNameRaw = new System.Windows.Forms.Button();
             tbPrincipalNameRaw = new System.Windows.Forms.TextBox();
-            label4 = new System.Windows.Forms.Label();
             label3 = new System.Windows.Forms.Label();
             btnSavePermissionEdits = new System.Windows.Forms.Button();
             btnEditPrincipal = new System.Windows.Forms.Button();
@@ -130,6 +129,9 @@
             // tvFilesystemBrowser
             // 
             tvFilesystemBrowser.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left;
+            tvFilesystemBrowser.BackColor = System.Drawing.Color.SteelBlue;
+            tvFilesystemBrowser.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            tvFilesystemBrowser.ForeColor = System.Drawing.Color.White;
             tvFilesystemBrowser.HideSelection = false;
             tvFilesystemBrowser.ImageIndex = 0;
             tvFilesystemBrowser.ImageList = ilFileSystemImages;
@@ -162,6 +164,8 @@
             // lbPrincipalsList
             // 
             lbPrincipalsList.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
+            lbPrincipalsList.BackColor = System.Drawing.Color.SteelBlue;
+            lbPrincipalsList.ForeColor = System.Drawing.Color.White;
             lbPrincipalsList.FormattingEnabled = true;
             lbPrincipalsList.IntegralHeight = false;
             lbPrincipalsList.ItemHeight = 15;
@@ -176,6 +180,7 @@
             // 
             btnDeletePrincipal.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
             btnDeletePrincipal.Enabled = false;
+            btnDeletePrincipal.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             btnDeletePrincipal.Location = new System.Drawing.Point(270, 240);
             btnDeletePrincipal.Name = "btnDeletePrincipal";
             btnDeletePrincipal.Size = new System.Drawing.Size(113, 32);
@@ -191,7 +196,6 @@
             groupBox1.Controls.Add(chkMarkPrincipalOwner);
             groupBox1.Controls.Add(btnResolvePrincipalNameRaw);
             groupBox1.Controls.Add(tbPrincipalNameRaw);
-            groupBox1.Controls.Add(label4);
             groupBox1.Controls.Add(label3);
             groupBox1.Location = new System.Drawing.Point(267, 277);
             groupBox1.Name = "groupBox1";
@@ -202,6 +206,7 @@
             // 
             // aclLayoutTable
             // 
+            aclLayoutTable.CellBorderStyle = System.Windows.Forms.TableLayoutPanelCellBorderStyle.Single;
             aclLayoutTable.ColumnCount = 5;
             aclLayoutTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
             aclLayoutTable.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 71F));
@@ -273,7 +278,7 @@
             aclLayoutTable.Controls.Add(diDeleteRecursive, 2, 12);
             aclLayoutTable.Controls.Add(oiDeleteRecursive, 3, 12);
             aclLayoutTable.Controls.Add(breakDeleteRecursive, 4, 12);
-            aclLayoutTable.Location = new System.Drawing.Point(19, 102);
+            aclLayoutTable.Location = new System.Drawing.Point(19, 82);
             aclLayoutTable.Name = "aclLayoutTable";
             aclLayoutTable.RowCount = 13;
             aclLayoutTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 25F));
@@ -289,95 +294,95 @@
             aclLayoutTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 25F));
             aclLayoutTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 25F));
             aclLayoutTable.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 25F));
-            aclLayoutTable.Size = new System.Drawing.Size(502, 330);
+            aclLayoutTable.Size = new System.Drawing.Size(502, 343);
             aclLayoutTable.TabIndex = 6;
             // 
             // label5
             // 
             label5.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
-            label5.Location = new System.Drawing.Point(3, 0);
+            label5.Location = new System.Drawing.Point(4, 1);
             label5.Name = "label5";
-            label5.Size = new System.Drawing.Size(320, 24);
+            label5.Size = new System.Drawing.Size(314, 24);
             label5.TabIndex = 0;
             label5.Text = "Permission";
             label5.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // label7
             // 
-            label7.Location = new System.Drawing.Point(3, 25);
+            label7.Location = new System.Drawing.Point(4, 27);
             label7.Name = "label7";
-            label7.Size = new System.Drawing.Size(320, 24);
+            label7.Size = new System.Drawing.Size(314, 24);
             label7.TabIndex = 0;
             label7.Text = "Create subdirectories";
             // 
             // label8
             // 
-            label8.Location = new System.Drawing.Point(3, 50);
+            label8.Location = new System.Drawing.Point(4, 53);
             label8.Name = "label8";
-            label8.Size = new System.Drawing.Size(320, 24);
+            label8.Size = new System.Drawing.Size(314, 24);
             label8.TabIndex = 0;
             label8.Text = "Create/modify files";
             // 
             // label9
             // 
-            label9.Location = new System.Drawing.Point(3, 75);
+            label9.Location = new System.Drawing.Point(4, 79);
             label9.Name = "label9";
-            label9.Size = new System.Drawing.Size(320, 24);
+            label9.Size = new System.Drawing.Size(314, 24);
             label9.TabIndex = 0;
             label9.Text = "View attributes and metadata";
             // 
             // label10
             // 
-            label10.Location = new System.Drawing.Point(3, 100);
+            label10.Location = new System.Drawing.Point(4, 105);
             label10.Name = "label10";
-            label10.Size = new System.Drawing.Size(320, 24);
+            label10.Size = new System.Drawing.Size(314, 24);
             label10.TabIndex = 0;
             label10.Text = "List directory or view file data";
             // 
             // label11
             // 
-            label11.Location = new System.Drawing.Point(3, 125);
+            label11.Location = new System.Drawing.Point(4, 131);
             label11.Name = "label11";
-            label11.Size = new System.Drawing.Size(320, 24);
+            label11.Size = new System.Drawing.Size(314, 24);
             label11.TabIndex = 0;
             label11.Text = "View permissions";
             // 
             // label12
             // 
-            label12.Location = new System.Drawing.Point(3, 150);
+            label12.Location = new System.Drawing.Point(4, 157);
             label12.Name = "label12";
-            label12.Size = new System.Drawing.Size(320, 24);
+            label12.Size = new System.Drawing.Size(314, 24);
             label12.TabIndex = 0;
             label12.Text = "Delete (subdirectories, files)";
             // 
             // label13
             // 
-            label13.Location = new System.Drawing.Point(3, 175);
+            label13.Location = new System.Drawing.Point(4, 183);
             label13.Name = "label13";
-            label13.Size = new System.Drawing.Size(320, 24);
+            label13.Size = new System.Drawing.Size(314, 24);
             label13.TabIndex = 0;
             label13.Text = "Modify permissions";
             // 
             // label14
             // 
-            label14.Location = new System.Drawing.Point(3, 200);
+            label14.Location = new System.Drawing.Point(4, 209);
             label14.Name = "label14";
-            label14.Size = new System.Drawing.Size(320, 24);
+            label14.Size = new System.Drawing.Size(314, 24);
             label14.TabIndex = 0;
             label14.Text = "Execute a file/program";
             // 
             // label15
             // 
-            label15.Location = new System.Drawing.Point(3, 225);
+            label15.Location = new System.Drawing.Point(4, 235);
             label15.Name = "label15";
-            label15.Size = new System.Drawing.Size(320, 24);
+            label15.Size = new System.Drawing.Size(314, 24);
             label15.TabIndex = 0;
             label15.Text = "Modify attributes and metadata";
             // 
             // label16
             // 
             label16.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
-            label16.Location = new System.Drawing.Point(329, 0);
+            label16.Location = new System.Drawing.Point(325, 1);
             label16.Name = "label16";
             label16.Size = new System.Drawing.Size(40, 24);
             label16.TabIndex = 0;
@@ -387,7 +392,7 @@
             // label17
             // 
             label17.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
-            label17.Location = new System.Drawing.Point(400, 0);
+            label17.Location = new System.Drawing.Point(397, 1);
             label17.Name = "label17";
             label17.Size = new System.Drawing.Size(29, 24);
             label17.TabIndex = 0;
@@ -397,7 +402,7 @@
             // label18
             // 
             label18.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
-            label18.Location = new System.Drawing.Point(435, 0);
+            label18.Location = new System.Drawing.Point(433, 1);
             label18.Name = "label18";
             label18.Size = new System.Drawing.Size(29, 24);
             label18.TabIndex = 0;
@@ -407,7 +412,7 @@
             // label19
             // 
             label19.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
-            label19.Location = new System.Drawing.Point(470, 0);
+            label19.Location = new System.Drawing.Point(469, 1);
             label19.Name = "label19";
             label19.Size = new System.Drawing.Size(29, 24);
             label19.TabIndex = 0;
@@ -419,7 +424,7 @@
             aclTypeCreateDirectory.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             aclTypeCreateDirectory.FormattingEnabled = true;
             aclTypeCreateDirectory.Items.AddRange(new object[] { "Allow", "Deny" });
-            aclTypeCreateDirectory.Location = new System.Drawing.Point(329, 28);
+            aclTypeCreateDirectory.Location = new System.Drawing.Point(325, 30);
             aclTypeCreateDirectory.Name = "aclTypeCreateDirectory";
             aclTypeCreateDirectory.Size = new System.Drawing.Size(65, 23);
             aclTypeCreateDirectory.TabIndex = 1;
@@ -429,7 +434,7 @@
             aclTypeCreateFiles.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             aclTypeCreateFiles.FormattingEnabled = true;
             aclTypeCreateFiles.Items.AddRange(new object[] { "Allow", "Deny" });
-            aclTypeCreateFiles.Location = new System.Drawing.Point(329, 53);
+            aclTypeCreateFiles.Location = new System.Drawing.Point(325, 56);
             aclTypeCreateFiles.Name = "aclTypeCreateFiles";
             aclTypeCreateFiles.Size = new System.Drawing.Size(65, 23);
             aclTypeCreateFiles.TabIndex = 1;
@@ -439,7 +444,7 @@
             aclTypeReadAttributes.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             aclTypeReadAttributes.FormattingEnabled = true;
             aclTypeReadAttributes.Items.AddRange(new object[] { "Allow", "Deny" });
-            aclTypeReadAttributes.Location = new System.Drawing.Point(329, 78);
+            aclTypeReadAttributes.Location = new System.Drawing.Point(325, 82);
             aclTypeReadAttributes.Name = "aclTypeReadAttributes";
             aclTypeReadAttributes.Size = new System.Drawing.Size(65, 23);
             aclTypeReadAttributes.TabIndex = 1;
@@ -449,7 +454,7 @@
             aclTypeListRead.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             aclTypeListRead.FormattingEnabled = true;
             aclTypeListRead.Items.AddRange(new object[] { "Allow", "Deny" });
-            aclTypeListRead.Location = new System.Drawing.Point(329, 103);
+            aclTypeListRead.Location = new System.Drawing.Point(325, 108);
             aclTypeListRead.Name = "aclTypeListRead";
             aclTypeListRead.Size = new System.Drawing.Size(65, 23);
             aclTypeListRead.TabIndex = 1;
@@ -459,7 +464,7 @@
             aclTypeReadPermissions.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             aclTypeReadPermissions.FormattingEnabled = true;
             aclTypeReadPermissions.Items.AddRange(new object[] { "Allow", "Deny" });
-            aclTypeReadPermissions.Location = new System.Drawing.Point(329, 128);
+            aclTypeReadPermissions.Location = new System.Drawing.Point(325, 134);
             aclTypeReadPermissions.Name = "aclTypeReadPermissions";
             aclTypeReadPermissions.Size = new System.Drawing.Size(65, 23);
             aclTypeReadPermissions.TabIndex = 1;
@@ -469,7 +474,7 @@
             aclTypeDelete.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             aclTypeDelete.FormattingEnabled = true;
             aclTypeDelete.Items.AddRange(new object[] { "Allow", "Deny" });
-            aclTypeDelete.Location = new System.Drawing.Point(329, 153);
+            aclTypeDelete.Location = new System.Drawing.Point(325, 160);
             aclTypeDelete.Name = "aclTypeDelete";
             aclTypeDelete.Size = new System.Drawing.Size(65, 23);
             aclTypeDelete.TabIndex = 1;
@@ -479,7 +484,7 @@
             aclTypeChangePermissions.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             aclTypeChangePermissions.FormattingEnabled = true;
             aclTypeChangePermissions.Items.AddRange(new object[] { "Allow", "Deny" });
-            aclTypeChangePermissions.Location = new System.Drawing.Point(329, 178);
+            aclTypeChangePermissions.Location = new System.Drawing.Point(325, 186);
             aclTypeChangePermissions.Name = "aclTypeChangePermissions";
             aclTypeChangePermissions.Size = new System.Drawing.Size(65, 23);
             aclTypeChangePermissions.TabIndex = 1;
@@ -489,7 +494,7 @@
             aclTypeExecute.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             aclTypeExecute.FormattingEnabled = true;
             aclTypeExecute.Items.AddRange(new object[] { "Allow", "Deny" });
-            aclTypeExecute.Location = new System.Drawing.Point(329, 203);
+            aclTypeExecute.Location = new System.Drawing.Point(325, 212);
             aclTypeExecute.Name = "aclTypeExecute";
             aclTypeExecute.Size = new System.Drawing.Size(65, 23);
             aclTypeExecute.TabIndex = 1;
@@ -499,7 +504,7 @@
             aclTypeWriteAttributes.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             aclTypeWriteAttributes.FormattingEnabled = true;
             aclTypeWriteAttributes.Items.AddRange(new object[] { "Allow", "Deny" });
-            aclTypeWriteAttributes.Location = new System.Drawing.Point(329, 228);
+            aclTypeWriteAttributes.Location = new System.Drawing.Point(325, 238);
             aclTypeWriteAttributes.Name = "aclTypeWriteAttributes";
             aclTypeWriteAttributes.Size = new System.Drawing.Size(65, 23);
             aclTypeWriteAttributes.TabIndex = 1;
@@ -507,7 +512,7 @@
             // diCreateDirectory
             // 
             diCreateDirectory.CheckAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            diCreateDirectory.Location = new System.Drawing.Point(400, 28);
+            diCreateDirectory.Location = new System.Drawing.Point(397, 30);
             diCreateDirectory.Name = "diCreateDirectory";
             diCreateDirectory.Size = new System.Drawing.Size(29, 19);
             diCreateDirectory.TabIndex = 2;
@@ -516,7 +521,7 @@
             // diCreateFiles
             // 
             diCreateFiles.CheckAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            diCreateFiles.Location = new System.Drawing.Point(400, 53);
+            diCreateFiles.Location = new System.Drawing.Point(397, 56);
             diCreateFiles.Name = "diCreateFiles";
             diCreateFiles.Size = new System.Drawing.Size(29, 19);
             diCreateFiles.TabIndex = 2;
@@ -525,7 +530,7 @@
             // diReadAttributes
             // 
             diReadAttributes.CheckAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            diReadAttributes.Location = new System.Drawing.Point(400, 78);
+            diReadAttributes.Location = new System.Drawing.Point(397, 82);
             diReadAttributes.Name = "diReadAttributes";
             diReadAttributes.Size = new System.Drawing.Size(29, 19);
             diReadAttributes.TabIndex = 2;
@@ -534,7 +539,7 @@
             // diListRead
             // 
             diListRead.CheckAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            diListRead.Location = new System.Drawing.Point(400, 103);
+            diListRead.Location = new System.Drawing.Point(397, 108);
             diListRead.Name = "diListRead";
             diListRead.Size = new System.Drawing.Size(29, 19);
             diListRead.TabIndex = 2;
@@ -543,7 +548,7 @@
             // diReadPermissions
             // 
             diReadPermissions.CheckAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            diReadPermissions.Location = new System.Drawing.Point(400, 128);
+            diReadPermissions.Location = new System.Drawing.Point(397, 134);
             diReadPermissions.Name = "diReadPermissions";
             diReadPermissions.Size = new System.Drawing.Size(29, 19);
             diReadPermissions.TabIndex = 2;
@@ -552,7 +557,7 @@
             // diDelete
             // 
             diDelete.CheckAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            diDelete.Location = new System.Drawing.Point(400, 153);
+            diDelete.Location = new System.Drawing.Point(397, 160);
             diDelete.Name = "diDelete";
             diDelete.Size = new System.Drawing.Size(29, 19);
             diDelete.TabIndex = 2;
@@ -561,7 +566,7 @@
             // diChangePermissions
             // 
             diChangePermissions.CheckAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            diChangePermissions.Location = new System.Drawing.Point(400, 178);
+            diChangePermissions.Location = new System.Drawing.Point(397, 186);
             diChangePermissions.Name = "diChangePermissions";
             diChangePermissions.Size = new System.Drawing.Size(29, 19);
             diChangePermissions.TabIndex = 2;
@@ -570,7 +575,7 @@
             // diExecute
             // 
             diExecute.CheckAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            diExecute.Location = new System.Drawing.Point(400, 203);
+            diExecute.Location = new System.Drawing.Point(397, 212);
             diExecute.Name = "diExecute";
             diExecute.Size = new System.Drawing.Size(29, 19);
             diExecute.TabIndex = 2;
@@ -579,7 +584,7 @@
             // diWriteAttributes
             // 
             diWriteAttributes.CheckAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            diWriteAttributes.Location = new System.Drawing.Point(400, 228);
+            diWriteAttributes.Location = new System.Drawing.Point(397, 238);
             diWriteAttributes.Name = "diWriteAttributes";
             diWriteAttributes.Size = new System.Drawing.Size(29, 19);
             diWriteAttributes.TabIndex = 2;
@@ -588,7 +593,7 @@
             // oiCreateDirectory
             // 
             oiCreateDirectory.CheckAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            oiCreateDirectory.Location = new System.Drawing.Point(435, 28);
+            oiCreateDirectory.Location = new System.Drawing.Point(433, 30);
             oiCreateDirectory.Name = "oiCreateDirectory";
             oiCreateDirectory.Size = new System.Drawing.Size(29, 19);
             oiCreateDirectory.TabIndex = 2;
@@ -597,7 +602,7 @@
             // oiCreateFiles
             // 
             oiCreateFiles.CheckAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            oiCreateFiles.Location = new System.Drawing.Point(435, 53);
+            oiCreateFiles.Location = new System.Drawing.Point(433, 56);
             oiCreateFiles.Name = "oiCreateFiles";
             oiCreateFiles.Size = new System.Drawing.Size(29, 19);
             oiCreateFiles.TabIndex = 2;
@@ -606,7 +611,7 @@
             // oiReadAttributes
             // 
             oiReadAttributes.CheckAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            oiReadAttributes.Location = new System.Drawing.Point(435, 78);
+            oiReadAttributes.Location = new System.Drawing.Point(433, 82);
             oiReadAttributes.Name = "oiReadAttributes";
             oiReadAttributes.Size = new System.Drawing.Size(29, 19);
             oiReadAttributes.TabIndex = 2;
@@ -615,7 +620,7 @@
             // oiListRead
             // 
             oiListRead.CheckAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            oiListRead.Location = new System.Drawing.Point(435, 103);
+            oiListRead.Location = new System.Drawing.Point(433, 108);
             oiListRead.Name = "oiListRead";
             oiListRead.Size = new System.Drawing.Size(29, 19);
             oiListRead.TabIndex = 2;
@@ -624,7 +629,7 @@
             // oiReadPermissions
             // 
             oiReadPermissions.CheckAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            oiReadPermissions.Location = new System.Drawing.Point(435, 128);
+            oiReadPermissions.Location = new System.Drawing.Point(433, 134);
             oiReadPermissions.Name = "oiReadPermissions";
             oiReadPermissions.Size = new System.Drawing.Size(29, 19);
             oiReadPermissions.TabIndex = 2;
@@ -633,7 +638,7 @@
             // oiDelete
             // 
             oiDelete.CheckAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            oiDelete.Location = new System.Drawing.Point(435, 153);
+            oiDelete.Location = new System.Drawing.Point(433, 160);
             oiDelete.Name = "oiDelete";
             oiDelete.Size = new System.Drawing.Size(29, 19);
             oiDelete.TabIndex = 2;
@@ -642,7 +647,7 @@
             // oiChangePermissions
             // 
             oiChangePermissions.CheckAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            oiChangePermissions.Location = new System.Drawing.Point(435, 178);
+            oiChangePermissions.Location = new System.Drawing.Point(433, 186);
             oiChangePermissions.Name = "oiChangePermissions";
             oiChangePermissions.Size = new System.Drawing.Size(29, 19);
             oiChangePermissions.TabIndex = 2;
@@ -651,7 +656,7 @@
             // oiExecute
             // 
             oiExecute.CheckAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            oiExecute.Location = new System.Drawing.Point(435, 203);
+            oiExecute.Location = new System.Drawing.Point(433, 212);
             oiExecute.Name = "oiExecute";
             oiExecute.Size = new System.Drawing.Size(29, 19);
             oiExecute.TabIndex = 2;
@@ -660,7 +665,7 @@
             // oiWriteAttributes
             // 
             oiWriteAttributes.CheckAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            oiWriteAttributes.Location = new System.Drawing.Point(435, 228);
+            oiWriteAttributes.Location = new System.Drawing.Point(433, 238);
             oiWriteAttributes.Name = "oiWriteAttributes";
             oiWriteAttributes.Size = new System.Drawing.Size(29, 19);
             oiWriteAttributes.TabIndex = 2;
@@ -669,7 +674,7 @@
             // breakCreateDirectory
             // 
             breakCreateDirectory.CheckAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            breakCreateDirectory.Location = new System.Drawing.Point(470, 28);
+            breakCreateDirectory.Location = new System.Drawing.Point(469, 30);
             breakCreateDirectory.Name = "breakCreateDirectory";
             breakCreateDirectory.Size = new System.Drawing.Size(29, 19);
             breakCreateDirectory.TabIndex = 2;
@@ -678,7 +683,7 @@
             // breakCreateFiles
             // 
             breakCreateFiles.CheckAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            breakCreateFiles.Location = new System.Drawing.Point(470, 53);
+            breakCreateFiles.Location = new System.Drawing.Point(469, 56);
             breakCreateFiles.Name = "breakCreateFiles";
             breakCreateFiles.Size = new System.Drawing.Size(29, 19);
             breakCreateFiles.TabIndex = 2;
@@ -687,7 +692,7 @@
             // breakReadAttributes
             // 
             breakReadAttributes.CheckAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            breakReadAttributes.Location = new System.Drawing.Point(470, 78);
+            breakReadAttributes.Location = new System.Drawing.Point(469, 82);
             breakReadAttributes.Name = "breakReadAttributes";
             breakReadAttributes.Size = new System.Drawing.Size(29, 19);
             breakReadAttributes.TabIndex = 2;
@@ -696,7 +701,7 @@
             // breakListRead
             // 
             breakListRead.CheckAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            breakListRead.Location = new System.Drawing.Point(470, 103);
+            breakListRead.Location = new System.Drawing.Point(469, 108);
             breakListRead.Name = "breakListRead";
             breakListRead.Size = new System.Drawing.Size(29, 19);
             breakListRead.TabIndex = 2;
@@ -705,7 +710,7 @@
             // breakReadPermissions
             // 
             breakReadPermissions.CheckAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            breakReadPermissions.Location = new System.Drawing.Point(470, 128);
+            breakReadPermissions.Location = new System.Drawing.Point(469, 134);
             breakReadPermissions.Name = "breakReadPermissions";
             breakReadPermissions.Size = new System.Drawing.Size(29, 19);
             breakReadPermissions.TabIndex = 2;
@@ -714,7 +719,7 @@
             // breakDelete
             // 
             breakDelete.CheckAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            breakDelete.Location = new System.Drawing.Point(470, 153);
+            breakDelete.Location = new System.Drawing.Point(469, 160);
             breakDelete.Name = "breakDelete";
             breakDelete.Size = new System.Drawing.Size(29, 19);
             breakDelete.TabIndex = 2;
@@ -723,7 +728,7 @@
             // breakChangePermissions
             // 
             breakChangePermissions.CheckAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            breakChangePermissions.Location = new System.Drawing.Point(470, 178);
+            breakChangePermissions.Location = new System.Drawing.Point(469, 186);
             breakChangePermissions.Name = "breakChangePermissions";
             breakChangePermissions.Size = new System.Drawing.Size(29, 19);
             breakChangePermissions.TabIndex = 2;
@@ -732,7 +737,7 @@
             // breakExecute
             // 
             breakExecute.CheckAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            breakExecute.Location = new System.Drawing.Point(470, 203);
+            breakExecute.Location = new System.Drawing.Point(469, 212);
             breakExecute.Name = "breakExecute";
             breakExecute.Size = new System.Drawing.Size(29, 19);
             breakExecute.TabIndex = 2;
@@ -741,7 +746,7 @@
             // breakWriteAttributes
             // 
             breakWriteAttributes.CheckAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            breakWriteAttributes.Location = new System.Drawing.Point(470, 228);
+            breakWriteAttributes.Location = new System.Drawing.Point(469, 238);
             breakWriteAttributes.Name = "breakWriteAttributes";
             breakWriteAttributes.Size = new System.Drawing.Size(29, 19);
             breakWriteAttributes.TabIndex = 2;
@@ -749,25 +754,25 @@
             // 
             // label20
             // 
-            label20.Location = new System.Drawing.Point(3, 250);
+            label20.Location = new System.Drawing.Point(4, 261);
             label20.Name = "label20";
-            label20.Size = new System.Drawing.Size(320, 24);
+            label20.Size = new System.Drawing.Size(314, 24);
             label20.TabIndex = 0;
             label20.Text = "View extended attributes and metadata";
             // 
             // label21
             // 
-            label21.Location = new System.Drawing.Point(3, 275);
+            label21.Location = new System.Drawing.Point(4, 287);
             label21.Name = "label21";
-            label21.Size = new System.Drawing.Size(320, 24);
+            label21.Size = new System.Drawing.Size(314, 24);
             label21.TabIndex = 0;
             label21.Text = "Modify extended attributes and metadata";
             // 
             // label22
             // 
-            label22.Location = new System.Drawing.Point(3, 300);
+            label22.Location = new System.Drawing.Point(4, 313);
             label22.Name = "label22";
-            label22.Size = new System.Drawing.Size(320, 24);
+            label22.Size = new System.Drawing.Size(314, 24);
             label22.TabIndex = 0;
             label22.Text = "Delete everything recursively";
             // 
@@ -776,7 +781,7 @@
             aclTypeReadExtendedAttributes.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             aclTypeReadExtendedAttributes.FormattingEnabled = true;
             aclTypeReadExtendedAttributes.Items.AddRange(new object[] { "Allow", "Deny" });
-            aclTypeReadExtendedAttributes.Location = new System.Drawing.Point(329, 253);
+            aclTypeReadExtendedAttributes.Location = new System.Drawing.Point(325, 264);
             aclTypeReadExtendedAttributes.Name = "aclTypeReadExtendedAttributes";
             aclTypeReadExtendedAttributes.Size = new System.Drawing.Size(65, 23);
             aclTypeReadExtendedAttributes.TabIndex = 1;
@@ -786,7 +791,7 @@
             aclTypeWriteExtendedAttributes.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             aclTypeWriteExtendedAttributes.FormattingEnabled = true;
             aclTypeWriteExtendedAttributes.Items.AddRange(new object[] { "Allow", "Deny" });
-            aclTypeWriteExtendedAttributes.Location = new System.Drawing.Point(329, 278);
+            aclTypeWriteExtendedAttributes.Location = new System.Drawing.Point(325, 290);
             aclTypeWriteExtendedAttributes.Name = "aclTypeWriteExtendedAttributes";
             aclTypeWriteExtendedAttributes.Size = new System.Drawing.Size(65, 23);
             aclTypeWriteExtendedAttributes.TabIndex = 1;
@@ -796,7 +801,7 @@
             aclTypeDeleteRecursive.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             aclTypeDeleteRecursive.FormattingEnabled = true;
             aclTypeDeleteRecursive.Items.AddRange(new object[] { "Allow", "Deny" });
-            aclTypeDeleteRecursive.Location = new System.Drawing.Point(329, 303);
+            aclTypeDeleteRecursive.Location = new System.Drawing.Point(325, 316);
             aclTypeDeleteRecursive.Name = "aclTypeDeleteRecursive";
             aclTypeDeleteRecursive.Size = new System.Drawing.Size(65, 23);
             aclTypeDeleteRecursive.TabIndex = 1;
@@ -804,7 +809,7 @@
             // diReadExtendedAttributes
             // 
             diReadExtendedAttributes.CheckAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            diReadExtendedAttributes.Location = new System.Drawing.Point(400, 253);
+            diReadExtendedAttributes.Location = new System.Drawing.Point(397, 264);
             diReadExtendedAttributes.Name = "diReadExtendedAttributes";
             diReadExtendedAttributes.Size = new System.Drawing.Size(29, 19);
             diReadExtendedAttributes.TabIndex = 2;
@@ -813,7 +818,7 @@
             // oiReadExtendedAttributes
             // 
             oiReadExtendedAttributes.CheckAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            oiReadExtendedAttributes.Location = new System.Drawing.Point(435, 253);
+            oiReadExtendedAttributes.Location = new System.Drawing.Point(433, 264);
             oiReadExtendedAttributes.Name = "oiReadExtendedAttributes";
             oiReadExtendedAttributes.Size = new System.Drawing.Size(29, 19);
             oiReadExtendedAttributes.TabIndex = 2;
@@ -822,7 +827,7 @@
             // breakReadExtendedAttributes
             // 
             breakReadExtendedAttributes.CheckAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            breakReadExtendedAttributes.Location = new System.Drawing.Point(470, 253);
+            breakReadExtendedAttributes.Location = new System.Drawing.Point(469, 264);
             breakReadExtendedAttributes.Name = "breakReadExtendedAttributes";
             breakReadExtendedAttributes.Size = new System.Drawing.Size(29, 19);
             breakReadExtendedAttributes.TabIndex = 2;
@@ -831,7 +836,7 @@
             // diWriteExtendedAttributes
             // 
             diWriteExtendedAttributes.CheckAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            diWriteExtendedAttributes.Location = new System.Drawing.Point(400, 278);
+            diWriteExtendedAttributes.Location = new System.Drawing.Point(397, 290);
             diWriteExtendedAttributes.Name = "diWriteExtendedAttributes";
             diWriteExtendedAttributes.Size = new System.Drawing.Size(29, 19);
             diWriteExtendedAttributes.TabIndex = 2;
@@ -840,7 +845,7 @@
             // oiWriteExtendedAttributes
             // 
             oiWriteExtendedAttributes.CheckAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            oiWriteExtendedAttributes.Location = new System.Drawing.Point(435, 278);
+            oiWriteExtendedAttributes.Location = new System.Drawing.Point(433, 290);
             oiWriteExtendedAttributes.Name = "oiWriteExtendedAttributes";
             oiWriteExtendedAttributes.Size = new System.Drawing.Size(29, 19);
             oiWriteExtendedAttributes.TabIndex = 2;
@@ -849,7 +854,7 @@
             // breakWriteExtendedAttributes
             // 
             breakWriteExtendedAttributes.CheckAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            breakWriteExtendedAttributes.Location = new System.Drawing.Point(470, 278);
+            breakWriteExtendedAttributes.Location = new System.Drawing.Point(469, 290);
             breakWriteExtendedAttributes.Name = "breakWriteExtendedAttributes";
             breakWriteExtendedAttributes.Size = new System.Drawing.Size(29, 19);
             breakWriteExtendedAttributes.TabIndex = 2;
@@ -858,7 +863,7 @@
             // diDeleteRecursive
             // 
             diDeleteRecursive.CheckAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            diDeleteRecursive.Location = new System.Drawing.Point(400, 303);
+            diDeleteRecursive.Location = new System.Drawing.Point(397, 316);
             diDeleteRecursive.Name = "diDeleteRecursive";
             diDeleteRecursive.Size = new System.Drawing.Size(29, 19);
             diDeleteRecursive.TabIndex = 2;
@@ -867,7 +872,7 @@
             // oiDeleteRecursive
             // 
             oiDeleteRecursive.CheckAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            oiDeleteRecursive.Location = new System.Drawing.Point(435, 303);
+            oiDeleteRecursive.Location = new System.Drawing.Point(433, 316);
             oiDeleteRecursive.Name = "oiDeleteRecursive";
             oiDeleteRecursive.Size = new System.Drawing.Size(29, 19);
             oiDeleteRecursive.TabIndex = 2;
@@ -876,7 +881,7 @@
             // breakDeleteRecursive
             // 
             breakDeleteRecursive.CheckAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            breakDeleteRecursive.Location = new System.Drawing.Point(470, 303);
+            breakDeleteRecursive.Location = new System.Drawing.Point(469, 316);
             breakDeleteRecursive.Name = "breakDeleteRecursive";
             breakDeleteRecursive.Size = new System.Drawing.Size(29, 19);
             breakDeleteRecursive.TabIndex = 2;
@@ -896,6 +901,7 @@
             // 
             btnResolvePrincipalNameRaw.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
             btnResolvePrincipalNameRaw.Enabled = false;
+            btnResolvePrincipalNameRaw.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             btnResolvePrincipalNameRaw.Location = new System.Drawing.Point(446, 26);
             btnResolvePrincipalNameRaw.Name = "btnResolvePrincipalNameRaw";
             btnResolvePrincipalNameRaw.Size = new System.Drawing.Size(75, 23);
@@ -913,15 +919,6 @@
             tbPrincipalNameRaw.TabIndex = 1;
             tbPrincipalNameRaw.TextChanged += OwnerNameRaw_EnableResolveName;
             // 
-            // label4
-            // 
-            label4.Location = new System.Drawing.Point(15, 82);
-            label4.Name = "label4";
-            label4.Size = new System.Drawing.Size(73, 15);
-            label4.TabIndex = 0;
-            label4.Text = "Permissions:";
-            label4.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            // 
             // label3
             // 
             label3.Location = new System.Drawing.Point(15, 29);
@@ -935,6 +932,7 @@
             // 
             btnSavePermissionEdits.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
             btnSavePermissionEdits.Enabled = false;
+            btnSavePermissionEdits.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             btnSavePermissionEdits.Location = new System.Drawing.Point(633, 724);
             btnSavePermissionEdits.Name = "btnSavePermissionEdits";
             btnSavePermissionEdits.Size = new System.Drawing.Size(75, 24);
@@ -947,6 +945,7 @@
             // 
             btnEditPrincipal.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
             btnEditPrincipal.Enabled = false;
+            btnEditPrincipal.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             btnEditPrincipal.Location = new System.Drawing.Point(679, 240);
             btnEditPrincipal.Name = "btnEditPrincipal";
             btnEditPrincipal.Size = new System.Drawing.Size(113, 32);
@@ -959,6 +958,7 @@
             // 
             btnCloseDialog.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
             btnCloseDialog.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+            btnCloseDialog.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             btnCloseDialog.Location = new System.Drawing.Point(714, 723);
             btnCloseDialog.Name = "btnCloseDialog";
             btnCloseDialog.Size = new System.Drawing.Size(75, 24);
@@ -989,6 +989,7 @@
             // btnTakeOwnership
             // 
             btnTakeOwnership.Enabled = false;
+            btnTakeOwnership.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             btnTakeOwnership.Location = new System.Drawing.Point(676, 65);
             btnTakeOwnership.Name = "btnTakeOwnership";
             btnTakeOwnership.Size = new System.Drawing.Size(113, 32);
@@ -1000,6 +1001,7 @@
             // btnAddPrincipal
             // 
             btnAddPrincipal.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
+            btnAddPrincipal.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             btnAddPrincipal.Location = new System.Drawing.Point(560, 240);
             btnAddPrincipal.Name = "btnAddPrincipal";
             btnAddPrincipal.Size = new System.Drawing.Size(113, 32);
@@ -1012,6 +1014,7 @@
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            BackColor = System.Drawing.Color.SteelBlue;
             CancelButton = btnCloseDialog;
             ClientSize = new System.Drawing.Size(809, 753);
             Controls.Add(btnTakeOwnership);
@@ -1027,6 +1030,7 @@
             Controls.Add(label6);
             Controls.Add(label2);
             Controls.Add(label1);
+            ForeColor = System.Drawing.Color.White;
             FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             MaximizeBox = false;
             MinimizeBox = false;
@@ -1051,7 +1055,6 @@
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.Button btnResolvePrincipalNameRaw;
         private System.Windows.Forms.TextBox tbPrincipalNameRaw;
-        private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Button btnEditPrincipal;
         private System.Windows.Forms.Button btnSavePermissionEdits;

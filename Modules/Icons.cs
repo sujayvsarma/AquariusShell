@@ -107,10 +107,17 @@ namespace AquariusShell.Modules
         /// <returns>Next larger size or if not possible (already maximum) then returns 'size'</returns>
         public static IconSizesEnum ToNextLargerSize(this IconSizesEnum size)
         {
-            int proposedSize = ((int)size) * 2;
-            if (Enum.IsDefined<IconSizesEnum>((IconSizesEnum)proposedSize))
+            switch (size)
             {
-                return (IconSizesEnum)proposedSize;
+                case IconSizesEnum.x16:
+                    return IconSizesEnum.x24;
+
+                case IconSizesEnum.x24:
+                    return IconSizesEnum.x32;
+
+                case IconSizesEnum.x32:
+                case IconSizesEnum.x64:
+                    return IconSizesEnum.x64;
             }
 
             return size;
@@ -163,7 +170,7 @@ namespace AquariusShell.Modules
         /// <returns>The associated image key</returns>
         public static string GetImageKey(string filePath, params ImageList[] imageLists)
         {
-            string imageKey = string.Empty;
+            string imageKey;
             if (Directory.Exists(filePath))
             {
                 imageKey = ShellEnvironment.IMAGEKEY_FOLDER;
@@ -192,7 +199,13 @@ namespace AquariusShell.Modules
                 {
                     if (!list.Images.ContainsKey(imageKey))
                     {
-                        list.Images.Add(imageKey, icon);
+                        try
+                        {
+                            list.Images.Add(imageKey, icon);
+                        }
+                        catch {
+                            imageKey = ShellEnvironment.IMAGEKEY_GENERICFILE;
+                        }
                     }
                 }
             }
@@ -204,12 +217,12 @@ namespace AquariusShell.Modules
         /// Get a "generic file" icon
         /// </summary>
         /// <param name="imageLists">ImageLists to add the icon to if not already</param>
-        /// <returns>Imagekey (hard-coded: .FILE.GENERIC)</returns>
+        /// <returns>Imagekey (hard-coded: <see cref="ShellEnvironment.IMAGEKEY_GENERICFILE"/>)</returns>
         public static string GetGenericFileIcon(params ImageList[] imageLists)
         {
-            string imageKey = ".FILE.GENERIC";
+            string imageKey = ShellEnvironment.IMAGEKEY_GENERICFILE;
 
-            Icon icon = SystemIcons.GetStockIcon(StockIconId.DocumentWithAssociation);
+            Icon icon = SystemIcons.GetStockIcon(StockIconId.DocumentNoAssociation);
             foreach (ImageList list in imageLists)
             {
                 if (!list.Images.ContainsKey(imageKey))

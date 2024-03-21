@@ -7,6 +7,7 @@ using System.Linq;
 using System.Media;
 using System.Windows.Forms;
 
+using AquariusShell.ConfigurationManagement.Constants;
 using AquariusShell.Modules;
 using AquariusShell.Objects;
 using AquariusShell.Runtime;
@@ -30,69 +31,93 @@ namespace AquariusShell.ShellApps
             }
             NoteCurrentDirectoryForTab(_activeTab, currentTabDirectory);
 
-            _activeExplorer.Items.Clear();
-            _activeExplorer.Groups.Clear();
-            _activeExplorer.Columns.Clear();
+            this.SetFormBusyState(true);
+            _activeExplorer.BeginUpdate();
 
-            viewImagesLarge.Images.Clear();
-            viewImagesSmall.Images.Clear();
-            AddIconToImageLists(ShellEnvironment.IMAGEKEY_FOLDER, SystemIcons.GetStockIcon(StockIconId.Folder));
-            AddIconToImageLists(IMAGEKEY_PARENTCONTAINER, SystemIcons.GetStockIcon(StockIconId.FolderOpen));
-
-            _editActionsOnListViewItemsIsDisabled = true;
-            _listingState = ListViewListingStatesEnum.SpecialFolder;
-
-            if (currentTabDirectory == DIRECTORY_MYCOMPUTER)
+            bool canDisplayFolder = true;
+            if (_settings.HiddenFolders.Count > 0)
             {
-                LoadMyComputerView();
-                tbJumpAddress.Text = "Computer";
-            }
-            else if (currentTabDirectory == PATHKEY_PRINTERS)
-            {
-                LoadPrintersList();
-                tbJumpAddress.Text = "Printers";
-            }
-            else if (currentTabDirectory == PATHKEY_RECYCLEBIN)
-            {
-                LoadRecycleBinView();
-                tbJumpAddress.Text = "Deleted items";
-            }
-            else
-            {
-                _editActionsOnListViewItemsIsDisabled = false;
-                if (currentTabDirectory.StartsWith(Environment.GetFolderPath(Environment.SpecialFolder.Windows))
-                        || currentTabDirectory.StartsWith(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles))
-                        || currentTabDirectory.StartsWith(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86))
-                        || currentTabDirectory.StartsWith(Environment.GetFolderPath(Environment.SpecialFolder.CommonProgramFiles))
-                        || currentTabDirectory.StartsWith(Environment.GetFolderPath(Environment.SpecialFolder.CommonProgramFilesX86)))
+                foreach(string hf in _settings.HiddenFolders)
                 {
-                    // Protect system directories   
-                    _editActionsOnListViewItemsIsDisabled = true;
-                }
-
-                _listingState = ListViewListingStatesEnum.FileSystemDirectory;
-                LoadFilesystemDirectory();
-
-                tbJumpAddress.Text = currentTabDirectory;
-            }
-
-            if (! string.IsNullOrWhiteSpace(_preselectedItem))
-            {
-                foreach (ListViewItem item in _activeExplorer.Items)
-                {
-                    if (GetPathFromListViewItem(item) == _preselectedItem)
+                    if (hf.Equals(currentTabDirectory, StringComparison.InvariantCultureIgnoreCase))
                     {
-                        item.Selected = true;
+                        MessageBox.Show("This folder cannot be displayed due to policy.", "Aquarius Shell", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        canDisplayFolder = false;
                         break;
                     }
                 }
-
-                // This is a use-once thingy!
-                _preselectedItem = null;
             }
+
+            if (canDisplayFolder)
+            {
+                // Doing these things here leaves the view in the previous location
+                _activeExplorer.Items.Clear();
+                _activeExplorer.Groups.Clear();
+                _activeExplorer.Columns.Clear();
+
+                viewImagesLarge.Images.Clear();
+                viewImagesSmall.Images.Clear();
+                AddIconToImageLists(ShellEnvironment.IMAGEKEY_FOLDER, SystemIcons.GetStockIcon(StockIconId.Folder));
+                AddIconToImageLists(IMAGEKEY_PARENTCONTAINER, SystemIcons.GetStockIcon(StockIconId.FolderOpen));
+
+                _editActionsOnListViewItemsIsDisabled = true;
+                _listingState = ListViewListingStatesEnum.SpecialFolder;
+
+                if (currentTabDirectory == DIRECTORY_MYCOMPUTER)
+                {
+                    LoadMyComputerView();
+                    tbJumpAddress.Text = "Computer";
+                }
+                else if (currentTabDirectory == PATHKEY_PRINTERS)
+                {
+                    LoadPrintersList();
+                    tbJumpAddress.Text = "Printers";
+                }
+                else if (currentTabDirectory == PATHKEY_RECYCLEBIN)
+                {
+                    LoadRecycleBinView();
+                    tbJumpAddress.Text = "Deleted items";
+                }
+                else
+                {
+                    _editActionsOnListViewItemsIsDisabled = false;
+                    if (currentTabDirectory.StartsWith(Environment.GetFolderPath(Environment.SpecialFolder.Windows))
+                            || currentTabDirectory.StartsWith(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles))
+                            || currentTabDirectory.StartsWith(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86))
+                            || currentTabDirectory.StartsWith(Environment.GetFolderPath(Environment.SpecialFolder.CommonProgramFiles))
+                            || currentTabDirectory.StartsWith(Environment.GetFolderPath(Environment.SpecialFolder.CommonProgramFilesX86)))
+                    {
+                        // Protect system directories   
+                        _editActionsOnListViewItemsIsDisabled = true;
+                    }
+
+                    _listingState = ListViewListingStatesEnum.FileSystemDirectory;
+                    LoadFilesystemDirectory();
+
+                    tbJumpAddress.Text = currentTabDirectory;
+                }
+
+                if (!string.IsNullOrWhiteSpace(_preselectedItem))
+                {
+                    foreach (ListViewItem item in _activeExplorer.Items)
+                    {
+                        if (GetPathFromListViewItem(item) == _preselectedItem)
+                        {
+                            item.Selected = true;
+                            break;
+                        }
+                    }
+
+                    // This is a use-once thingy!
+                    _preselectedItem = null;
+                }
+            }
+
+            _activeExplorer.EndUpdate();
 
             ResetToolbarAndContextMenu();
             SetActiveTabTitle();
+            this.SetFormBusyState(false);
         }
 
         /// <summary>
@@ -111,9 +136,9 @@ namespace AquariusShell.ShellApps
             _activeExplorer.Groups.AddRange(
                     new ListViewGroup[]
                     {
-                        new ListViewGroup("Drives") { Name = "lvgDrives", CollapsedState = ListViewGroupCollapsedState.Expanded },
-                        new ListViewGroup("Printers and Supported Device Groups") { Name = "lvgDevices", CollapsedState = ListViewGroupCollapsedState.Expanded },
-                        new ListViewGroup("Windows System Objects") { Name = "lvgWinSys", CollapsedState = ListViewGroupCollapsedState.Expanded }
+                        new("Drives") { Name = "lvgDrives", CollapsedState = ListViewGroupCollapsedState.Expanded },
+                        new("Printers and Supported Device Groups") { Name = "lvgDevices", CollapsedState = ListViewGroupCollapsedState.Expanded },
+                        new("Windows System Objects") { Name = "lvgWinSys", CollapsedState = ListViewGroupCollapsedState.Expanded }
                     }
                 );
 
@@ -121,11 +146,11 @@ namespace AquariusShell.ShellApps
             _activeExplorer.Columns.AddRange(
                     new ColumnHeader[]
                     {
-                        new ColumnHeader() { Width = 240, Text = "Volume label" },
-                        new ColumnHeader() { Width = 42, Text = "Drive", TextAlign = HorizontalAlignment.Center },
-                        new ColumnHeader() { Width = 120, Text = "Format" },
-                        new ColumnHeader() { Width = 120, Text = "Total size" },
-                        new ColumnHeader() { Width = 120, Text = "Free space" }
+                        new() { Width = 240, Text = "Volume label" },
+                        new() { Width = 42, Text = "Drive", TextAlign = HorizontalAlignment.Center },
+                        new() { Width = 120, Text = "Format" },
+                        new() { Width = 120, Text = "Total size" },
+                        new() { Width = 120, Text = "Free space" }
                     }
                 );
 
@@ -133,8 +158,7 @@ namespace AquariusShell.ShellApps
             foreach (DriveInfo drive in DriveInfo.GetDrives())
             {
                 string imageKey = Icons.GetImageKey(drive);
-                ListViewItem driveIcon = default!;
-
+                ListViewItem driveIcon;
                 try
                 {
                     driveIcon = AddItemToListView(
@@ -190,9 +214,9 @@ namespace AquariusShell.ShellApps
             _activeExplorer.Groups.AddRange(
                     new ListViewGroup[]
                     {
-                        new ListViewGroup("Directories") { Name = "lvgDirectories", CollapsedState = ListViewGroupCollapsedState.Expanded },
-                        new ListViewGroup("Executable programs") { Name = "lvgExecutables", CollapsedState = ListViewGroupCollapsedState.Expanded },
-                        new ListViewGroup("All other files") { Name = "lvgAllOtherFiles", CollapsedState = ListViewGroupCollapsedState.Expanded }
+                        new("Directories") { Name = "lvgDirectories", CollapsedState = ListViewGroupCollapsedState.Expanded },
+                        new("Executable programs") { Name = "lvgExecutables", CollapsedState = ListViewGroupCollapsedState.Expanded },
+                        new("All other files") { Name = "lvgAllOtherFiles", CollapsedState = ListViewGroupCollapsedState.Expanded }
                     }
                 );
 
@@ -200,11 +224,11 @@ namespace AquariusShell.ShellApps
             _activeExplorer.Columns.AddRange(
                     new ColumnHeader[]
                     {
-                            new ColumnHeader() { Width = 240, Text = "Name" },
-                            new ColumnHeader() { Width = 42, Text = "Sync", TextAlign = HorizontalAlignment.Center },
-                            new ColumnHeader() { Width = 180, Text = "Type" },
-                            new ColumnHeader() { Width = 120, Text = "Size", TextAlign = HorizontalAlignment.Right },
-                            new ColumnHeader() { Width = 180, Text = "Last modified", TextAlign = HorizontalAlignment.Right }
+                            new() { Width = 240, Text = "Name" },
+                            new() { Width = 42, Text = "Sync", TextAlign = HorizontalAlignment.Center },
+                            new() { Width = 180, Text = "Type" },
+                            new() { Width = 120, Text = "Size", TextAlign = HorizontalAlignment.Right },
+                            new() { Width = 180, Text = "Last modified", TextAlign = HorizontalAlignment.Right }
                     }
                 );
 
@@ -312,13 +336,14 @@ namespace AquariusShell.ShellApps
 
                 // If a file is marked Offline, it is usually a one-drive backed item that does not exist on disk.
                 // Trying to fetch its icon would download the item!!!
-                string imageKey = (fi.Attributes.HasFlag(FileAttributes.Offline) ? Icons.GetGenericFileIcon(viewImagesLarge, viewImagesSmall) : Icons.GetImageKey(fi.FullName, viewImagesLarge, viewImagesSmall));
+                string imageKey = ((fi.Attributes.HasFlag(FileAttributes.Offline) || ((int)fi.Attributes >= ShellEnvironment.FILEATTRIBUTE_NOTONDISK)) 
+                                    ? Icons.GetGenericFileIcon(viewImagesLarge, viewImagesSmall) : Icons.GetImageKey(fi.FullName, viewImagesLarge, viewImagesSmall));
 
                 ListViewItem fileIcon = AddItemToListView(
                         fi.Name,
                         imageKey,
                         fi.FullName,
-                            fi.Attributes.HasFlag(FileAttributes.Offline) ? "No" : "Yes",
+                            (fi.Attributes.HasFlag(FileAttributes.Offline) || ((int)fi.Attributes >= ShellEnvironment.FILEATTRIBUTE_NOTONDISK)) ? "No" : "Yes",
                             Shell32.GetFileTypeName(fi.Extension, true),
                             fi.Length.FormatFileSize(),
                             ((fi.LastAccessTime > fi.LastWriteTime) ? fi.LastWriteTime : fi.LastWriteTime).ToString("MMM dd, yyyy HH:mm:ss")
@@ -336,11 +361,11 @@ namespace AquariusShell.ShellApps
             _activeExplorer.Columns.AddRange(
                         new ColumnHeader[]
                         {
-                            new ColumnHeader() { Width = 240, Text = "Name" },
-                            new ColumnHeader() { Width = 180, Text = "Type" },
-                            new ColumnHeader() { Width = 120, Text = "Size", TextAlign = HorizontalAlignment.Right },
-                            new ColumnHeader() { Width = 180, Text = "Deleted at", TextAlign = HorizontalAlignment.Right },
-                            new ColumnHeader() { Width = 240, Text = "Original path", TextAlign = HorizontalAlignment.Left }
+                            new() { Width = 240, Text = "Name" },
+                            new() { Width = 180, Text = "Type" },
+                            new() { Width = 120, Text = "Size", TextAlign = HorizontalAlignment.Right },
+                            new() { Width = 180, Text = "Deleted at", TextAlign = HorizontalAlignment.Right },
+                            new() { Width = 240, Text = "Original path", TextAlign = HorizontalAlignment.Left }
                         }
                     );
 
@@ -395,9 +420,9 @@ namespace AquariusShell.ShellApps
             _activeExplorer.Columns.AddRange(
                         new ColumnHeader[]
                         {
-                            new ColumnHeader() { Width = 240, Text = "Name" },
-                            new ColumnHeader() { Width = 240, Text = "Type" },
-                            new ColumnHeader() { Width = 240, Text = "Status", TextAlign = HorizontalAlignment.Center }
+                            new() { Width = 240, Text = "Name" },
+                            new() { Width = 240, Text = "Type" },
+                            new() { Width = 240, Text = "Status", TextAlign = HorizontalAlignment.Center }
                         }
                     );
 
@@ -473,24 +498,32 @@ namespace AquariusShell.ShellApps
             bool editActionsEnabled = !_editActionsOnListViewItemsIsDisabled;
             bool isRecycleBinFolder = (currentTabDirectory == PATHKEY_RECYCLEBIN);
 
-            tsDDBNew.Enabled = editActionsEnabled;
-            tsbEditCopy.Enabled = editActionsEnabled;
-            tsbEditCut.Enabled = editActionsEnabled;
-            tsbEditDelete.Enabled = editActionsEnabled;
-            tsbEditPaste.Enabled = editActionsEnabled;
+            tsbRefresh.Enabled = _settings.EnabledButtons.HasFlag(FileBrowserToolbarButtonsEnumFlags.Refresh);
+            tssbMyComputer.Enabled = _settings.EnabledButtons.HasFlag(FileBrowserToolbarButtonsEnumFlags.Home);
 
-            copyToolStripMenuItem.Enabled = editActionsEnabled;
-            cutToolStripMenuItem.Enabled = editActionsEnabled;
-            deleteToolStripMenuItem.Enabled = editActionsEnabled;
-            pasteToolStripMenuItem.Enabled = editActionsEnabled;
+            tsDDBNew.Enabled = editActionsEnabled && _settings.EnabledButtons.HasFlag(FileBrowserToolbarButtonsEnumFlags.CreateNew);
+
+            tsbEditCopy.Enabled = editActionsEnabled && _settings.EnabledButtons.HasFlag(FileBrowserToolbarButtonsEnumFlags.Copy);
+            tsbEditCut.Enabled = editActionsEnabled && _settings.EnabledButtons.HasFlag(FileBrowserToolbarButtonsEnumFlags.Cut);
+            tsbEditDelete.Enabled = editActionsEnabled && _settings.EnabledButtons.HasFlag(FileBrowserToolbarButtonsEnumFlags.Delete);
+            tsbEditPaste.Enabled = editActionsEnabled && _settings.EnabledButtons.HasFlag(FileBrowserToolbarButtonsEnumFlags.Paste);
+
+            copyToolStripMenuItem.Enabled = editActionsEnabled && _settings.EnabledButtons.HasFlag(FileBrowserToolbarButtonsEnumFlags.Copy);
+            cutToolStripMenuItem.Enabled = editActionsEnabled && _settings.EnabledButtons.HasFlag(FileBrowserToolbarButtonsEnumFlags.Cut);
+            deleteToolStripMenuItem.Enabled = editActionsEnabled && _settings.EnabledButtons.HasFlag(FileBrowserToolbarButtonsEnumFlags.Delete);
+            pasteToolStripMenuItem.Enabled = editActionsEnabled && _settings.EnabledButtons.HasFlag(FileBrowserToolbarButtonsEnumFlags.Paste);
 
             // applicable everywhere except Recycle Bin
-            tsbProperties.Enabled = (! isRecycleBinFolder);
-            propertiesToolStripMenuItem.Enabled = (! isRecycleBinFolder);
+            tsbProperties.Enabled = (! isRecycleBinFolder) && _settings.EnabledButtons.HasFlag(FileBrowserToolbarButtonsEnumFlags.ShowProperties);
+            propertiesToolStripMenuItem.Enabled = (! isRecycleBinFolder) && _settings.EnabledButtons.HasFlag(FileBrowserToolbarButtonsEnumFlags.ShowProperties);
 
             // only applicable for Recycle Bin
-            tsbRecyclebinRestore.Enabled = isRecycleBinFolder;
-            restoreToolStripMenuItem.Enabled = isRecycleBinFolder;
+            tsbRecyclebinRestore.Enabled = isRecycleBinFolder && _settings.ShowDeletedItems;
+            restoreToolStripMenuItem.Enabled = isRecycleBinFolder && _settings.EnabledButtons.HasFlag(FileBrowserToolbarButtonsEnumFlags.RestoreFromRecycleBin);
+
+            tssbViewMode.Enabled = _settings.EnabledButtons.HasFlag(FileBrowserToolbarButtonsEnumFlags.ViewMode);
+            tspCloseActiveTab.Enabled = _settings.EnabledButtons.HasFlag(FileBrowserToolbarButtonsEnumFlags.CloseActiveTab);
+            tsbOpenInTerminal.Enabled = _settings.EnabledButtons.HasFlag(FileBrowserToolbarButtonsEnumFlags.OpenCommandPromptInActiveTabLocation);
         }
 
         /// <summary>
@@ -509,7 +542,7 @@ namespace AquariusShell.ShellApps
         /// </summary>
         /// <param name="item">ListViewItem to decode</param>
         /// <returns>String path -- never null</returns>
-        private string GetPathFromListViewItem(ListViewItem item)
+        private static string GetPathFromListViewItem(ListViewItem item)
             => (string)(item.Tag!);
 
         /// <summary>
@@ -551,7 +584,7 @@ namespace AquariusShell.ShellApps
                     case "CONTROLPANEL":
                     case "CONTROL PANEL":
                     case "CONFIGURE":
-                        //TODO: Open the Settings form!
+                        ShellEnvironment.ShellApps.GetInstanceOf($"{IShellAppModule.CommandSignifierPrefix}aqShellConfig");
                         break;
 
                     case "PRINTERS":
@@ -571,10 +604,11 @@ namespace AquariusShell.ShellApps
                         if (tbJumpAddress.Text.StartsWith("\\\\"))
                         {
                             //TODO: Network location (??)
+                            LoadCurrentDirectoryView(tbJumpAddress.Text);
 
-                            MessageBox.Show($"The path entered '{tbJumpAddress.Text}' is a network location that is not currently supported by this Shell.",
-                                "Aquarius Shell", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                            tbJumpAddress.Focus();
+                            //MessageBox.Show($"The path entered '{tbJumpAddress.Text}' is a network location that is not currently supported by this Shell.",
+                            //    "Aquarius Shell", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            //tbJumpAddress.Focus();
                         }
                         else if (Directory.Exists(tbJumpAddress.Text))
                         {
@@ -625,8 +659,8 @@ namespace AquariusShell.ShellApps
         /// </summary>
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
-            // backspace
-            if (keyData.HasFlag(Keys.Back))
+            // backspace, but only on ListView
+            if ((msg.HWnd == _activeExplorer.Handle) && keyData.HasFlag(Keys.Back))
             {
                 // go up to the parent level. If we are at My PC, beep!
                 string? jump = null;

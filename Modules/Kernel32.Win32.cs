@@ -57,17 +57,17 @@ namespace AquariusShell.Modules
         /// <summary>
         /// FSCTL constant to set compression state
         /// </summary>
-        static int FSCTL_SET_COMPRESSION = 0x9C040;
+        static readonly int FSCTL_SET_COMPRESSION = 0x9C040;
 
         /// <summary>
         /// Set compression format to default (LZNT1)
         /// </summary>
-        static short COMPRESSION_FORMAT_DEFAULT = 1;
+        static readonly short COMPRESSION_FORMAT_DEFAULT = 1;
 
         /// <summary>
         /// Set no compression (remove compression)
         /// </summary>
-        static short COMPRESSION_FORMAT_NONE = 0;
+        static readonly short COMPRESSION_FORMAT_NONE = 0;
 
 
         /// <summary>

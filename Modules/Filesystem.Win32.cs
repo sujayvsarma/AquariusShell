@@ -1,6 +1,5 @@
 using System;
 using System.Runtime.InteropServices;
-using System.Runtime.InteropServices.ComTypes;
 using System.Text;
 
 namespace AquariusShell.Modules
@@ -18,7 +17,7 @@ namespace AquariusShell.Modules
         /// <param name="proposedShortcutName">[Out] The generated shortcut name</param>
         /// <param name="duplicateShortcut">[Out] True when this is a shortcut to a shortcut, generating a "copy" operation when it will be actually created.</param>
         /// <param name="flags">One or more flags</param>
-        /// <returns></returns>
+        /// <returns>True if successful</returns>
         [DllImport("shell32.dll", CharSet = CharSet.Unicode, PreserveSig = true, SetLastError = true)]
         extern static bool SHGetNewLinkInfo(string linkTargetPath, string pathWhereShortcutWillBeStored, out StringBuilder proposedShortcutName, out bool duplicateShortcut, ShGetNewLinkInfoFlagsEnum flags);
 

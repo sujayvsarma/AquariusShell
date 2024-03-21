@@ -1,19 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
-using System.Net.Http;
-using System.Security.Cryptography.X509Certificates;
-using System.Text.Json;
 using System.Windows.Forms;
 
+using AquariusShell.ConfigurationManagement;
+using AquariusShell.ConfigurationManagement.Settings;
 using AquariusShell.Modules;
-using AquariusShell.Objects;
 using AquariusShell.Runtime;
-
-using SujaySarma.Sdk.RestApi;
 
 namespace AquariusShell.Forms
 {
@@ -22,107 +17,43 @@ namespace AquariusShell.Forms
     /// </summary>
     public partial class WorkspaceBackground : Form
     {
-        public WorkspaceBackground()
+
+        /// <summary>
+        /// Timer tick event. Shift images if required
+        /// </summary>
+        private async void backgroundChangerTimer_Tick(object sender, EventArgs e)
         {
-            InitializeComponent();
-
-            _loadedCacheFilePath = string.Empty;
-
-            // check if we have a cached background. If we do, load it!
-            string cachedBackground = Path.Combine(ShellEnvironment.CacheDirectory, "desktop.jpg");
-            if (!File.Exists(cachedBackground))
+            // the next tick should occur as per change interval
+            backgroundChangerTimer.Stop();
+            if ((!_settings.ShowBackgroundImage) || (_backgroundProvider == null))
             {
-                cachedBackground = Path.Combine(ShellEnvironment.CacheDirectory, "desktop.png");
+                this.BackgroundImage = null;
+                return;
             }
 
-            if (File.Exists(cachedBackground))
+            Image? image = await _backgroundProvider.RefreshOrGetNext();
+            if (image != null)
             {
-                // we want to be able to replace the picture in our timer event below,
-                // so create a temporary copy
-                _loadedCacheFilePath = Path.ChangeExtension(Path.GetTempFileName(), Path.GetExtension(cachedBackground));
-                File.Copy(cachedBackground, _loadedCacheFilePath, true);
+                this.BackgroundImage = image;
 
-                this.BackgroundImage = Image.FromFile(_loadedCacheFilePath);
+                // delete existing caches
+                foreach(string cached in Directory.EnumerateFiles(ShellEnvironment.CacheDirectory, "desktop.*", SearchOption.TopDirectoryOnly))
+                {
+                    File.Delete(cached);
+                }
+
+                image.Save(Path.Combine(ShellEnvironment.CacheDirectory, $"desktop.{image.Tag!}"));
                 Application.DoEvents();
             }
 
-            ShellEnvironment.WorkArea = this;
-            _taskbar = new();
-            _bingApiClient = new()
-            {
-                RequestTimeout = 30,
-                RequestUri = new Uri($"https://www.bing.com/HPImageArchive.aspx?format=js&idx=0&n=1&mkt={System.Globalization.CultureInfo.CurrentUICulture.IetfLanguageTag}")
-            };
-        }
-
-        private async void backgroundChangerTimer_Tick(object sender, EventArgs e)
-        {
-            // the next tick should occur 30 mins from now
-            backgroundChangerTimer.Stop();
-            backgroundChangerTimer.Interval = (int)TimeSpan.FromMinutes(30).TotalMilliseconds;
-
-            HttpResponseMessage bingApiResponse = await _bingApiClient.Get();
-            if ((bingApiResponse != null) && (bingApiResponse.StatusCode == System.Net.HttpStatusCode.OK))
-            {
-                try
-                {
-                    BingImagesApiResponse? bingApiResponseDecoded = await JsonSerializer.DeserializeAsync<BingImagesApiResponse>(bingApiResponse.Content.ReadAsStream());
-                    if ((bingApiResponseDecoded != null) && (bingApiResponseDecoded.Images.Count > 0) && (!_lastImagePath.Equals(bingApiResponseDecoded.Images[0].Url)))
-                    {
-                        _httpClient = new()
-                        {
-                            Timeout = TimeSpan.FromSeconds(10)
-                        };
-
-                        try
-                        {
-                            HttpResponseMessage imageResourceLoadResponse = await _httpClient.GetAsync($"https://www.bing.com{bingApiResponseDecoded.Images[0].Url}");
-                            if ((imageResourceLoadResponse != null) && (imageResourceLoadResponse.StatusCode == System.Net.HttpStatusCode.OK))
-                            {
-                                Image? pic = Image.FromStream(imageResourceLoadResponse.Content.ReadAsStream());
-                                if (pic != null)
-                                {
-                                    this.BackgroundImage = pic;
-                                    Application.DoEvents();
-
-                                    // cache it for next load
-                                    // obviously we are expecting only jpg and png images to come down off Bing...
-                                    string fileExtension = ((imageResourceLoadResponse.Content.Headers.ContentType?.MediaType == "image/jpeg") ? "jpg" : "png");
-
-                                    // delete existing caches
-                                    File.Delete(Path.Combine(ShellEnvironment.CacheDirectory, "desktop.jpg"));
-                                    File.Delete(Path.Combine(ShellEnvironment.CacheDirectory, "desktop.png"));
-#pragma warning disable CS8509
-                                    pic.Save(
-                                        Path.Combine(ShellEnvironment.CacheDirectory, $"desktop.{fileExtension}"),
-                                        format: fileExtension switch
-                                        {
-                                            "jpg" => ImageFormat.Jpeg,
-                                            "png" => ImageFormat.Png,
-                                        }
-                                    );
-#pragma warning restore CS8509
-
-                                    // only change this once everything is successful
-                                    _lastImagePath = bingApiResponseDecoded.Images[0].Url;
-                                }
-                            }
-                        }
-                        catch
-                        {
-                            // timeouts usually. Doesnt matter.
-                        }
-                    }
-                }
-                catch
-                {
-                    // garbage responses? Doesnt matter
-                }
-            }
-
+            backgroundChangerTimer.Interval = (int)TimeSpan.FromSeconds(_settings.BackgroundImageChangeInterval).TotalMilliseconds;
             backgroundChangerTimer.Start();
         }
 
+        /// <summary>
+        /// Form's DragEnter event. If user is dragging in a picture (PNG and JPEG only!), then 
+        /// we change effects to indicate they can drop it on to us.
+        /// </summary>
         private void WorkspaceBackground_DragEnter(object sender, DragEventArgs e)
         {
             if ((e.Data != null) && e.Data.GetDataPresent(DataFormats.FileDrop))
@@ -140,6 +71,10 @@ namespace AquariusShell.Forms
             }
         }
 
+        /// <summary>
+        /// Form's DragDrop event. If the user had dragged on a picture (PNG and JPEG only!), 
+        /// we show that picture as the background, replacing whatever was shown earlier
+        /// </summary>
         private void WorkspaceBackground_DragDrop(object sender, DragEventArgs e)
         {
             if ((e.Data != null) && (e.Effect == DragDropEffects.Copy))
@@ -153,19 +88,20 @@ namespace AquariusShell.Forms
                     {
                         this.BackgroundImage = pic;
 
-                        _lastImagePath = path;
+                        // Timer is disabled if there is a custom-dropped image. 
+                        // This will change only if the shell is restarted or the config refreshed, 
+                        // because we have no other way for the user to signal to us to continue the previous carousel if any!
                         backgroundChangerTimer.Stop();
                     }
                 }
             }
         }
 
+        /// <summary>
+        /// Form shown event. This form is shown only ONCE, so we can do a lot of "first-time only" things here!
+        /// </summary>
         private void WorkspaceBackground_Shown(object sender, EventArgs e)
         {
-            backgroundChangerTimer.Interval = (int)TimeSpan.FromSeconds(3).TotalMilliseconds;   // 3 seconds is good for things to load up a bit
-            backgroundChangerTimer.Enabled = true;
-            backgroundChangerTimer.Start();
-
             int taskbarHeight = Taskbar.CalcHeight(ShellEnvironment.ConfiguredSizeOfIcons);
             _taskbar.Size = new Size(ShellEnvironment.WorkareaBounds.Width, taskbarHeight);
             _taskbar.Location = new Point(0, ShellEnvironment.WorkareaBounds.Bottom - taskbarHeight - 9);
@@ -182,30 +118,144 @@ namespace AquariusShell.Forms
                 Size = this.Size
             };
             Modules.Windows.SetWorkareaBounds(newWorkArea);
+
+            // Now is a good time to get rid of the splash screen?
+            if (_splashInstance != null)
+            {
+                _splashInstance.Close();
+
+                try
+                {
+                    _splashInstance.Dispose();
+                }
+                catch { /* Eat if we get an ObjectDisposed exception */}
+                _splashInstance = null;
+            }
         }
 
+        /// <summary>
+        /// Though the form cannot be resized by the user, the screen res or monitor itself may be changed. 
+        /// Update the global workarea bounds if that happens.
+        /// </summary>
         private void WorkspaceBackground_ResizeEnd(object sender, EventArgs e)
         {
             ShellEnvironment.WorkareaBounds = this.Bounds;
         }
 
-        private void WorkspaceBackground_FormClosing(object sender, FormClosingEventArgs e)
+        /// <summary>
+        /// Initialise
+        /// </summary>
+        /// <param name="splashInstance">Instance of the loaded and running Splash form (shown by Program.cs)</param>
+        public WorkspaceBackground(Splash splashInstance)
         {
-            ShellEnvironment.ClearHeavyCachesForExit();
+            InitializeComponent();
 
-            Rectangle newWorkArea = new()
+            _splashInstance = splashInstance;
+            _loadedCacheFilePath = string.Empty;
+
+            _settings = ConfigurationProvider<WorkspaceAreaSettings>.Get(true);
+            ConfigurationProvider<WorkspaceAreaSettings>.ConfigurationUpdated += ConfigurationProvider_ConfigurationUpdated;
+
+            this.BackColor = _settings.BackgroundColour;
+            ShowCachedBackgroundImageIfExists();            
+
+            ShellEnvironment.WorkArea = this;
+            _taskbar = new();
+
+            InitialiseBackgroundImageCarousel();
+        }
+
+        /// <summary>
+        /// Initialise the background images system
+        /// </summary>
+        private void InitialiseBackgroundImageCarousel()
+        {
+            if (backgroundChangerTimer.Enabled)
             {
-                Location = ShellEnvironment.PrimaryScreenSafe.Bounds.Location,
-                Size = ShellEnvironment.PrimaryScreenSafe.Bounds.Size
-            };
-            Modules.Windows.SetWorkareaBounds(newWorkArea);
+                backgroundChangerTimer.Enabled = false;
+                backgroundChangerTimer.Stop();
+            }
+
+            if (_settings.ShowBackgroundImage)
+            {
+                switch (_settings.BackgroundImagesSource)
+                {
+                    case ConfigurationManagement.Constants.BackgroundImagesSourcesEnum.WebService:
+                        if (_settings.BackgroundImageLocation.StartsWith("https://www.bing.com/HPImageArchive.aspx"))
+                        {
+                            _backgroundProvider = new BingImagesProvider()
+                            {
+                                ImageStoreLocation = _settings.BackgroundImageLocation
+                            };
+                        }
+                        break;
+
+                    case ConfigurationManagement.Constants.BackgroundImagesSourcesEnum.LocalFolder:
+                        _backgroundProvider = new LocalFolderImagesProvider()
+                        {
+                            ImageStoreLocation = _settings.BackgroundImageLocation
+                        };
+                        break;
+                }
+
+                // This interval is only for the FIRST show, not the refresh cycle!
+                backgroundChangerTimer.Interval = (int)TimeSpan.FromSeconds(3).TotalMilliseconds;
+                backgroundChangerTimer.Enabled = true;
+                backgroundChangerTimer.Start();
+            }
+            else
+            {
+                this.BackgroundImage = null;
+            }
+        }
+
+        /// <summary>
+        /// If settings allow it and a cached background image exists, then load that.
+        /// </summary>
+        private void ShowCachedBackgroundImageIfExists()
+        {
+            if (_settings.ShowBackgroundImage)
+            {
+                // check if we have a cached background. If we do, load it!
+                string cachedBackground = Path.Combine(ShellEnvironment.CacheDirectory, "desktop.jpg");
+                if (!File.Exists(cachedBackground))
+                {
+                    cachedBackground = Path.Combine(ShellEnvironment.CacheDirectory, "desktop.png");
+                }
+
+                if (File.Exists(cachedBackground))
+                {
+                    // we want to be able to replace the picture in our timer event later,
+                    // so create a temporary copy
+                    _loadedCacheFilePath = Path.ChangeExtension(Path.GetTempFileName(), Path.GetExtension(cachedBackground));
+                    File.Copy(cachedBackground, _loadedCacheFilePath, true);
+
+                    this.BackgroundImage = Image.FromFile(_loadedCacheFilePath);
+                    Application.DoEvents();
+                }
+            }
         }
 
 
-        private Taskbar _taskbar;
-        private List<string> _acceptableImageExtensions = new() { ".png", ".jpg", ".jpeg" };
-        private string _lastImagePath = string.Empty, _loadedCacheFilePath;
-        private RestApiClient _bingApiClient;
-        private HttpClient? _httpClient = null;        
+        /// <summary>
+        /// Configuration updated event
+        /// </summary>
+        /// <param name="updatedSettings">Updated copy of settings</param>
+        private void ConfigurationProvider_ConfigurationUpdated(IAquariusShellSettings updatedSettings)
+        {
+            _settings = (WorkspaceAreaSettings)updatedSettings;
+
+            // Refresh what needs to be
+            InitialiseBackgroundImageCarousel();
+        }
+
+        private WorkspaceAreaSettings _settings;
+        private Splash? _splashInstance;
+        private readonly Taskbar _taskbar;
+
+        private string _loadedCacheFilePath;
+        private IBackgroundImageProvider? _backgroundProvider;
+        private readonly List<string> _acceptableImageExtensions = new() { ".png", ".jpg", ".jpeg" };
+        
     }
 }

@@ -4,7 +4,9 @@ using System.Security.AccessControl;
 using System.Security.Principal;
 using System.Windows.Forms;
 
+using AquariusShell.ConfigurationManagement.Settings;
 using AquariusShell.Modules;
+using AquariusShell.Objects;
 using AquariusShell.Runtime;
 
 namespace AquariusShell.ShellApps
@@ -22,6 +24,8 @@ namespace AquariusShell.ShellApps
         public AccessControlBrowser()
         {
             InitializeComponent();
+
+            _settings = ConfigurationManagement.ConfigurationProvider<AccessControlBrowserSettings>.Get();
 
             // Adds all the "Drive" icons
             Icons.LoadDriveIcons(ilFileSystemImages);
@@ -53,10 +57,11 @@ namespace AquariusShell.ShellApps
             _type = ObjectTypes.None;
         }
 
+        private readonly LinkedList<FileSystemNode> _hierarchy;
+        private readonly SecurityIdentifier _currentUserSID;
+        private readonly FileSystemRights[] _enumRightsValues;
+        private readonly AccessControlBrowserSettings _settings = default!;
 
-        private LinkedList<FileSystemNode> _hierarchy;
-        private SecurityIdentifier _currentUserSID;
-        private FileSystemRights[] _enumRightsValues;
         private ObjectTypes _type;
     }
 }

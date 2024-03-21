@@ -504,7 +504,7 @@ namespace AquariusShell.Forms
                         }
                         else
                         {
-                            Filesystem.SendItemToRecycleBin(filesAndDirectoriesOrderedByNameReversed[i]);
+                            Filesystem.SendFileToRecycleBin(filesAndDirectoriesOrderedByNameReversed[i]);
                         }
                     }
                     else
@@ -518,7 +518,7 @@ namespace AquariusShell.Forms
                         }
                         else
                         {
-                            Filesystem.SendItemToRecycleBin(filesAndDirectoriesOrderedByNameReversed[i]);
+                            Filesystem.SendFileToRecycleBin(filesAndDirectoriesOrderedByNameReversed[i]);
                         }                        
                     }
                     
@@ -591,7 +591,7 @@ namespace AquariusShell.Forms
                         }
                         else
                         {
-                            Filesystem.SendItemToRecycleBin(_filesList[i]);
+                            Filesystem.SendFileToRecycleBin(_filesList[i]);
                         }
                     }
                 }
@@ -614,7 +614,9 @@ namespace AquariusShell.Forms
 
         #endregion
 
-        private List<string> _filesList;
-        private string _baseSourcePath, _baseDestinationPath, _baseDeletePath;
+        private readonly List<string> _filesList;
+        private readonly string _baseSourcePath;
+        private readonly string _baseDestinationPath;
+        private readonly string _baseDeletePath;
     }
 }

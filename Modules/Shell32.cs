@@ -35,7 +35,9 @@ namespace AquariusShell.Modules
         public static void ClearRecycleBin(char driveLetter)
         {
             string driveRootedPath = $"{driveLetter}:\\";
+#pragma warning disable CA1806 // Do not ignore method results
             SHEmptyRecycleBin(IntPtr.Zero, driveRootedPath, (uint)RecycleBinFlagsEnum.SilentMode);
+#pragma warning restore CA1806 // Do not ignore method results
         }
 
         /// <summary>
@@ -48,7 +50,9 @@ namespace AquariusShell.Modules
             char driveLetter = driveName[0];
             uint driveIndex = (uint)(driveLetter - 'A');
 
+#pragma warning disable CA1806 // Do not ignore method results
             SHFormatDrive(parentWindowHandle, driveIndex);
+#pragma warning restore CA1806 // Do not ignore method results
         }
 
 
@@ -145,10 +149,7 @@ namespace AquariusShell.Modules
         public static IntPtr ExecuteOrLaunchTarget(string fullPathToTarget, ShellExecuteVerbsEnum verb = ShellExecuteVerbsEnum.Open, bool runSilently = false)
         {
             Process? process = TryExecutingUsingShellAssociation(fullPathToTarget, verb, runSilently);
-            if (process == null)
-            {
-                process = TryExecutingUsingRunDll(fullPathToTarget, verb, runSilently);
-            }
+            process ??= TryExecutingUsingRunDll(fullPathToTarget, verb, runSilently);
 
             if (process != null)
             {
@@ -178,11 +179,7 @@ namespace AquariusShell.Modules
             try
             {
                 Process? process = Process.Start(startInfo);
-                if (process == null)
-                {
-                    throw new Exception("Could not start process.");
-                }
-                return true;
+                return process == null ? throw new Exception("Could not start process.") : true;
             }
             catch (Exception)
             {

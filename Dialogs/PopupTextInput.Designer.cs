@@ -55,6 +55,7 @@
             // btnAccept
             // 
             btnAccept.DialogResult = System.Windows.Forms.DialogResult.OK;
+            btnAccept.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             btnAccept.Location = new System.Drawing.Point(271, 102);
             btnAccept.Name = "btnAccept";
             btnAccept.Size = new System.Drawing.Size(75, 23);
@@ -66,6 +67,7 @@
             // btnCancel
             // 
             btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+            btnCancel.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             btnCancel.Location = new System.Drawing.Point(8, 102);
             btnCancel.Name = "btnCancel";
             btnCancel.Size = new System.Drawing.Size(75, 23);
@@ -79,6 +81,7 @@
             AcceptButton = btnAccept;
             AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            BackColor = System.Drawing.Color.SteelBlue;
             CancelButton = btnCancel;
             ClientSize = new System.Drawing.Size(358, 140);
             ControlBox = false;
@@ -86,6 +89,7 @@
             Controls.Add(btnAccept);
             Controls.Add(tbInputValue);
             Controls.Add(lblPrompt);
+            ForeColor = System.Drawing.Color.White;
             FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             MaximizeBox = false;
             MinimizeBox = false;

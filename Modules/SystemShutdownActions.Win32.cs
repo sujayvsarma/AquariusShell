@@ -87,11 +87,6 @@ namespace AquariusShell.Modules
         const ushort EWX_REBOOT = 0x00000002;
 
         /// <summary>
-        /// Reboot the computer with restart of applications
-        /// </summary>
-        const ushort EWX_RESTARTAPPS = 0x00000040;
-
-        /// <summary>
         /// Shutdown Windows
         /// </summary>
         const ushort EWX_SHUTDOWN = 0x00000001;

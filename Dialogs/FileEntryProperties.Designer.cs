@@ -32,7 +32,7 @@
             lblFileNameWithoutExtension = new System.Windows.Forms.Label();
             pbFileTypeIcon = new System.Windows.Forms.PictureBox();
             sfdFileCopyMoveDestinationPicker = new System.Windows.Forms.SaveFileDialog();
-            tabControl1 = new System.Windows.Forms.TabControl();
+            tbProperties = new System.Windows.Forms.TabControl();
             tpGeneral = new System.Windows.Forms.TabPage();
             btnUnblockFileOrManageAcl = new System.Windows.Forms.Button();
             btnCopyFile = new System.Windows.Forms.Button();
@@ -58,7 +58,7 @@
             columnHeader1 = new System.Windows.Forms.ColumnHeader();
             columnHeader2 = new System.Windows.Forms.ColumnHeader();
             ((System.ComponentModel.ISupportInitialize)pbFileTypeIcon).BeginInit();
-            tabControl1.SuspendLayout();
+            tbProperties.SuspendLayout();
             tpGeneral.SuspendLayout();
             groupBox1.SuspendLayout();
             basicInfoLayoutTable.SuspendLayout();
@@ -101,18 +101,19 @@
             sfdFileCopyMoveDestinationPicker.SupportMultiDottedExtensions = true;
             sfdFileCopyMoveDestinationPicker.Title = "Select the destination location";
             // 
-            // tabControl1
+            // tbProperties
             // 
-            tabControl1.Controls.Add(tpGeneral);
-            tabControl1.Controls.Add(tpMetadata);
-            tabControl1.Location = new System.Drawing.Point(6, 49);
-            tabControl1.Name = "tabControl1";
-            tabControl1.SelectedIndex = 0;
-            tabControl1.Size = new System.Drawing.Size(411, 416);
-            tabControl1.TabIndex = 13;
+            tbProperties.Controls.Add(tpGeneral);
+            tbProperties.Controls.Add(tpMetadata);
+            tbProperties.Location = new System.Drawing.Point(6, 49);
+            tbProperties.Name = "tbProperties";
+            tbProperties.SelectedIndex = 0;
+            tbProperties.Size = new System.Drawing.Size(411, 416);
+            tbProperties.TabIndex = 13;
             // 
             // tpGeneral
             // 
+            tpGeneral.BackColor = System.Drawing.Color.SteelBlue;
             tpGeneral.Controls.Add(btnUnblockFileOrManageAcl);
             tpGeneral.Controls.Add(btnCopyFile);
             tpGeneral.Controls.Add(btnMoveFile);
@@ -125,10 +126,10 @@
             tpGeneral.Size = new System.Drawing.Size(403, 388);
             tpGeneral.TabIndex = 0;
             tpGeneral.Text = "General";
-            tpGeneral.UseVisualStyleBackColor = true;
             // 
             // btnUnblockFileOrManageAcl
             // 
+            btnUnblockFileOrManageAcl.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             btnUnblockFileOrManageAcl.Location = new System.Drawing.Point(312, 352);
             btnUnblockFileOrManageAcl.Name = "btnUnblockFileOrManageAcl";
             btnUnblockFileOrManageAcl.Size = new System.Drawing.Size(86, 30);
@@ -139,6 +140,7 @@
             // 
             // btnCopyFile
             // 
+            btnCopyFile.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             btnCopyFile.Location = new System.Drawing.Point(170, 352);
             btnCopyFile.Name = "btnCopyFile";
             btnCopyFile.Size = new System.Drawing.Size(75, 30);
@@ -148,6 +150,7 @@
             // 
             // btnMoveFile
             // 
+            btnMoveFile.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             btnMoveFile.Location = new System.Drawing.Point(89, 352);
             btnMoveFile.Name = "btnMoveFile";
             btnMoveFile.Size = new System.Drawing.Size(75, 30);
@@ -158,6 +161,7 @@
             // btnDeleteFile
             // 
             btnDeleteFile.BackColor = System.Drawing.Color.Red;
+            btnDeleteFile.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             btnDeleteFile.ForeColor = System.Drawing.Color.White;
             btnDeleteFile.Location = new System.Drawing.Point(8, 352);
             btnDeleteFile.Name = "btnDeleteFile";
@@ -168,6 +172,7 @@
             // 
             // groupBox1
             // 
+            groupBox1.BackColor = System.Drawing.Color.SteelBlue;
             groupBox1.Controls.Add(layoutAttributesList);
             groupBox1.Location = new System.Drawing.Point(-2, 165);
             groupBox1.Name = "groupBox1";
@@ -357,20 +362,23 @@
             // 
             // tpMetadata
             // 
+            tpMetadata.BackColor = System.Drawing.Color.SteelBlue;
             tpMetadata.Controls.Add(lvMetadata);
+            tpMetadata.ForeColor = System.Drawing.Color.White;
             tpMetadata.Location = new System.Drawing.Point(4, 24);
             tpMetadata.Name = "tpMetadata";
             tpMetadata.Padding = new System.Windows.Forms.Padding(3);
             tpMetadata.Size = new System.Drawing.Size(403, 388);
             tpMetadata.TabIndex = 1;
             tpMetadata.Text = "Metadata";
-            tpMetadata.UseVisualStyleBackColor = true;
             // 
             // lvMetadata
             // 
+            lvMetadata.BackColor = System.Drawing.Color.SteelBlue;
             lvMetadata.BorderStyle = System.Windows.Forms.BorderStyle.None;
             lvMetadata.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] { columnHeader1, columnHeader2 });
             lvMetadata.Dock = System.Windows.Forms.DockStyle.Fill;
+            lvMetadata.ForeColor = System.Drawing.Color.White;
             lvMetadata.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
             lvMetadata.LabelWrap = false;
             lvMetadata.Location = new System.Drawing.Point(3, 3);
@@ -396,11 +404,13 @@
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            BackColor = System.Drawing.Color.SteelBlue;
             ClientSize = new System.Drawing.Size(420, 470);
-            Controls.Add(tabControl1);
+            Controls.Add(tbProperties);
             Controls.Add(pbFileTypeIcon);
             Controls.Add(lblFileNameWithoutExtension);
             Controls.Add(horizontalLine1);
+            ForeColor = System.Drawing.Color.White;
             FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             MaximizeBox = false;
             MinimizeBox = false;
@@ -409,7 +419,7 @@
             StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             Text = "Properties";
             ((System.ComponentModel.ISupportInitialize)pbFileTypeIcon).EndInit();
-            tabControl1.ResumeLayout(false);
+            tbProperties.ResumeLayout(false);
             tpGeneral.ResumeLayout(false);
             tpGeneral.PerformLayout();
             groupBox1.ResumeLayout(false);
@@ -424,7 +434,7 @@
         private System.Windows.Forms.Label lblFileNameWithoutExtension;
         private System.Windows.Forms.PictureBox pbFileTypeIcon;
         private System.Windows.Forms.SaveFileDialog sfdFileCopyMoveDestinationPicker;
-        private System.Windows.Forms.TabControl tabControl1;
+        private System.Windows.Forms.TabControl tbProperties;
         private System.Windows.Forms.TabPage tpGeneral;
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.FlowLayoutPanel layoutAttributesList;

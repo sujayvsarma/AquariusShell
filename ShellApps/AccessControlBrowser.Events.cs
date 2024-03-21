@@ -5,6 +5,8 @@ using System.Security.AccessControl;
 using System.Security.Principal;
 using System.Windows.Forms;
 
+using AquariusShell.Objects;
+
 namespace AquariusShell.ShellApps
 {
     /// <summary>
@@ -82,6 +84,13 @@ namespace AquariusShell.ShellApps
 
 
             SetAclEditControls(readOnly: true);
+
+            // Respect choices made above
+            chkMarkPrincipalOwner.Enabled &= _settings.AllowReplaceOwnerWithPrincipal;
+            btnDeletePrincipal.Enabled &= _settings.AllowDeletePrincipal;
+            btnEditPrincipal.Enabled &= _settings.AllowEditPrincipal;
+            btnAddPrincipal.Enabled &= _settings.AllowAddPrincipal;
+
             _populatingPrincipalPermissions = false;
 
             //
@@ -319,7 +328,7 @@ namespace AquariusShell.ShellApps
             }
 
             FileSystemNode node = (FileSystemNode)tvFilesystemBrowser.SelectedNode;
-            FileSystemSecurity fsSecurity;
+            FileSystemSecurity fsSecurity, fsSecurityOriginal;
             if (_type == ObjectTypes.Directory)
             {
                 fsSecurity = (new DirectoryInfo(node.AbsolutePath)).GetAccessControl(AccessControlSections.Access | AccessControlSections.Owner);
@@ -328,6 +337,8 @@ namespace AquariusShell.ShellApps
             {
                 fsSecurity = (new FileInfo(node.AbsolutePath)).GetAccessControl(AccessControlSections.Access | AccessControlSections.Owner);
             }
+
+            fsSecurityOriginal = fsSecurity;
 
             // are we in add or edit mode?
             if (lbPrincipalsList.SelectedItem != null)
@@ -359,36 +370,47 @@ namespace AquariusShell.ShellApps
                 }
             }
 
-            try
+            bool aclsSetSuccessfully = false;
+            if (fsSecurity != fsSecurityOriginal)
             {
-                if (_type == ObjectTypes.Directory)
+                try
                 {
-                    (new DirectoryInfo(node.AbsolutePath)).SetAccessControl((DirectorySecurity)fsSecurity);
-                }
-                else // if (_type == ObjectTypes.File)
-                {
-                    (new FileInfo(node.AbsolutePath)).SetAccessControl((FileSecurity)fsSecurity);
-                }
+                    if (_type == ObjectTypes.Directory)
+                    {
+                        (new DirectoryInfo(node.AbsolutePath)).SetAccessControl((DirectorySecurity)fsSecurity);
+                    }
+                    else // if (_type == ObjectTypes.File)
+                    {
+                        (new FileInfo(node.AbsolutePath)).SetAccessControl((FileSecurity)fsSecurity);
+                    }
 
-                MessageBox.Show(
-                        "Permissions were set successfully. " +
-                            $"You may see a different combination of permissions for '{tbPrincipalNameRaw.Text}'. " +
-                                "This is because of the way permissions are distributed between existing, explicit, implicit, group-based permissions.",
-                        "Aquarius Shell",
-                        MessageBoxButtons.OK,
-                        MessageBoxIcon.Information
-                    );
+                    aclsSetSuccessfully = true;
+                    MessageBox.Show(
+                            "Permissions were set successfully. " +
+                                $"You may see a different combination of permissions for '{tbPrincipalNameRaw.Text}'. " +
+                                    "This is because of the way permissions are distributed between existing, explicit, implicit, group-based permissions.",
+                            "Aquarius Shell",
+                            MessageBoxButtons.OK,
+                            MessageBoxIcon.Information
+                        );
+                }
+                catch
+                {
+                    MessageBox.Show(
+                            "Permissions could not be set. " +
+                                $"This is most likely because you do not have permissions to set permissions on '{node.Text}'.",
+                            "Aquarius Shell",
+                            MessageBoxButtons.OK,
+                            MessageBoxIcon.Information
+                        );
+                }
             }
-            catch
+            else
             {
-                MessageBox.Show(
-                        "Permissions could not be set. " +
-                            $"This is most likely because you do not have permissions to set permissions on '{node.Text}'.",
-                        "Aquarius Shell",
-                        MessageBoxButtons.OK,
-                        MessageBoxIcon.Information
-                    );
+                aclsSetSuccessfully = true;
             }
+
+            _areAclEditControlsDirty = (aclsSetSuccessfully ? false : true) || false;
 
             ClearAclControls();
             LoadSecurityPrincipals(node.AbsolutePath);
@@ -452,10 +474,6 @@ namespace AquariusShell.ShellApps
         {
             this.Text = Caption;
 
-            //_disableTreeViewActivation = true;
-            //tvFilesystemBrowser.Refresh();
-            //_disableTreeViewActivation = false;
-
             // Also trigger loading the final leaf item's principals... 
             tvFilesystemBrowser.SelectedNode = _hierarchy.Last!.Value;
         }
@@ -465,13 +483,18 @@ namespace AquariusShell.ShellApps
         /// </summary>
         private void CloseDialog_Clicked(object sender, EventArgs e)
         {
-            //TODO: Check!
-
-            if (AppClosed != null)
+            if (_areAclEditControlsDirty)
             {
-                AppClosed(typeof(AccessControlBrowser));
+                if (MessageBox.Show("There appear to be uncommitted changes on the screen. Do you wish to exit anyway?", "Aquarius Shell", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.No)
+                {
+                    return;
+                }
             }
+
+            AppClosed?.Invoke(typeof(AccessControlBrowser));
             this.Close();
         }
+
+        private bool _areAclEditControlsDirty = false;
     }
 }

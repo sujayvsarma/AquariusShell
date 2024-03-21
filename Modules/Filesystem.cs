@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
+using System.Security.Principal;
 using System.Text;
 
 using AquariusShell.Objects;
-using AquariusShell.Runtime;
+
 
 namespace AquariusShell.Modules
 {
@@ -23,9 +23,11 @@ namespace AquariusShell.Modules
         /// <returns>New name. Will be Empty string if there was a problem</returns>
         public static string GenerateNewShortcutName(string target, string saveToPath)
         {
+#pragma warning disable IDE0059 // unnecessary assignment
             StringBuilder linkName = new(int.MaxValue);
-            bool result = SHGetNewLinkInfo(target, saveToPath, out linkName, out bool isDuplicate, (uint)ShGetNewLinkInfoFlagsEnum.None);
+#pragma warning restore IDE0059 // unnecessary assignment
 
+            bool result = SHGetNewLinkInfo(target, saveToPath, out linkName, out bool _, (uint)ShGetNewLinkInfoFlagsEnum.None);
             return (result ? linkName.ToString() : string.Empty);
         }
 
@@ -36,6 +38,8 @@ namespace AquariusShell.Modules
         public static List<RecyclebinItem> GetFilesInRecycleBin()
         {
             List<RecyclebinItem> items = new();
+
+#pragma warning disable IDE0059 // unnecessary assignment
 
             // We are using Dynamic COM because working with ShellAPI for this is way too tedious!
             Type shellAppType = Type.GetTypeFromProgID("Shell.Application")!;
@@ -48,6 +52,7 @@ namespace AquariusShell.Modules
                     dynamic? recyclebinContents = recyclebinFolder.Items();
                     if (recyclebinContents != null)
                     {
+                        string currentUserSID = WindowsIdentity.GetCurrent().Owner!.ToString();
                         for (int i = 0; i < recyclebinContents.Count; i++)
                         {
                             dynamic? itemInFolder = recyclebinContents.Item(i);
@@ -66,7 +71,7 @@ namespace AquariusShell.Modules
                             // Result: "D:\src\$RECYCLE.BIN\S-X-Y-JHSDKJASDKAHSD\helloworld.cs"
                             string diskRbPath = Path.Combine(
                                     Path.GetDirectoryName(resolvedRbPath)!,
-                                    ShellEnvironment.CurrentUserSID
+                                    currentUserSID
                                 );
 
                             diskRbPath = rbPath.Replace(resolvedRbPath, diskRbPath);
@@ -103,6 +108,8 @@ namespace AquariusShell.Modules
                 shell = null;
             }
 
+#pragma warning restore IDE0059 // unnecessary assignment
+
             return items;
         }
 
@@ -111,7 +118,7 @@ namespace AquariusShell.Modules
         /// </summary>
         /// <param name="fullyQualifiedPath">Fully qualified path to the file or directory to delete</param>
         /// <returns>True if operation succeeded</returns>
-        public static bool SendItemToRecycleBin(string fullyQualifiedPath)
+        public static bool SendFileToRecycleBin(string fullyQualifiedPath)
         {
             SHFILEOPSTRUCT ops = new()
             {

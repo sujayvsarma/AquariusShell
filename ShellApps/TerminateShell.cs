@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Drawing;
-using System.IO;
 using System.Windows.Forms;
 
-using AquariusShell.Controls;
+using AquariusShell.ConfigurationManagement;
+using AquariusShell.ConfigurationManagement.Settings;
 using AquariusShell.Modules;
+using AquariusShell.Objects;
 using AquariusShell.Properties;
 using AquariusShell.Runtime;
 
@@ -27,10 +28,7 @@ namespace AquariusShell.ShellApps
         {
             get
             {
-                if (_icon == null)
-                {
-                    _icon = new Bitmap(Resources.shutdown, ShellEnvironment.ConfiguredSizeOfIconsInPixels, ShellEnvironment.ConfiguredSizeOfIconsInPixels);
-                }
+                _icon ??= new Bitmap(Resources.shutdown, ShellEnvironment.ConfiguredSizeOfIconsInPixels, ShellEnvironment.ConfiguredSizeOfIconsInPixels);
                 return _icon;
             }
         }
@@ -45,7 +43,7 @@ namespace AquariusShell.ShellApps
         /// The launch command for this module
         /// </summary>
         public string Command => _command;
-        private static string _command = $"{IShellAppModule.CommandSignifierPrefix}sigkill";
+        private static readonly string _command = $"{IShellAppModule.CommandSignifierPrefix}sigkill";
 
         /// <summary>
         /// Instancing mode
@@ -100,7 +98,25 @@ namespace AquariusShell.ShellApps
         {
             InitializeComponent();
 
+            _settings = ConfigurationProvider<TerminateShellSettings>.Get();
+
             this.Icon = Icon.FromHandle((new Bitmap(Resources.shutdown, 16, 16)).GetHicon());
+
+            cbShutdownSwitchToExplorer.Enabled = _settings.AllowSwitchToExplorer;
+            cbShutdownAction.Items.Clear();
+
+            foreach (WindowsShutdownActions action in Enum.GetValues<WindowsShutdownActions>())
+            {
+                if (action != WindowsShutdownActions.SwitchToExplorer)
+                {
+                    bool hasValue = _settings.AllowedActions.TryGetValue(action, out bool allowed);
+                    if ((hasValue && allowed) || (!hasValue))
+                    {
+                        NameValuePair<WindowsShutdownActions> item = new(action.GetEnumFriendlyName(), action);
+                        cbShutdownAction.Items.Add(item);
+                    }
+                }
+            }
         }
 
         #region Event Subscriptions
@@ -129,63 +145,29 @@ namespace AquariusShell.ShellApps
         /// </summary>
         private void btnAction_Click(object sender, EventArgs e)
         {
-            bool force = cbForce.Checked;
-            bool switchToExplorer = false;
-
-            WindowsShutdownActions actionType = WindowsShutdownActions.SimpleExit;
-            if (rbAdvancedExitShell.Checked)
+            if (cbShutdownAction.SelectedItem == default)
             {
-                actionType = WindowsShutdownActions.SimpleExit;
-            }
-            else if (rbSwitchShell.Checked)
-            {
-                actionType = WindowsShutdownActions.SwitchToExplorer;
-                switchToExplorer = true;
-            }
-            else if (rbLogOff.Checked)
-            {
-                actionType = WindowsShutdownActions.LogOff;
-            }
-            else if (rbReboot.Checked)
-            {
-                actionType = WindowsShutdownActions.Reboot;
-                if (cbRebootSwitchToExplorer.Checked)
-                {
-                    switchToExplorer = true;
-                }
-            }
-            else if (rbShutdown.Checked)
-            {
-                actionType = WindowsShutdownActions.Shutdown;
-                if (cbShutdownSwitchToExplorer.Checked)
-                {
-                    switchToExplorer = true;
-                }
+                return;
             }
 
-            if (switchToExplorer)
+            NameValuePair<WindowsShutdownActions> selectedItem = (NameValuePair<WindowsShutdownActions>)cbShutdownAction.SelectedItem;
+
+            if (cbShutdownSwitchToExplorer.Checked)
             {
-                // re-register explorer as the shell
-                Win32Registry.Set(Microsoft.Win32.RegistryHive.LocalMachine, "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon", "Shell", "explorer.exe");
-
-                // move our registration into a backup key
-                Win32Registry.Set(Microsoft.Win32.RegistryHive.LocalMachine, "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon", "Shell_aquarius", Application.ExecutablePath);
+                CurrentShellActions.SwitchToExplorer();
             }
-
-            switch (actionType)
+            
+            switch (selectedItem.Value)
             {
                 case WindowsShutdownActions.SimpleExit:
-                    // rather dramatic!
+                    // Dramatic
                     Application.Exit();
                     break;
 
-                case WindowsShutdownActions.SwitchToExplorer:
-                    Shell32.ExecuteProgram(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows), "explorer.exe"), Shell32.ShellExecuteVerbsEnum.None);
-                    Application.Exit();
-                    break;
-
-                default:
-                    SystemShutdownActions.PerformShutdownAction(actionType, force);
+                case WindowsShutdownActions.LogOff:
+                case WindowsShutdownActions.Shutdown:
+                case WindowsShutdownActions.Reboot:
+                    SystemShutdownActions.PerformShutdownAction(selectedItem.Value, cbForce.Checked);
                     Application.Exit();
                     break;
             }
@@ -197,5 +179,7 @@ namespace AquariusShell.ShellApps
         /// Notify that this app was closed by the user
         /// </summary>
         public event BuiltInAppClosed? AppClosed;
+
+        private readonly TerminateShellSettings _settings;
     }
 }

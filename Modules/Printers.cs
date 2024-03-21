@@ -11,6 +11,7 @@ namespace AquariusShell.Modules
     /// </summary>
     internal static partial class Printers
     {
+        internal static readonly char[] separator = new char[] { ',' };
 
         /// <summary>
         /// Get information about local and network printers
@@ -24,6 +25,7 @@ namespace AquariusShell.Modules
             // and WMI does the same thing as getting it from the registry anyway!
             ManagementObjectSearcher wmi = new("SELECT * FROM Win32_Printer");
             ManagementObjectCollection results = wmi.Get();
+#pragma warning disable IDE0220 // Add explicit cast
             foreach (ManagementObject item in results)
             {
                 Printer device = new();
@@ -138,7 +140,7 @@ namespace AquariusShell.Modules
                             break;
 
                         case "PortName":
-                            device.Ports = ((string)(property.Value ?? string.Empty)).Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                            device.Ports = ((string)(property.Value ?? string.Empty)).Split(separator, StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
                             break;
 
                         case "StartTime":
@@ -153,6 +155,7 @@ namespace AquariusShell.Modules
 
                 printers.Add(device);
             }
+#pragma warning restore IDE0220 // Add explicit cast
 
             return printers;
         }

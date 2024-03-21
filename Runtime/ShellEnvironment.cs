@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
-using System.Security.Principal;
 using System.Windows.Forms;
 
 using AquariusShell.Forms;
@@ -16,32 +15,6 @@ namespace AquariusShell.Runtime
     /// </summary>
     internal static class ShellEnvironment
     {
-        /// <summary>
-        /// Get current user's SID
-        /// </summary>
-        public static string CurrentUserSID
-        {
-            get
-            {
-                if (_currentUserSid == null)
-                {
-                    SecurityIdentifier? sid = WindowsIdentity.GetCurrent().Owner;
-                    if (sid != null)
-                    {
-                        _currentUserSid = sid.ToString();
-
-                        if (sid.AccountDomainSid != null)
-                        {
-                            _currentUserSid = sid.AccountDomainSid.ToString();
-                        }
-                    }
-                }
-
-                return _currentUserSid ?? throw new ApplicationException("Critical error: Could not detect current user's account information!");
-            }
-        }
-        private static string? _currentUserSid = null;
-
         /// <summary>
         /// Directory where we can cache stuff
         /// </summary>
@@ -79,7 +52,7 @@ namespace AquariusShell.Runtime
                 if (_logDirectory == null)
                 {
                     _lastDate = DateOnly.FromDateTime(DateTime.Now);
-                    _logDirectory = Path.Combine(Application.StartupPath, ".logs", _lastDate.ToString("yyyy-mm-dd"));
+                    _logDirectory = Path.Combine(Application.StartupPath, ".logs", _lastDate.ToString("yyyy-MM-dd"));
                     if (!Directory.Exists(_logDirectory))
                     {
                         Directory.CreateDirectory(_logDirectory);
@@ -183,11 +156,7 @@ namespace AquariusShell.Runtime
         {
             get
             {
-                if (_shellApps == null)
-                {
-                    _shellApps = new();
-                }
-
+                _shellApps ??= new();
                 return _shellApps;
             }
         }
@@ -221,6 +190,22 @@ namespace AquariusShell.Runtime
         /// </summary>
         public static string IMAGEKEY_FOLDER = "_AQSHELL_FOLDER";
 
+        /// <summary>
+        /// The image key for a generic file
+        /// </summary>
+        public static string IMAGEKEY_GENERICFILE = "GenericFile";
+
+        /// <summary>
+        /// A file attribute value that means that the item is not available on local disk
+        /// </summary>
+        public static int FILEATTRIBUTE_NOTONDISK = 0x00020000;
+
+        /// <summary>
+        /// The total of margins either vertically or horizontally for all controls on all our UI. 
+        /// Every control has a default margin of 3px along any edge. So total margin on an axis will be 3+3 = 6px.
+        /// </summary>
+        public static int FORM_CONTROLS_MARGIN_EXTENTS = 6;
+
 
         /// <summary>
         /// Clear all the heavy-weight caches we are holding on to, as we are about to terminate
@@ -230,6 +215,12 @@ namespace AquariusShell.Runtime
             _shellApps = null;
             _printers.Clear();
             WorkArea = default!;
+        }
+
+
+        public static void SetFormBusyState(this Form form, bool isBusy = true)
+        {
+            form.UseWaitCursor = isBusy;
         }
 
 

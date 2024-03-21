@@ -3,7 +3,6 @@ using System;
 using System.Drawing;
 using System.Windows.Forms;
 
-using AquariusShell.Controls;
 using AquariusShell.Runtime;
 
 namespace AquariusShell.ShellApps
@@ -22,10 +21,7 @@ namespace AquariusShell.ShellApps
         {
             get
             {
-                if (_icon == null)
-                {
-                    _icon = SystemIcons.GetStockIcon(StockIconId.Lock, ShellEnvironment.ConfiguredSizeOfIconsInPixels).ToBitmap();
-                }
+                _icon ??= SystemIcons.GetStockIcon(StockIconId.Lock, ShellEnvironment.ConfiguredSizeOfIconsInPixels).ToBitmap();
 
                 return _icon;
             }
@@ -41,7 +37,7 @@ namespace AquariusShell.ShellApps
         /// The launch command for this module
         /// </summary>
         public string Command => _command;
-        private static string _command = $"{IShellAppModule.CommandSignifierPrefix}aclbrowser";
+        private static readonly string _command = $"{IShellAppModule.CommandSignifierPrefix}aclbrowser";
 
         /// <summary>
         /// Instancing mode

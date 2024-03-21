@@ -1,4 +1,6 @@
-﻿namespace AquariusShell.Forms
+﻿using Microsoft.VisualBasic.ApplicationServices;
+
+namespace AquariusShell.Forms
 {
     partial class CanvasProgramLauncher
     {
@@ -31,95 +33,94 @@
             components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(CanvasProgramLauncher));
             accordionPanel = new System.Windows.Forms.FlowLayoutPanel();
-            panelAquariusShellApps = new System.Windows.Forms.Panel();
             lvShellApps = new System.Windows.Forms.ListView();
-            lvAppsListIcons32 = new System.Windows.Forms.ImageList(components);
-            btnCloseLauncher = new System.Windows.Forms.Button();
-            btnAquariusShellAppsAccordionHeader = new System.Windows.Forms.Button();
-            chevronImages = new System.Windows.Forms.ImageList(components);
-            tbWinProgsSearchBox = new System.Windows.Forms.TextBox();
+            imgListWindowsAppIcons = new System.Windows.Forms.ImageList(components);
             lvWindowsApps = new System.Windows.Forms.ListView();
-            prgGlobalFilesWatcher = new System.IO.FileSystemWatcher();
-            prgUserFilesWatcher = new System.IO.FileSystemWatcher();
+            tbWinProgsSearchBox = new System.Windows.Forms.TextBox();
+            imgListShellAppIcons = new System.Windows.Forms.ImageList(components);
+            chevronImages = new System.Windows.Forms.ImageList(components);
             accordionPanel.SuspendLayout();
-            panelAquariusShellApps.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)prgGlobalFilesWatcher).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)prgUserFilesWatcher).BeginInit();
             SuspendLayout();
             // 
             // accordionPanel
             // 
-            accordionPanel.BackColor = System.Drawing.Color.Transparent;
-            accordionPanel.Controls.Add(panelAquariusShellApps);
-            accordionPanel.Controls.Add(tbWinProgsSearchBox);
+            accordionPanel.BackColor = System.Drawing.Color.SteelBlue;
+            accordionPanel.Controls.Add(lvShellApps);
             accordionPanel.Controls.Add(lvWindowsApps);
+            accordionPanel.Controls.Add(tbWinProgsSearchBox);
             accordionPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             accordionPanel.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
             accordionPanel.Location = new System.Drawing.Point(0, 0);
             accordionPanel.Name = "accordionPanel";
-            accordionPanel.Size = new System.Drawing.Size(290, 697);
+            accordionPanel.Size = new System.Drawing.Size(794, 594);
             accordionPanel.TabIndex = 1;
-            // 
-            // panelAquariusShellApps
-            // 
-            panelAquariusShellApps.Anchor = System.Windows.Forms.AnchorStyles.Top;
-            panelAquariusShellApps.Controls.Add(lvShellApps);
-            panelAquariusShellApps.Controls.Add(btnCloseLauncher);
-            panelAquariusShellApps.Controls.Add(btnAquariusShellAppsAccordionHeader);
-            panelAquariusShellApps.Location = new System.Drawing.Point(3, 3);
-            panelAquariusShellApps.Name = "panelAquariusShellApps";
-            panelAquariusShellApps.Size = new System.Drawing.Size(311, 243);
-            panelAquariusShellApps.TabIndex = 0;
             // 
             // lvShellApps
             // 
             lvShellApps.Activation = System.Windows.Forms.ItemActivation.TwoClick;
-            lvShellApps.BackColor = System.Drawing.SystemColors.Control;
+            lvShellApps.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
+            lvShellApps.BackColor = System.Drawing.Color.SteelBlue;
             lvShellApps.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            lvShellApps.LargeImageList = lvAppsListIcons32;
-            lvShellApps.Location = new System.Drawing.Point(1, 49);
+            lvShellApps.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
+            lvShellApps.LargeImageList = imgListShellAppIcons;
+            lvShellApps.Location = new System.Drawing.Point(3, 12);
+            lvShellApps.Margin = new System.Windows.Forms.Padding(3, 12, 3, 3);
             lvShellApps.MultiSelect = false;
             lvShellApps.Name = "lvShellApps";
             lvShellApps.ShowGroups = false;
             lvShellApps.ShowItemToolTips = true;
-            lvShellApps.Size = new System.Drawing.Size(302, 191);
+            lvShellApps.Size = new System.Drawing.Size(791, 116);
+            lvShellApps.SmallImageList = imgListShellAppIcons;
             lvShellApps.Sorting = System.Windows.Forms.SortOrder.Ascending;
-            lvShellApps.TabIndex = 6;
+            lvShellApps.TabIndex = 8;
             lvShellApps.UseCompatibleStateImageBehavior = false;
             lvShellApps.ItemActivate += lvShellApps_ItemActivate;
             // 
-            // lvAppsListIcons32
+            // lvWindowsAppsListIcons32
             // 
-            lvAppsListIcons32.ColorDepth = System.Windows.Forms.ColorDepth.Depth32Bit;
-            lvAppsListIcons32.ImageSize = new System.Drawing.Size(32, 32);
-            lvAppsListIcons32.TransparentColor = System.Drawing.Color.Transparent;
+            imgListWindowsAppIcons.ColorDepth = System.Windows.Forms.ColorDepth.Depth32Bit;
+            imgListWindowsAppIcons.ImageSize = new System.Drawing.Size(24, 24);
+            imgListWindowsAppIcons.TransparentColor = System.Drawing.Color.Transparent;
             // 
-            // btnCloseLauncher
+            // lvWindowsApps
             // 
-            btnCloseLauncher.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            btnCloseLauncher.Image = (System.Drawing.Image)resources.GetObject("btnCloseLauncher.Image");
-            btnCloseLauncher.Location = new System.Drawing.Point(268, 4);
-            btnCloseLauncher.Name = "btnCloseLauncher";
-            btnCloseLauncher.Size = new System.Drawing.Size(39, 42);
-            btnCloseLauncher.TabIndex = 5;
-            btnCloseLauncher.UseVisualStyleBackColor = true;
-            btnCloseLauncher.Click += btnCloseLauncher_Click;
+            lvWindowsApps.Activation = System.Windows.Forms.ItemActivation.TwoClick;
+            lvWindowsApps.BackColor = System.Drawing.Color.SteelBlue;
+            lvWindowsApps.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            lvWindowsApps.Font = new System.Drawing.Font("Segoe UI", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, 0);
+            lvWindowsApps.LargeImageList = imgListWindowsAppIcons;
+            lvWindowsApps.Location = new System.Drawing.Point(3, 134);
+            lvWindowsApps.MultiSelect = false;
+            lvWindowsApps.Name = "lvWindowsApps";
+            lvWindowsApps.ShowGroups = false;
+            lvWindowsApps.ShowItemToolTips = true;
+            lvWindowsApps.Size = new System.Drawing.Size(791, 418);
+            lvWindowsApps.SmallImageList = imgListWindowsAppIcons;
+            lvWindowsApps.Sorting = System.Windows.Forms.SortOrder.Ascending;
+            lvWindowsApps.TabIndex = 7;
+            lvWindowsApps.UseCompatibleStateImageBehavior = false;
+            lvWindowsApps.ItemActivate += lvWindowsApps_ItemActivate;
             // 
-            // btnAquariusShellAppsAccordionHeader
+            // tbWinProgsSearchBox
             // 
-            btnAquariusShellAppsAccordionHeader.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
-            btnAquariusShellAppsAccordionHeader.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            btnAquariusShellAppsAccordionHeader.ImageKey = "DN";
-            btnAquariusShellAppsAccordionHeader.ImageList = chevronImages;
-            btnAquariusShellAppsAccordionHeader.Location = new System.Drawing.Point(1, 3);
-            btnAquariusShellAppsAccordionHeader.Name = "btnAquariusShellAppsAccordionHeader";
-            btnAquariusShellAppsAccordionHeader.Size = new System.Drawing.Size(306, 43);
-            btnAquariusShellAppsAccordionHeader.TabIndex = 3;
-            btnAquariusShellAppsAccordionHeader.Text = "Aquarius Shell Apps";
-            btnAquariusShellAppsAccordionHeader.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            btnAquariusShellAppsAccordionHeader.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
-            btnAquariusShellAppsAccordionHeader.UseVisualStyleBackColor = true;
-            btnAquariusShellAppsAccordionHeader.Click += btnAquariusShellAppsAccordionHeader_Click;
+            tbWinProgsSearchBox.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
+            tbWinProgsSearchBox.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Suggest;
+            tbWinProgsSearchBox.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.CustomSource;
+            tbWinProgsSearchBox.Location = new System.Drawing.Point(6, 561);
+            tbWinProgsSearchBox.Margin = new System.Windows.Forms.Padding(6);
+            tbWinProgsSearchBox.MaxLength = 255;
+            tbWinProgsSearchBox.Name = "tbWinProgsSearchBox";
+            tbWinProgsSearchBox.PlaceholderText = "Search...";
+            tbWinProgsSearchBox.Size = new System.Drawing.Size(785, 23);
+            tbWinProgsSearchBox.TabIndex = 9;
+            tbWinProgsSearchBox.WordWrap = false;
+            tbWinProgsSearchBox.TextChanged += tbWinProgsSearchBox_TextChanged;
+            // 
+            // lvShellAppsListIcons32
+            // 
+            imgListShellAppIcons.ColorDepth = System.Windows.Forms.ColorDepth.Depth32Bit;
+            imgListShellAppIcons.ImageSize = new System.Drawing.Size(24, 24);
+            imgListShellAppIcons.TransparentColor = System.Drawing.Color.Transparent;
             // 
             // chevronImages
             // 
@@ -129,84 +130,32 @@
             chevronImages.Images.SetKeyName(0, "DN");
             chevronImages.Images.SetKeyName(1, "UP");
             // 
-            // tbWinProgsSearchBox
-            // 
-            tbWinProgsSearchBox.Location = new System.Drawing.Point(3, 252);
-            tbWinProgsSearchBox.MaxLength = 255;
-            tbWinProgsSearchBox.Name = "tbWinProgsSearchBox";
-            tbWinProgsSearchBox.PlaceholderText = "Search...";
-            tbWinProgsSearchBox.Size = new System.Drawing.Size(307, 23);
-            tbWinProgsSearchBox.TabIndex = 6;
-            tbWinProgsSearchBox.WordWrap = false;
-            tbWinProgsSearchBox.TextChanged += tbWinProgsSearchBox_TextChanged;
-            // 
-            // lvWindowsApps
-            // 
-            lvWindowsApps.Activation = System.Windows.Forms.ItemActivation.TwoClick;
-            lvWindowsApps.BackColor = System.Drawing.SystemColors.Control;
-            lvWindowsApps.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            lvWindowsApps.LargeImageList = lvAppsListIcons32;
-            lvWindowsApps.Location = new System.Drawing.Point(3, 281);
-            lvWindowsApps.MultiSelect = false;
-            lvWindowsApps.Name = "lvWindowsApps";
-            lvWindowsApps.ShowGroups = false;
-            lvWindowsApps.ShowItemToolTips = true;
-            lvWindowsApps.Size = new System.Drawing.Size(245, 193);
-            lvWindowsApps.Sorting = System.Windows.Forms.SortOrder.Ascending;
-            lvWindowsApps.TabIndex = 7;
-            lvWindowsApps.UseCompatibleStateImageBehavior = false;
-            lvWindowsApps.ItemActivate += lvWindowsApps_ItemActivate;
-            // 
-            // prgGlobalFilesWatcher
-            // 
-            prgGlobalFilesWatcher.EnableRaisingEvents = true;
-            prgGlobalFilesWatcher.IncludeSubdirectories = true;
-            prgGlobalFilesWatcher.NotifyFilter = System.IO.NotifyFilters.FileName;
-            prgGlobalFilesWatcher.SynchronizingObject = this;
-            prgGlobalFilesWatcher.Created += prgFilesWatcher_Created;
-            prgGlobalFilesWatcher.Deleted += prgFilesWatcher_Deleted;
-            // 
-            // prgUserFilesWatcher
-            // 
-            prgUserFilesWatcher.EnableRaisingEvents = true;
-            prgUserFilesWatcher.IncludeSubdirectories = true;
-            prgUserFilesWatcher.NotifyFilter = System.IO.NotifyFilters.FileName;
-            prgUserFilesWatcher.SynchronizingObject = this;
-            prgUserFilesWatcher.Created += prgFilesWatcher_Created;
-            prgUserFilesWatcher.Deleted += prgFilesWatcher_Deleted;
-            // 
             // CanvasProgramLauncher
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            CancelButton = btnCloseLauncher;
-            ClientSize = new System.Drawing.Size(290, 697);
+            BackColor = System.Drawing.Color.SteelBlue;
+            ClientSize = new System.Drawing.Size(794, 594);
             ControlBox = false;
             Controls.Add(accordionPanel);
-            FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             Name = "CanvasProgramLauncher";
             ShowIcon = false;
             ShowInTaskbar = false;
-            Load += CanvasProgramLauncher_Load;
+            StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
+            Text = "Apps and Programs";
             accordionPanel.ResumeLayout(false);
             accordionPanel.PerformLayout();
-            panelAquariusShellApps.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)prgGlobalFilesWatcher).EndInit();
-            ((System.ComponentModel.ISupportInitialize)prgUserFilesWatcher).EndInit();
             ResumeLayout(false);
         }
 
         #endregion
         private System.Windows.Forms.FlowLayoutPanel accordionPanel;
-        private System.Windows.Forms.Panel panelAquariusShellApps;
-        private System.Windows.Forms.Button btnAquariusShellAppsAccordionHeader;
         private System.Windows.Forms.ImageList chevronImages;
-        private System.Windows.Forms.Button btnCloseLauncher;
-        private System.IO.FileSystemWatcher prgGlobalFilesWatcher;
-        private System.IO.FileSystemWatcher prgUserFilesWatcher;
-        private System.Windows.Forms.ImageList lvAppsListIcons32;
+        private System.Windows.Forms.ImageList imgListWindowsAppIcons;
+        private System.Windows.Forms.ImageList imgListShellAppIcons;
+        private System.Windows.Forms.ListView lvWindowsApps;
         private System.Windows.Forms.ListView lvShellApps;
         private System.Windows.Forms.TextBox tbWinProgsSearchBox;
-        private System.Windows.Forms.ListView lvWindowsApps;
     }
 }

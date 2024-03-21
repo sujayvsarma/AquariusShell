@@ -1,7 +1,7 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Drawing;
 using System.Runtime.InteropServices;
-using System.Text;
 
 using AquariusShell.Runtime;
 
@@ -40,6 +40,30 @@ namespace AquariusShell.Modules
 
             return false;
         }
+
+        /// <summary>
+        /// Restore the given window (if required) and bring it to the front
+        /// </summary>
+        /// <param name="hWndMainWindow">Handle to the process's main window (what's listed on the app/task list)</param>
+        /// <returns>True if action succeeded.</returns>
+        public static bool SwitchToWindow(IntPtr hWndMainWindow)
+        {
+            if (IsWindowVisible(hWndMainWindow))
+            {
+                if (IsIconic(hWndMainWindow))
+                {
+                    if (!ShowWindow(hWndMainWindow, ShowWindowCommandsEnum.Restore))
+                    {
+                        return false;
+                    }
+                }
+
+                return SetForegroundWindow(hWndMainWindow);
+            }
+
+            return false;
+        }
+
 
         /// <summary>
         /// Kills the task associated with the provided window handle if it is in a hung/zombie state
@@ -106,14 +130,28 @@ namespace AquariusShell.Modules
         /// <param name="workareaHandle">Handle to the workarea form</param>
         /// <param name="width">Width of the form</param>
         /// <param name="height">Height of the form</param>
-        /// <returns>True if function succeeded</returns>
-        public static bool SetWorkareaAsBackgroundWindow(IntPtr workareaHandle, int width, int height)
-            => SetWindowPos(
+        public static void SetWorkareaAsBackgroundWindow(IntPtr workareaHandle, int width, int height)
+        {
+            SetWindowPos(
                     workareaHandle,
                     new IntPtr((int)SetWindowPosInsertAfterFlagsEnum.HWND_BOTTOM),
                     0, 0, width, height,
                     SetWindowPosFlagsEnum.SWP_NOACTIVATE | SetWindowPosFlagsEnum.SWP_NOSIZE | SetWindowPosFlagsEnum.SWP_NOMOVE
                 );
+
+            // for each running process, if there is a window, bring it above ourselves
+            // We need to do this if we are not the default shell and something else was running before we got here!
+            foreach (Process process in Process.GetProcesses())
+            {
+                if ((process.MainWindowHandle != nint.Zero)
+                     && (!string.IsNullOrWhiteSpace(process.MainWindowTitle))
+                            && Modules.Windows.IsWindowShowableOnOurTaskbar(process.MainWindowHandle)
+                        )
+                {
+                    SetForegroundWindow(process.MainWindowHandle);
+                }
+            }
+        }
 
         /// <summary>
         /// Returns if the smallerRect is within the largerRect
@@ -139,7 +177,7 @@ namespace AquariusShell.Modules
         /// <returns>True if the call succeeded</returns>
         public static bool SetWorkareaBounds(Rectangle workAreaBounds)
         {
-            WIN32RECT rect = WIN32RECT.FromRectangle(workAreaBounds);
+            Win32Rectangle rect = Win32Rectangle.FromRectangle(workAreaBounds);
             return SystemParametersInfo(SPI_SETWORKAREA, 0, ref rect, 0);
         }       
     }

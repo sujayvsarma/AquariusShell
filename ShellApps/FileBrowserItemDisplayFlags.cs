@@ -23,6 +23,8 @@ namespace AquariusShell.ShellApps
         /// </summary>
         ShowSystemItems = 0b0000_0010,
 
+#pragma warning disable CA1069  // Two enums having same values (this is on purpose!)
+
         /// <summary>
         /// Hide files with a 0-byte size
         /// </summary>
@@ -33,6 +35,8 @@ namespace AquariusShell.ShellApps
         /// (folders with hidden files or nested empty folders will still be shown!)
         /// </summary>
         HideEmptyFolders = 0b0000_0100,
+
+#pragma warning restore CA1069  // Two enums having same values
 
         /// <summary>
         /// Show all items including hidden, system and zero-size
