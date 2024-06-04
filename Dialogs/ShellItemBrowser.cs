@@ -12,6 +12,10 @@ using Microsoft.WindowsAPICodePack.Shell;
 
 namespace AquariusShell.Dialogs
 {
+    /// <summary>
+    /// Shows a specialist browser dialog that lets the user browse the filesystem, installed apps and control panel applets. 
+    /// This dialog is typically raised from the <see cref="Controls.ManageableShellItemsListbox"/> and never directly.
+    /// </summary>
     public partial class ShellItemBrowser : Form
     {
         /// <summary>

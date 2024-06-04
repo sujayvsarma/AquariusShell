@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Collections.Specialized;
 
 using AquariusShell.ConfigurationManagement.Reflection;
 using AquariusShell.Objects;

@@ -1,12 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Net.Sockets;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 using AquariusShell.ConfigurationManagement.Constants;
@@ -16,6 +8,9 @@ using AquariusShell.Runtime;
 
 namespace AquariusShell.ConfigurationManagement.SettingsPages
 {
+    /// <summary>
+    /// Settings to configure <see cref="ConfigurationManagement.Settings.IconSettings"/>
+    /// </summary>
     public partial class GlobalIconSettingsPage : UserControl, ISettingsPage
     {
         /// <summary>

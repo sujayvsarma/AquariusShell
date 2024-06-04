@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Windows.Forms;
 
-using AquariusShell.ConfigurationManagement.Constants;
 using AquariusShell.ConfigurationManagement.Settings;
 
 namespace AquariusShell.ConfigurationManagement.SettingsPages
 {
+    /// <summary>
+    /// Settings to configure <see cref="ConfigurationManagement.Settings.AccessControlBrowserSettings"/>
+    /// </summary>
     public partial class AclBrowserSettingsPage : UserControl, ISettingsPage
     {
 

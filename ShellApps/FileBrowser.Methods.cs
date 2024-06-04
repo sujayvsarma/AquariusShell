@@ -604,11 +604,10 @@ namespace AquariusShell.ShellApps
                         if (tbJumpAddress.Text.StartsWith("\\\\"))
                         {
                             //TODO: Network location (??)
-                            LoadCurrentDirectoryView(tbJumpAddress.Text);
 
-                            //MessageBox.Show($"The path entered '{tbJumpAddress.Text}' is a network location that is not currently supported by this Shell.",
-                            //    "Aquarius Shell", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                            //tbJumpAddress.Focus();
+                            MessageBox.Show($"The path entered '{tbJumpAddress.Text}' is a network location that is not currently supported by this Shell.",
+                                "Aquarius Shell", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            tbJumpAddress.Focus();
                         }
                         else if (Directory.Exists(tbJumpAddress.Text))
                         {

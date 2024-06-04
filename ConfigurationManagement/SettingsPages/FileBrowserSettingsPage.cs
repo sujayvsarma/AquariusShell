@@ -8,6 +8,9 @@ using AquariusShell.Runtime;
 
 namespace AquariusShell.ConfigurationManagement.SettingsPages
 {
+    /// <summary>
+    /// Settings to configure <see cref="ConfigurationManagement.Settings.FileBrowserSettings"/>
+    /// </summary>
     public partial class FileBrowserSettingsPage : UserControl, ISettingsPage
     {
         /// <summary>
@@ -41,7 +44,7 @@ namespace AquariusShell.ConfigurationManagement.SettingsPages
             }
 
             _settings.HiddenFolders = [];
-            foreach (NameValuePair<string> folderPair in mngLstHiddenPaths.Items)
+            foreach (NameValuePair<string> folderPair in mngLstHiddenPaths.SelectedItems)
             {
                 _settings.HiddenFolders.Add(folderPair.Value!);
             }
@@ -124,6 +127,9 @@ namespace AquariusShell.ConfigurationManagement.SettingsPages
             tbInitialDirectory.Text = fbdFindInitialDirectoryPath.SelectedPath;
         }
 
+        /// <summary>
+        /// Initialise
+        /// </summary>
         public FileBrowserSettingsPage()
         {
             InitializeComponent();

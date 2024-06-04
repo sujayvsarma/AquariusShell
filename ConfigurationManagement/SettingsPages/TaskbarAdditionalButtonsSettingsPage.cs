@@ -10,6 +10,9 @@ using AquariusShell.Runtime;
 
 namespace AquariusShell.ConfigurationManagement.SettingsPages
 {
+    /// <summary>
+    /// Settings to configure <see cref="ConfigurationManagement.Settings.TaskbarAdditionalButtonsSettings"/>
+    /// </summary>
     public partial class TaskbarAdditionalButtonsSettingsPage : UserControl, ISettingsPage
     {
         /// <summary>

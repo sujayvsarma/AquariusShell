@@ -6,8 +6,6 @@ using System.Drawing;
 using System.Linq;
 using System.Reflection;
 using System.Text.Json;
-using System.Text.Json.Serialization;
-using System.Windows.Forms;
 
 using Microsoft.Win32;
 
@@ -99,17 +97,15 @@ namespace AquariusShell.ConfigurationManagement.Reflection
         public static object ConvertTo(Type destinationType, object value)
         {
             //NOTE: value is not null -- already been checked by caller before calling here
+
+            TypeConverter converter = TypeDescriptor.GetConverter(destinationType);
+            if ((converter != null) && converter.CanConvertFrom(value.GetType()))
+            {
+                return converter.ConvertFrom(value)!;
+            }
+
             if (destinationType.IsEnum)
             {
-                if (value is string strVal)
-                {
-                    // Input is a string, destination is an Enum, Enum.Parse() it to convert!
-                    // We are using Parse() and not TryParse() with good reason. Bad values will throw exceptions to the top-level caller 
-                    // and we WANT that to happen! -- not only that, TryParse requires an extra typed storage that we do not want to provide here!
-
-                    return Enum.Parse(destinationType, strVal);
-                }
-
                 if (value is int intVal)
                 {
                     return intVal;
@@ -118,11 +114,7 @@ namespace AquariusShell.ConfigurationManagement.Reflection
 
             if (destinationType == typeof(Color))
             {
-                if (value is string colourName)
-                {
-                    return Color.FromName(colourName);
-                }
-                else if (value is int colourHex)
+                if (value is int colourHex)
                 {
                     return Color.FromArgb(colourHex);
                 }
@@ -166,12 +158,6 @@ namespace AquariusShell.ConfigurationManagement.Reflection
                 }
 
                 return dt;
-            }
-
-            TypeConverter converter = TypeDescriptor.GetConverter(destinationType);
-            if ((converter != null) && converter.CanConvertTo(destinationType))
-            {
-                return converter.ConvertTo(value, destinationType)!;
             }
 
             // see if type has a Parse static method

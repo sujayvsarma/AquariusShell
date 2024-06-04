@@ -5,6 +5,9 @@ using System.Windows.Forms;
 
 namespace AquariusShell.Controls
 {
+    /// <summary>
+    /// Shows a listbox control with Add/Edit/Delete buttons to manage strings.
+    /// </summary>
     public partial class ManageableStringItemsListbox : UserControl
     {
 

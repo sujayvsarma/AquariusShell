@@ -5,6 +5,9 @@ using AquariusShell.ConfigurationManagement.Settings;
 
 namespace AquariusShell.ConfigurationManagement.SettingsPages
 {
+    /// <summary>
+    /// Settings to configure <see cref="ConfigurationManagement.Settings.RunDialogSettings"/>
+    /// </summary>
     public partial class RunDialogSettingsPage : UserControl, ISettingsPage
     {
         /// <summary>
@@ -88,7 +91,9 @@ namespace AquariusShell.ConfigurationManagement.SettingsPages
             }
         }
 
-
+        /// <summary>
+        /// Initialise
+        /// </summary>
         public RunDialogSettingsPage()
         {
             InitializeComponent();

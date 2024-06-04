@@ -5,6 +5,9 @@ using AquariusShell.Modules;
 
 namespace AquariusShell.ConfigurationManagement.SettingsPages
 {
+    /// <summary>
+    /// Settings to configure <see cref="ConfigurationManagement.Settings.TerminateShellSettings"/>
+    /// </summary>
     public partial class TerminateShellSettingsPage : UserControl, ISettingsPage
     {
         /// <summary>

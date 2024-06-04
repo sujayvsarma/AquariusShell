@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Drawing;
-using System.IO;
 using System.Windows.Forms;
 
 using AquariusShell.ConfigurationManagement.Settings;
@@ -11,8 +9,15 @@ using AquariusShell.Objects;
 
 namespace AquariusShell.ConfigurationManagement.SettingsPages
 {
+    /// <summary>
+    /// Simply displays a list of Windows control panel items. When an item is clicked, it executes the applet.
+    /// THIS IS NOT A TRUE "Settings" PAGE LIKE THE OTHERS IN THIS NAMESPACE/FOLDER!
+    /// </summary>
     public partial class WindowsControlPanelListSettingsPage : UserControl, ISettingsPage
     {
+        /// <summary>
+        /// Initialise
+        /// </summary>
         public WindowsControlPanelListSettingsPage()
         {
             InitializeComponent();

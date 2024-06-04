@@ -205,10 +205,6 @@ namespace AquariusShell.ShellApps
                         }
                     }
                 }
-                else
-                {
-                    //TODO: Handle non-FS objects
-                }
             }
             catch (Exception ex)
             {
@@ -242,8 +238,6 @@ namespace AquariusShell.ShellApps
             tbPrincipalNameRaw.Text = "";
             btnResolvePrincipalNameRaw.Enabled = false;
             chkMarkPrincipalOwner.Enabled = false;
-
-
 
             foreach (FileSystemRights right in _enumRightsValues)
             {

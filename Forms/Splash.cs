@@ -1,15 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
+﻿using System.Windows.Forms;
 
 namespace AquariusShell.Forms
 {
+    /// <summary>
+    /// Launch/startup Splash screen
+    /// </summary>
     public partial class Splash : Form
     {
         public Splash()

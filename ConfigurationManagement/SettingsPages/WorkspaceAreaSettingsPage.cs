@@ -8,6 +8,9 @@ using AquariusShell.Objects;
 
 namespace AquariusShell.ConfigurationManagement.SettingsPages
 {
+    /// <summary>
+    /// Settings to configure <see cref="ConfigurationManagement.Settings.WorkspaceAreaSettings"/>
+    /// </summary>
     public partial class WorkspaceAreaSettingsPage : UserControl, ISettingsPage
     {
         /// <summary>

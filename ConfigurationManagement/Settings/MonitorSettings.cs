@@ -1,13 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 using AquariusShell.ConfigurationManagement.Reflection;
 
 namespace AquariusShell.ConfigurationManagement.Settings
 {
+    /// <summary>
+    /// Settings to support multi-monitor systems
+    /// </summary>
     [RegistryKeyName("WorkspaceArea\\MonitorSettings")]
     internal class MonitorSettings : IAquariusShellSettings
     {
@@ -28,8 +27,6 @@ namespace AquariusShell.ConfigurationManagement.Settings
         /// </summary>
         [RegistryValueName("IsEnabled")]
         public bool IsEnabled { get; set; } = true;
-
-
 
     }
 }

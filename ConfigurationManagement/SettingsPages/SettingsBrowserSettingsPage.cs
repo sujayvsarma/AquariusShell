@@ -5,6 +5,9 @@ using AquariusShell.Objects;
 
 namespace AquariusShell.ConfigurationManagement.SettingsPages
 {
+    /// <summary>
+    /// Settings to configure <see cref="ConfigurationManagement.Settings.SettingsBrowserSettings"/>
+    /// </summary>
     public partial class SettingsBrowserSettingsPage : UserControl, ISettingsPage
     {
         /// <summary>
@@ -44,7 +47,7 @@ namespace AquariusShell.ConfigurationManagement.SettingsPages
             _settings.RequirePassword = chkRequirePasswordToLaunchSettingsBrowser.Checked;
 
             _settings.DisabledWin32Applets.Clear();
-            foreach (NameValuePair<string> item in mngLstHiddenControlPanelApplets.Items)
+            foreach (NameValuePair<string> item in mngLstHiddenControlPanelApplets.SelectedItems)
             {
                 _settings.DisabledWin32Applets.Add(item);
             }
@@ -82,7 +85,7 @@ namespace AquariusShell.ConfigurationManagement.SettingsPages
 
             foreach (NameValuePair<string> item in _settings.DisabledWin32Applets)
             {
-                mngLstHiddenControlPanelApplets.Items.Add(item);
+                mngLstHiddenControlPanelApplets.SelectedItems.Add(item);
             }
 
             chkAllowRunningCPLWithPassword.Checked = _settings.AllowDisabledAppletsExecutionWithPassword;

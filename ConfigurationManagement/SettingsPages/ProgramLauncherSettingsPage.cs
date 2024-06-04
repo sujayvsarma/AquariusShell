@@ -5,6 +5,9 @@ using AquariusShell.Objects;
 
 namespace AquariusShell.ConfigurationManagement.SettingsPages
 {
+    /// <summary>
+    /// Settings to configure <see cref="ConfigurationManagement.Settings.CanvasLauncherSettings"/>
+    /// </summary>
     public partial class ProgramLauncherSettingsPage : UserControl, ISettingsPage
     {
         /// <summary>
@@ -32,13 +35,13 @@ namespace AquariusShell.ConfigurationManagement.SettingsPages
             _settings.ShowSearchBox = chkShowSearchBox.Checked;
 
             _settings.HiddenPrograms.Clear();
-            foreach(NameValuePair<string> item in mngLstHiddenItems.Items)
+            foreach(NameValuePair<string> item in mngLstHiddenItems.SelectedItems)
             {
                 _settings.HiddenPrograms.Add(item);
             }
 
             _settings.PasswordProtectedPrograms.Clear();
-            foreach (NameValuePair<string> item in mngLstRequirePasswordItems.Items)
+            foreach (NameValuePair<string> item in mngLstRequirePasswordItems.SelectedItems)
             {
                 _settings.PasswordProtectedPrograms.Add(item);
             }
@@ -56,12 +59,12 @@ namespace AquariusShell.ConfigurationManagement.SettingsPages
             chkShowSearchBox.Checked = _settings.ShowSearchBox;
             foreach(NameValuePair<string> item in _settings.HiddenPrograms)
             {
-                mngLstHiddenItems.Items.Add(item);
+                mngLstHiddenItems.SelectedItems.Add(item);
             }
 
             foreach (NameValuePair<string> item in _settings.PasswordProtectedPrograms)
             {
-                mngLstRequirePasswordItems.Items.Add(item);
+                mngLstRequirePasswordItems.SelectedItems.Add(item);
             }
 
             tbPassword.Tag = null;

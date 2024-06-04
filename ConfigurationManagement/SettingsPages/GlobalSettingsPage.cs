@@ -9,6 +9,9 @@ using AquariusShell.Runtime;
 
 namespace AquariusShell.ConfigurationManagement.SettingsPages
 {
+    /// <summary>
+    /// Settings to configure <see cref="ConfigurationManagement.Settings.GlobalSettings"/>
+    /// </summary>
     public partial class GlobalSettingsPage : UserControl, ISettingsPage
     {
 

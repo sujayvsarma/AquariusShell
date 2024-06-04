@@ -3,6 +3,9 @@ using System.Windows.Forms;
 
 namespace AquariusShell.Forms
 {
+    /// <summary>
+    /// Shows a small custom popup dialog to accept an input value
+    /// </summary>
     public partial class PopupTextInput : Form
     {
 

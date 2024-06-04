@@ -8,6 +8,10 @@ using AquariusShell.Objects;
 
 namespace AquariusShell.Controls
 {
+    /// <summary>
+    /// Shows a Listbox control with buttons to Add/Edit/Delete the Windows Shell related items (files, apps, control panel items). 
+    /// On clicking Add, the <see cref="ShellItemBrowser"> dialog is raised to allow the user to select an item.
+    /// </summary>
     public partial class ManageableShellItemsListbox : UserControl
     {
         /// <summary>
@@ -47,9 +51,9 @@ namespace AquariusShell.Controls
         } = false;
 
         /// <summary>
-        /// Items in the list
+        /// Items selected by the user and currently listed in the listbox
         /// </summary>
-        public List<NameValuePair<string>> Items
+        public List<NameValuePair<string>> SelectedItems
         {
             get
             {

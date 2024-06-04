@@ -301,7 +301,13 @@ namespace AquariusShell.ShellApps
             }
             else
             {
-                //TODO: ???
+                if (currentTabDirectory.StartsWith("\\\\"))
+                {
+                    //TODO: Network location (??)
+
+                    MessageBox.Show($"The path entered '{currentTabDirectory}' is a network location that is not currently supported by this Shell.",
+                        "Aquarius Shell", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
             }
         }
 
@@ -353,7 +359,6 @@ namespace AquariusShell.ShellApps
                 FileOperationWithProgress fowp = new(recycleBinItem, sourceDestinationPathMaps[recycleBinItem]);
                 fowp.Show(this);
 
-                //TODO: We need to write a specific method to handle recycle bin ??
                 fowp.MoveSpecificFilesOrDirectories();
             }
 
