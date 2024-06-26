@@ -11,19 +11,20 @@ We will attempt to recreating all of the features of the original:
 
 Feature | Current status 
 --------|----------------
-Work area | Planning
-Apps & Docs Launcher | Planning
+Work area | Feature Complete
+Apps & Docs Launcher | Feature Complete
 Task manager | Planning
-File browser | Planning
-Progress dialogs | Planning
-Message boxes | Planning
-Configuration UI | Planning
+File browser | Feature Complete
+Progress dialogs | Feature Complete
+Message boxes | Feature Complete
+Configuration UI | Feature Complete
 Installer | Planning
 
 ## Windows Compatibility
 Windows 10 and above.
-
 (The original worked on Windows 95 to Vista, including NT/2000 Server and Workstation editions)
+
+It is infinitely hard to support everything that happens in modern Windows (like virtual locations, shell objects, etc) without running into complicated topics like COM/DCOM, Interop issues, etc. To keep things simple, we only do in Aquarius Shell what was possible in Windows 95 and what the original Aquarius Shell could do. Everything else is... out of scope! :-)
 
 ## Dev Setup
 You will need: 
